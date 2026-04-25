@@ -54,10 +54,11 @@ export default function Dashboard() {
             </div>
             <nav className="flex items-center space-x-6">
               <Link href="/dashboard" className="text-purple-600 font-medium">대시보드</Link>
-              <Link href="/discover" className="text-gray-600 hover:text-purple-600">탐색</Link>
-              <Link href="/matches" className="text-gray-600 hover:text-purple-600">매칭</Link>
+              <Link href="/feed" className="text-gray-600 hover:text-purple-600">피드</Link>
+              <Link href="/explore" className="text-gray-600 hover:text-purple-600">탐색</Link>
+              <Link href="/discover" className="text-gray-600 hover:text-purple-600">매칭</Link>
               <Link href="/messages" className="text-gray-600 hover:text-purple-600">메시지</Link>
-              <Link href="/profile" className="text-gray-600 hover:text-purple-600">프로필</Link>
+              <Link href={`/creator/${user?.id ?? ''}`} className="text-gray-600 hover:text-purple-600">내 채널</Link>
             </nav>
           </div>
         </div>
