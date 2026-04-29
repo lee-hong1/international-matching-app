@@ -7,6 +7,16 @@ const supabase = createClient(
 )
 
 export async function GET(request: NextRequest) {
+  const authHeader = request.headers.get('authorization')
+  if (!authHeader) {
+    return NextResponse.json({ error: '인증이 필요합니다' }, { status: 401 })
+  }
+  const token = authHeader.replace('Bearer ', '')
+  const { data: { user }, error: authError } = await supabase.auth.getUser(token)
+  if (authError || !user) {
+    return NextResponse.json({ error: '인증이 유효하지 않습니다' }, { status: 401 })
+  }
+
   const { searchParams } = new URL(request.url)
   const type = searchParams.get('type') ?? 'feed'
   const userId = searchParams.get('userId')

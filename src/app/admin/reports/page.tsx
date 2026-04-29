@@ -3,6 +3,12 @@
 import { useState, useEffect, useCallback } from 'react'
 import { adminService, type ReportManagement } from '@/lib/admin'
 
+function maskEmail(email: string): string {
+  const [local, domain] = email.split('@')
+  if (!domain) return email
+  return `${local.slice(0, 2)}***@${domain}`
+}
+
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {
   pending:   { label: '대기중',   color: 'bg-yellow-100 text-yellow-700' },
   reviewing: { label: '검토중',   color: 'bg-blue-100   text-blue-700'   },
@@ -117,13 +123,13 @@ export default function AdminReportsPage() {
                         <td className="px-4 py-3">
                           <div>
                             <p className="font-medium text-gray-900">{(report.reporter as any)?.full_name ?? '-'}</p>
-                            <p className="text-xs text-gray-400">{(report.reporter as any)?.email}</p>
+                            <p className="text-xs text-gray-400">{maskEmail((report.reporter as any)?.email ?? '')}</p>
                           </div>
                         </td>
                         <td className="px-4 py-3">
                           <div>
                             <p className="font-medium text-gray-900">{(report.reported as any)?.full_name ?? '-'}</p>
-                            <p className="text-xs text-gray-400">{(report.reported as any)?.email}</p>
+                            <p className="text-xs text-gray-400">{maskEmail((report.reported as any)?.email ?? '')}</p>
                           </div>
                         </td>
                         <td className="px-4 py-3">
@@ -201,7 +207,7 @@ export default function AdminReportsPage() {
                       </div>
                       <div className="min-w-0">
                         <p className="text-sm font-medium text-gray-900 truncate">{data?.full_name ?? '-'}</p>
-                        <p className="text-xs text-gray-400 truncate">{data?.email}</p>
+                        <p className="text-xs text-gray-400 truncate">{maskEmail(data?.email ?? '')}</p>
                       </div>
                     </div>
                   </div>

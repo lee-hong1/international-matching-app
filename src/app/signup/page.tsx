@@ -119,8 +119,12 @@ export default function SignUpPage() {
 
       if (signUpError) {
         const msg = signUpError.message ?? ''
-        if (msg.includes('already registered')) setError('이미 사용 중인 이메일입니다.')
-        else setError(msg || '회원가입에 실패했습니다.')
+        // 이메일 존재 여부를 노출하지 않는 일반적인 오류 메시지
+        if (msg.includes('already registered') || msg.includes('already exists')) {
+          setError('입력하신 정보로 가입을 진행할 수 없습니다. 이미 가입된 이메일이면 로그인을 이용해주세요.')
+        } else {
+          setError(msg || '회원가입에 실패했습니다.')
+        }
         return
       }
 

@@ -17,11 +17,30 @@ export default function CreatePost({ onClose, onPostCreated }: CreatePostProps) 
   const [location, setLocation] = useState('')
   const [isPublic, setIsPublic] = useState(true)
   const [uploading, setUploading] = useState(false)
+  const [fileError, setFileError] = useState('')
   const fileInputRef = useRef<HTMLInputElement>(null)
 
+  const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'video/mp4', 'video/quicktime', 'video/webm']
+  const MAX_FILE_SIZE = 50 * 1024 * 1024 // 50MB
+
   function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    setFileError('')
     const files = Array.from(e.target.files ?? []).slice(0, 10)
     if (files.length === 0) return
+
+    for (const file of files) {
+      if (!ALLOWED_TYPES.includes(file.type)) {
+        setFileError(`허용되지 않는 파일 형식입니다: ${file.name}`)
+        e.target.value = ''
+        return
+      }
+      if (file.size > MAX_FILE_SIZE) {
+        setFileError(`파일 크기는 50MB를 초과할 수 없습니다: ${file.name}`)
+        e.target.value = ''
+        return
+      }
+    }
+
     setSelectedFiles(files)
     const urls = files.map((f) => URL.createObjectURL(f))
     setPreviews(urls)
@@ -99,8 +118,11 @@ export default function CreatePost({ onClose, onPostCreated }: CreatePostProps) 
             </div>
             <div className="text-center">
               <p className="text-lg font-semibold text-gray-800">사진을 선택하세요</p>
-              <p className="text-sm text-gray-500 mt-1">최대 10장까지 선택 가능합니다</p>
+              <p className="text-sm text-gray-500 mt-1">최대 10장, 파일당 50MB 이하 (JPG, PNG, GIF, MP4)</p>
             </div>
+            {fileError && (
+              <p className="text-sm text-red-500 text-center px-4">{fileError}</p>
+            )}
             <input
               ref={fileInputRef}
               type="file"

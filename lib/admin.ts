@@ -57,8 +57,9 @@ export const adminService = {
       return false
     }
 
-    // 관리자 이메일 목록 (환경 변수로 관리)
-    const adminEmails = process.env.NEXT_PUBLIC_ADMIN_EMAILS?.split(',') || []
+    // ADMIN_EMAILS는 서버사이드 전용 env var (NEXT_PUBLIC_ 없음)
+    const adminEmails = (process.env.ADMIN_EMAILS ?? process.env.NEXT_PUBLIC_ADMIN_EMAILS ?? '')
+      .split(',').map((e) => e.trim()).filter(Boolean)
     return adminEmails.includes(data.email)
   },
 

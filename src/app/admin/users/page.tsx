@@ -4,6 +4,13 @@ import { useState, useEffect, useCallback } from 'react'
 import { adminService, type UserManagement } from '@/lib/admin'
 import { supabase } from '@/lib/supabase'
 
+function maskEmail(email: string): string {
+  const [local, domain] = email.split('@')
+  if (!domain) return email
+  const visible = local.slice(0, 2)
+  return `${visible}***@${domain}`
+}
+
 const VERIFICATION_LABELS: Record<string, { label: string; color: string }> = {
   pending:  { label: '대기중',  color: 'bg-yellow-100 text-yellow-700' },
   verified: { label: '인증됨',  color: 'bg-green-100  text-green-700'  },
@@ -172,7 +179,7 @@ export default function AdminUsersPage() {
                             </div>
                             <div className="min-w-0">
                               <p className="font-medium text-gray-900 truncate max-w-[140px]">{user.full_name ?? '-'}</p>
-                              <p className="text-xs text-gray-400 truncate max-w-[140px]">{user.email}</p>
+                              <p className="text-xs text-gray-400 truncate max-w-[140px]">{maskEmail(user.email)}</p>
                             </div>
                           </div>
                         </td>
@@ -242,7 +249,7 @@ export default function AdminUsersPage() {
                 </div>
                 <div className="flex-1">
                   <p className="font-semibold text-gray-900">{selectedUser.full_name ?? '-'}</p>
-                  <p className="text-sm text-gray-500">{selectedUser.email}</p>
+                  <p className="text-sm text-gray-500">{maskEmail(selectedUser.email)}</p>
                   <div className="flex gap-2 mt-2 flex-wrap">
                     <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${(VERIFICATION_LABELS[selectedUser.verification_status] ?? { color: 'bg-gray-100 text-gray-600' }).color}`}>
                       {VERIFICATION_LABELS[selectedUser.verification_status]?.label}

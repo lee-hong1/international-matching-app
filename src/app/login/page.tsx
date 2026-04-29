@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { authService } from '@/lib/auth'
+import { supabase } from '@/lib/supabase'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -26,9 +27,15 @@ export default function LoginPage() {
         else if (msg.includes('Email not confirmed')) setError('이메일 인증을 완료해 주세요.')
         else setError('로그인에 실패했습니다. 다시 시도해 주세요.')
       } else if (user) {
-        const adminEmails = (process.env.NEXT_PUBLIC_ADMIN_EMAILS ?? '').split(',')
-        if (adminEmails.includes(user.email ?? '')) {
-          router.push('/admin')
+        // 서버사이드 API로 admin 여부 확인 (admin 이메일 목록을 클라이언트에 노출하지 않음)
+        const { data: { session } } = await supabase.auth.getSession()
+        const token = session?.access_token
+        if (token) {
+          const res = await fetch('/api/check-admin', {
+            headers: { authorization: `Bearer ${token}` },
+          })
+          const { isAdmin } = await res.json()
+          router.push(isAdmin ? '/admin' : '/feed')
         } else {
           router.push('/feed')
         }

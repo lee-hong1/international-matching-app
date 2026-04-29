@@ -19,11 +19,26 @@ export default function CreateStory({ onClose, onStoryCreated }: CreateStoryProp
   const [caption, setCaption] = useState('')
   const [bgColor, setBgColor] = useState('#000000')
   const [uploading, setUploading] = useState(false)
+  const [fileError, setFileError] = useState('')
   const fileInputRef = useRef<HTMLInputElement>(null)
 
+  const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'video/mp4', 'video/quicktime', 'video/webm']
+  const MAX_FILE_SIZE = 50 * 1024 * 1024
+
   function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    setFileError('')
     const file = e.target.files?.[0]
     if (!file) return
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      setFileError('허용되지 않는 파일 형식입니다. (JPG, PNG, GIF, MP4만 가능)')
+      e.target.value = ''
+      return
+    }
+    if (file.size > MAX_FILE_SIZE) {
+      setFileError('파일 크기는 50MB를 초과할 수 없습니다.')
+      e.target.value = ''
+      return
+    }
     setSelectedFile(file)
     setPreview(URL.createObjectURL(file))
   }
@@ -92,7 +107,8 @@ export default function CreateStory({ onClose, onStoryCreated }: CreateStoryProp
               </button>
             )}
           </div>
-          <input ref={fileInputRef} type="file" accept="image/*,video/*" onChange={handleFileSelect} className="hidden" />
+          <input ref={fileInputRef} type="file" accept="image/jpeg,image/png,image/gif,image/webp,video/mp4,video/webm" onChange={handleFileSelect} className="hidden" />
+          {fileError && <p className="text-sm text-red-500 text-center">{fileError}</p>}
 
           {/* 배경색 선택 (사진 없을 때) */}
           {!preview && (
