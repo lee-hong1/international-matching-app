@@ -1,0 +1,23 @@
+{
+  "note": "Live entry points per style/domain for styles with few or no individually catalogued sites. Open these to see current examples; they are search/collection pages, not single sites.",
+  "styles": {
+    "neubrutalism": ["https://neubrutalism.com/", "https://github.com/ComradeAERGO/Awesome-Neobrutalism", "https://www.figma.com/community/file/1350960002277170570/gumroad-component-library"],
+    "claymorphism": ["https://dribbble.com/search/claymorphism", "https://hype4.academy/articles/design/claymorphism-in-user-interfaces", "https://www.setproduct.com/blog/claymorphism-design-guide", "https://www.pinterest.com/ideas/claymorphism-design/899365907899/"],
+    "dark-oled": ["https://pageproofer.com/inspiration/precision-dark/", "https://frontend.horse/articles/the-linear-look/"],
+    "organic-warm": ["https://dribbble.com/search/earthy-ui", "https://za.pinterest.com/nutmeg_design/feminine-and-earthy-web-design-inspiration/", "https://www.squarespace.com/blog/health-wellness-website-examples"],
+    "retro-y2k": ["https://aesthetics.fandom.com/wiki/Old_Web", "https://livefive.online/retro-revival-nostalgia-and-y2k-web-design-trends/", "http://www.cameronsworld.net"],
+    "soft-neumorphism": ["https://www.uistyleguide.com/style/neumorphism", "https://www.uistyleguide.com/style/soft-ui-evolution"],
+    "vibrant-blocks": ["https://www.uistyleguide.com/style/vibrant-block-based"],
+    "data-dense-dashboard": ["https://www.uistyleguide.com/style/data-dense-dashboard", "https://refero.design/"],
+    "accessible-inclusive": ["https://www.uistyleguide.com/style/accessible-ethical", "https://www.uistyleguide.com/style/inclusive-design"]
+  },
+  "domains": {
+    "dating": ["https://gummble.com/categories/dating-apps", "https://www.inspoai.io/solutions/dating-app-design-inspiration", "https://www.pinterest.com/ideas/dating-app-design-ideas/945415054460/", "https://www.dreamcodesign.com/dating-web-design-examples-7-pn4.html", "https://sidebench.com/dating-apps-ux/"],
+    "mobile-app": ["https://mobbin.com/", "https://refero.design/", "https://pageflows.com/", "https://appshots.design/", "https://www.awwwards.com/websites/mobile-apps/"],
+    "landing": ["https://www.lapa.ninja/", "https://land-book.com/", "https://www.awwwards.com/websites/"],
+    "web-general": ["https://www.siteinspire.com/websites", "https://www.awwwards.com/websites/", "https://httpster.net/", "https://minimal.gallery/", "https://recent.design/", "https://dribbble.com/", "https://www.behance.net/"]
+  },
+  "domainNotes": {
+    "dating": "Patterns documented in the research: Tinder swipe-card stack; Bumble time-limited matches and bio as the last scroll screen; Hinge prompt-led profiles. Simple, minimal onboarding is the norm across all three."
+  }
+}

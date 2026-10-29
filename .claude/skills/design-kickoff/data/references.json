@@ -1,0 +1,4058 @@
+{
+ "snapshotDate": "2026-10-29",
+ "count": 270,
+ "references": [
+  {
+   "name": "&friends",
+   "url": "https://andfriends.soccer",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:unusual-layout"
+   ],
+   "styles": [
+    "brutalism-raw",
+    "gen-z-maximalism",
+    "exaggerated-minimalism"
+   ]
+  },
+  {
+   "name": "1984 Ventures",
+   "url": "https://1984.vc",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:grid-layout"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "bento-grid",
+    "editorial-magazine"
+   ]
+  },
+  {
+   "name": "2bit.chat",
+   "url": "https://www.awwwards.com/sites/2bit-chat",
+   "sources": [
+    "awwwards"
+   ],
+   "categories": [
+    "awwwards:mobile-apps"
+   ],
+   "styles": [
+    "motion-driven",
+    "glassmorphism",
+    "aurora-gradient",
+    "ai-native"
+   ]
+  },
+  {
+   "name": "A24",
+   "url": "https://www.awwwards.com/sites/a24",
+   "sources": [
+    "awwwards"
+   ],
+   "categories": [
+    "awwwards:winners"
+   ],
+   "styles": [
+    "kinetic-type-parallax",
+    "3d-hyperreal",
+    "motion-driven"
+   ]
+  },
+  {
+   "name": "Abel",
+   "url": "https://abelfragrance.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:e-commerce",
+    "siteinspire:grid-layout"
+   ],
+   "styles": [
+    "luxury-premium",
+    "editorial-magazine",
+    "minimal-swiss",
+    "bento-grid"
+   ]
+  },
+  {
+   "name": "Akke Knitwear",
+   "url": "https://akkeknitwear.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:fashion"
+   ],
+   "styles": [
+    "luxury-premium",
+    "editorial-magazine"
+   ]
+  },
+  {
+   "name": "Alex Villarejo i Garcia",
+   "url": "https://villarejoigarcia.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:unusual-layout"
+   ],
+   "styles": [
+    "brutalism-raw",
+    "gen-z-maximalism",
+    "exaggerated-minimalism"
+   ]
+  },
+  {
+   "name": "Alex Zarour",
+   "url": "https://alexzarour.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:typographic"
+   ],
+   "styles": [
+    "editorial-magazine",
+    "exaggerated-minimalism",
+    "kinetic-type-parallax"
+   ]
+  },
+  {
+   "name": "Alicia Dubuis",
+   "url": "https://aliciadubuis.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:minimal"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "exaggerated-minimalism"
+   ]
+  },
+  {
+   "name": "Amie",
+   "url": "https://amie.so",
+   "sources": [
+    "httpster",
+    "curated"
+   ],
+   "categories": [
+    "httpster:featured",
+    "curated:saas-clean"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "editorial-magazine",
+    "brutalism-raw",
+    "hero-conversion"
+   ]
+  },
+  {
+   "name": "AND2ES™",
+   "url": "https://www.and2es.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:unusual-layout"
+   ],
+   "styles": [
+    "brutalism-raw",
+    "gen-z-maximalism",
+    "exaggerated-minimalism"
+   ]
+  },
+  {
+   "name": "ANDMADE Inc.",
+   "url": "https://andmade.jp",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:grid-layout"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "bento-grid",
+    "editorial-magazine"
+   ]
+  },
+  {
+   "name": "Angela Ricciardi",
+   "url": "https://www.angelaricciardi.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:unusual-layout"
+   ],
+   "styles": [
+    "brutalism-raw",
+    "gen-z-maximalism",
+    "exaggerated-minimalism"
+   ]
+  },
+  {
+   "name": "AP Transit - NYC Subway Map",
+   "url": "https://www.awwwards.com/sites/ap-transit-nyc-subway-map",
+   "sources": [
+    "awwwards"
+   ],
+   "categories": [
+    "awwwards:mobile-apps"
+   ],
+   "styles": [
+    "motion-driven",
+    "glassmorphism",
+    "aurora-gradient",
+    "ai-native"
+   ]
+  },
+  {
+   "name": "Aparelho Studio",
+   "url": "https://aparelho.studio",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:unusual-layout"
+   ],
+   "styles": [
+    "brutalism-raw",
+    "gen-z-maximalism",
+    "exaggerated-minimalism"
+   ]
+  },
+  {
+   "name": "Arc",
+   "url": "https://arc.net",
+   "sources": [
+    "httpster",
+    "curated"
+   ],
+   "categories": [
+    "httpster:featured",
+    "curated:saas-clean"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "editorial-magazine",
+    "brutalism-raw",
+    "hero-conversion"
+   ]
+  },
+  {
+   "name": "Arc'teryx",
+   "url": "https://arcteryx.com/us/en/explore/system0",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:minimal",
+    "siteinspire:e-commerce"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "exaggerated-minimalism",
+    "luxury-premium",
+    "editorial-magazine"
+   ]
+  },
+  {
+   "name": "archivio-uno",
+   "url": "https://archivio-uno.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:grid-layout"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "bento-grid",
+    "editorial-magazine"
+   ]
+  },
+  {
+   "name": "Artemii Lebedev",
+   "url": "https://artemiilebedev.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:minimal",
+    "siteinspire:unusual-layout"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "exaggerated-minimalism",
+    "brutalism-raw",
+    "gen-z-maximalism"
+   ]
+  },
+  {
+   "name": "Atlas",
+   "url": "https://www.atlasnyc.us",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:typographic"
+   ],
+   "styles": [
+    "editorial-magazine",
+    "exaggerated-minimalism",
+    "kinetic-type-parallax"
+   ]
+  },
+  {
+   "name": "Atlason",
+   "url": "http://atlason.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:typographic",
+    "siteinspire:grid-layout",
+    "siteinspire:unusual-layout"
+   ],
+   "styles": [
+    "editorial-magazine",
+    "exaggerated-minimalism",
+    "kinetic-type-parallax",
+    "minimal-swiss",
+    "bento-grid",
+    "brutalism-raw",
+    "gen-z-maximalism"
+   ]
+  },
+  {
+   "name": "Atomicdust",
+   "url": "https://atomicdust.com",
+   "sources": [
+    "minimal-gallery"
+   ],
+   "categories": [
+    "minimal-gallery:featured"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "exaggerated-minimalism"
+   ]
+  },
+  {
+   "name": "Base Off Mute",
+   "url": "https://offmute.basedesign.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:typographic"
+   ],
+   "styles": [
+    "editorial-magazine",
+    "exaggerated-minimalism",
+    "kinetic-type-parallax"
+   ]
+  },
+  {
+   "name": "Bauhaus Clock",
+   "url": "https://bauhausclock.com",
+   "sources": [
+    "httpster"
+   ],
+   "categories": [
+    "httpster:featured"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "editorial-magazine",
+    "brutalism-raw"
+   ]
+  },
+  {
+   "name": "BD85BD85",
+   "url": "https://bd85bd85.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:unusual-layout"
+   ],
+   "styles": [
+    "brutalism-raw",
+    "gen-z-maximalism",
+    "exaggerated-minimalism"
+   ]
+  },
+  {
+   "name": "Beats in Space",
+   "url": "https://www.beatsinspace.net",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:grid-layout",
+    "siteinspire:unusual-layout"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "bento-grid",
+    "editorial-magazine",
+    "brutalism-raw",
+    "gen-z-maximalism",
+    "exaggerated-minimalism"
+   ]
+  },
+  {
+   "name": "Beauty In Stem",
+   "url": "https://www.lapa.ninja/post/beauty-in-stem/",
+   "sources": [
+    "lapa-ninja"
+   ],
+   "categories": [
+    "lapa-ninja:landing"
+   ],
+   "styles": [
+    "hero-conversion",
+    "bento-grid",
+    "aurora-gradient"
+   ]
+  },
+  {
+   "name": "Belgrade Arbor",
+   "url": "https://www.awwwards.com/sites/belgrade-arbor",
+   "sources": [
+    "awwwards"
+   ],
+   "categories": [
+    "awwwards:winners"
+   ],
+   "styles": [
+    "kinetic-type-parallax",
+    "3d-hyperreal",
+    "motion-driven"
+   ]
+  },
+  {
+   "name": "Bianco Bianco",
+   "url": "https://www.biancobian.co",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:typographic"
+   ],
+   "styles": [
+    "editorial-magazine",
+    "exaggerated-minimalism",
+    "kinetic-type-parallax"
+   ]
+  },
+  {
+   "name": "Bink",
+   "url": "https://binkmade.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:e-commerce"
+   ],
+   "styles": [
+    "luxury-premium",
+    "editorial-magazine"
+   ]
+  },
+  {
+   "name": "Boc.Studio",
+   "url": "https://boc.studio",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:unusual-layout"
+   ],
+   "styles": [
+    "brutalism-raw",
+    "gen-z-maximalism",
+    "exaggerated-minimalism"
+   ]
+  },
+  {
+   "name": "Bureau Rouge",
+   "url": "https://bureaurouge.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:typographic"
+   ],
+   "styles": [
+    "editorial-magazine",
+    "exaggerated-minimalism",
+    "kinetic-type-parallax"
+   ]
+  },
+  {
+   "name": "Butter",
+   "url": "https://www.awwwards.com/sites/butter",
+   "sources": [
+    "awwwards"
+   ],
+   "categories": [
+    "awwwards:mobile-apps"
+   ],
+   "styles": [
+    "motion-driven",
+    "glassmorphism",
+    "aurora-gradient",
+    "ai-native"
+   ]
+  },
+  {
+   "name": "Cactus Digitale",
+   "url": "https://cactusdigitale.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:unusual-layout"
+   ],
+   "styles": [
+    "brutalism-raw",
+    "gen-z-maximalism",
+    "exaggerated-minimalism"
+   ]
+  },
+  {
+   "name": "Cal.com",
+   "url": "https://cal.com",
+   "sources": [
+    "curated"
+   ],
+   "categories": [
+    "curated:saas-clean"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "hero-conversion"
+   ]
+  },
+  {
+   "name": "Call Your Girlfriend",
+   "url": "https://www.awwwards.com/sites/call-your-girlfriend",
+   "sources": [
+    "awwwards"
+   ],
+   "categories": [
+    "awwwards:mobile-apps"
+   ],
+   "styles": [
+    "motion-driven",
+    "glassmorphism",
+    "aurora-gradient",
+    "ai-native"
+   ]
+  },
+  {
+   "name": "Care of Chan",
+   "url": "https://www.careofchan.com",
+   "sources": [
+    "httpster"
+   ],
+   "categories": [
+    "httpster:featured"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "editorial-magazine",
+    "brutalism-raw"
+   ]
+  },
+  {
+   "name": "Cartier - Le Chœur des Pierres",
+   "url": "https://www.awwwards.com/sites/cartier-le-choeur-des-pierres",
+   "sources": [
+    "awwwards"
+   ],
+   "categories": [
+    "awwwards:winners"
+   ],
+   "styles": [
+    "kinetic-type-parallax",
+    "3d-hyperreal",
+    "motion-driven"
+   ]
+  },
+  {
+   "name": "Casa Gay",
+   "url": "https://casagay.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:typographic",
+    "siteinspire:e-commerce"
+   ],
+   "styles": [
+    "editorial-magazine",
+    "exaggerated-minimalism",
+    "kinetic-type-parallax",
+    "luxury-premium"
+   ]
+  },
+  {
+   "name": "Causal",
+   "url": "https://causal.so",
+   "sources": [
+    "minimal-gallery"
+   ],
+   "categories": [
+    "minimal-gallery:featured"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "exaggerated-minimalism"
+   ]
+  },
+  {
+   "name": "CcType Foundry",
+   "url": "https://cctype.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:typographic",
+    "siteinspire:e-commerce"
+   ],
+   "styles": [
+    "editorial-magazine",
+    "exaggerated-minimalism",
+    "kinetic-type-parallax",
+    "luxury-premium"
+   ]
+  },
+  {
+   "name": "CÉNÉE",
+   "url": "https://www.cenee-paris.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:e-commerce"
+   ],
+   "styles": [
+    "luxury-premium",
+    "editorial-magazine"
+   ]
+  },
+  {
+   "name": "Centre de la photographie Genève",
+   "url": "https://www.centrephotogeneve.ch",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:typographic"
+   ],
+   "styles": [
+    "editorial-magazine",
+    "exaggerated-minimalism",
+    "kinetic-type-parallax"
+   ]
+  },
+  {
+   "name": "Charmling",
+   "url": "https://www.awwwards.com/sites/charmling",
+   "sources": [
+    "awwwards"
+   ],
+   "categories": [
+    "awwwards:mobile-apps"
+   ],
+   "styles": [
+    "motion-driven",
+    "glassmorphism",
+    "aurora-gradient",
+    "ai-native"
+   ]
+  },
+  {
+   "name": "CHIMI",
+   "url": "https://chimi-online.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:e-commerce",
+    "siteinspire:fashion"
+   ],
+   "styles": [
+    "luxury-premium",
+    "editorial-magazine"
+   ]
+  },
+  {
+   "name": "Collection",
+   "url": "https://www.collection.industries/en",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:typographic"
+   ],
+   "styles": [
+    "editorial-magazine",
+    "exaggerated-minimalism",
+    "kinetic-type-parallax"
+   ]
+  },
+  {
+   "name": "Company Picnic",
+   "url": "https://companypicnic.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:unusual-layout"
+   ],
+   "styles": [
+    "brutalism-raw",
+    "gen-z-maximalism",
+    "exaggerated-minimalism"
+   ]
+  },
+  {
+   "name": "Corentin Bernadou",
+   "url": "https://corentinbernadou.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:unusual-layout"
+   ],
+   "styles": [
+    "brutalism-raw",
+    "gen-z-maximalism",
+    "exaggerated-minimalism"
+   ]
+  },
+  {
+   "name": "Cosmos",
+   "url": "https://www.cosmos.so",
+   "sources": [
+    "httpster"
+   ],
+   "categories": [
+    "httpster:featured"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "editorial-magazine",
+    "brutalism-raw"
+   ]
+  },
+  {
+   "name": "Coutumes",
+   "url": "https://coutumes.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:typographic",
+    "siteinspire:e-commerce",
+    "siteinspire:fashion"
+   ],
+   "styles": [
+    "editorial-magazine",
+    "exaggerated-minimalism",
+    "kinetic-type-parallax",
+    "luxury-premium"
+   ]
+  },
+  {
+   "name": "Cristina Săvulescu",
+   "url": "https://cristinasavulescu.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:fashion"
+   ],
+   "styles": [
+    "luxury-premium",
+    "editorial-magazine"
+   ]
+  },
+  {
+   "name": "Cursor",
+   "url": "https://cursor.com",
+   "sources": [
+    "curated"
+   ],
+   "categories": [
+    "curated:dark"
+   ],
+   "styles": [
+    "dark-oled"
+   ]
+  },
+  {
+   "name": "Dark Mofo",
+   "url": "https://darkmofo.net.au",
+   "sources": [
+    "httpster"
+   ],
+   "categories": [
+    "httpster:featured"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "editorial-magazine",
+    "brutalism-raw"
+   ]
+  },
+  {
+   "name": "David McGillivray",
+   "url": "http://dmcg.co",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:typographic"
+   ],
+   "styles": [
+    "editorial-magazine",
+    "exaggerated-minimalism",
+    "kinetic-type-parallax"
+   ]
+  },
+  {
+   "name": "Denim Tears",
+   "url": "https://denimtears.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:fashion"
+   ],
+   "styles": [
+    "luxury-premium",
+    "editorial-magazine"
+   ]
+  },
+  {
+   "name": "Designed by Women",
+   "url": "https://designedbywomen.org",
+   "sources": [
+    "httpster"
+   ],
+   "categories": [
+    "httpster:featured"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "editorial-magazine",
+    "brutalism-raw"
+   ]
+  },
+  {
+   "name": "designmill®",
+   "url": "https://www.designmill.in",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:typographic"
+   ],
+   "styles": [
+    "editorial-magazine",
+    "exaggerated-minimalism",
+    "kinetic-type-parallax"
+   ]
+  },
+  {
+   "name": "DIA Studio",
+   "url": "https://dia.studio",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:grid-layout"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "bento-grid",
+    "editorial-magazine"
+   ]
+  },
+  {
+   "name": "DISKO",
+   "url": "https://www.awwwards.com/sites/disko",
+   "sources": [
+    "awwwards"
+   ],
+   "categories": [
+    "awwwards:mobile-apps"
+   ],
+   "styles": [
+    "motion-driven",
+    "glassmorphism",
+    "aurora-gradient",
+    "ai-native"
+   ]
+  },
+  {
+   "name": "DRĄSA Studio",
+   "url": "https://drasa.uk",
+   "sources": [
+    "minimal-gallery"
+   ],
+   "categories": [
+    "minimal-gallery:featured"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "exaggerated-minimalism"
+   ]
+  },
+  {
+   "name": "Driessen Architectuur",
+   "url": "https://driessenarchitectuur.nl",
+   "sources": [
+    "minimal-gallery"
+   ],
+   "categories": [
+    "minimal-gallery:featured"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "exaggerated-minimalism"
+   ]
+  },
+  {
+   "name": "Driftime®",
+   "url": "https://driftime.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:typographic"
+   ],
+   "styles": [
+    "editorial-magazine",
+    "exaggerated-minimalism",
+    "kinetic-type-parallax"
+   ]
+  },
+  {
+   "name": "Drink Mockly",
+   "url": "https://drinkmockly.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:e-commerce"
+   ],
+   "styles": [
+    "luxury-premium",
+    "editorial-magazine"
+   ]
+  },
+  {
+   "name": "ElevenLabs",
+   "url": "https://elevenlabs.io",
+   "sources": [
+    "curated"
+   ],
+   "categories": [
+    "curated:dark"
+   ],
+   "styles": [
+    "dark-oled"
+   ]
+  },
+  {
+   "name": "Elva",
+   "url": "https://www.awwwards.com/sites/elva",
+   "sources": [
+    "awwwards"
+   ],
+   "categories": [
+    "awwwards:mobile-apps"
+   ],
+   "styles": [
+    "motion-driven",
+    "glassmorphism",
+    "aurora-gradient",
+    "ai-native"
+   ]
+  },
+  {
+   "name": "Emi Takahashi",
+   "url": "https://emitakahashi.ca",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:minimal",
+    "siteinspire:grid-layout"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "exaggerated-minimalism",
+    "bento-grid",
+    "editorial-magazine"
+   ]
+  },
+  {
+   "name": "Emotion Agency",
+   "url": "https://www.awwwards.com/sites/emotion-agency-1",
+   "sources": [
+    "awwwards"
+   ],
+   "categories": [
+    "awwwards:winners"
+   ],
+   "styles": [
+    "kinetic-type-parallax",
+    "3d-hyperreal",
+    "motion-driven"
+   ]
+  },
+  {
+   "name": "ESR Bespoke",
+   "url": "https://www.awwwards.com/sites/esr-bespoke",
+   "sources": [
+    "awwwards"
+   ],
+   "categories": [
+    "awwwards:winners"
+   ],
+   "styles": [
+    "kinetic-type-parallax",
+    "3d-hyperreal",
+    "motion-driven"
+   ]
+  },
+  {
+   "name": "Estudio Niksen",
+   "url": "https://estudioniksen.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:e-commerce",
+    "siteinspire:fashion"
+   ],
+   "styles": [
+    "luxury-premium",
+    "editorial-magazine"
+   ]
+  },
+  {
+   "name": "Evan Tolleson",
+   "url": "https://evantolleson.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:grid-layout"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "bento-grid",
+    "editorial-magazine"
+   ]
+  },
+  {
+   "name": "Exemplar",
+   "url": "https://exemplarfromsweden.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:minimal"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "exaggerated-minimalism"
+   ]
+  },
+  {
+   "name": "Félix Péault",
+   "url": "https://felixpeault.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:minimal"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "exaggerated-minimalism"
+   ]
+  },
+  {
+   "name": "Fellowship",
+   "url": "https://fellowship.xyz",
+   "sources": [
+    "httpster"
+   ],
+   "categories": [
+    "httpster:featured"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "editorial-magazine",
+    "brutalism-raw"
+   ]
+  },
+  {
+   "name": "Fig Challenge",
+   "url": "https://www.figchallenge.com/join",
+   "sources": [
+    "curated"
+   ],
+   "categories": [
+    "curated:neubrutalism"
+   ],
+   "styles": [
+    "neubrutalism"
+   ]
+  },
+  {
+   "name": "Figma (About)",
+   "url": "https://www.figma.com/about/",
+   "sources": [
+    "curated"
+   ],
+   "categories": [
+    "curated:neubrutalism"
+   ],
+   "styles": [
+    "neubrutalism"
+   ]
+  },
+  {
+   "name": "Fiona Vilmer",
+   "url": "http://fionavilmer.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:typographic"
+   ],
+   "styles": [
+    "editorial-magazine",
+    "exaggerated-minimalism",
+    "kinetic-type-parallax"
+   ]
+  },
+  {
+   "name": "Flowlife",
+   "url": "https://www.flowlife.com",
+   "sources": [
+    "minimal-gallery"
+   ],
+   "categories": [
+    "minimal-gallery:featured"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "exaggerated-minimalism"
+   ]
+  },
+  {
+   "name": "Flowty",
+   "url": "https://www.awwwards.com/sites/flowty",
+   "sources": [
+    "awwwards"
+   ],
+   "categories": [
+    "awwwards:mobile-apps"
+   ],
+   "styles": [
+    "motion-driven",
+    "glassmorphism",
+    "aurora-gradient",
+    "ai-native"
+   ]
+  },
+  {
+   "name": "Fluently",
+   "url": "https://www.awwwards.com/sites/fluently",
+   "sources": [
+    "awwwards"
+   ],
+   "categories": [
+    "awwwards:mobile-apps"
+   ],
+   "styles": [
+    "motion-driven",
+    "glassmorphism",
+    "aurora-gradient",
+    "ai-native"
+   ]
+  },
+  {
+   "name": "Focal Glow",
+   "url": "https://focalglow.co",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:e-commerce"
+   ],
+   "styles": [
+    "luxury-premium",
+    "editorial-magazine"
+   ]
+  },
+  {
+   "name": "Footer Design Gallery",
+   "url": "https://www.footer.design",
+   "sources": [
+    "httpster"
+   ],
+   "categories": [
+    "httpster:featured"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "editorial-magazine",
+    "brutalism-raw"
+   ]
+  },
+  {
+   "name": "Forge Automotive",
+   "url": "https://www.awwwards.com/sites/forge-automotive",
+   "sources": [
+    "awwwards"
+   ],
+   "categories": [
+    "awwwards:winners"
+   ],
+   "styles": [
+    "kinetic-type-parallax",
+    "3d-hyperreal",
+    "motion-driven"
+   ]
+  },
+  {
+   "name": "FORMAT",
+   "url": "https://www.awwwards.com/sites/format",
+   "sources": [
+    "awwwards"
+   ],
+   "categories": [
+    "awwwards:winners"
+   ],
+   "styles": [
+    "kinetic-type-parallax",
+    "3d-hyperreal",
+    "motion-driven"
+   ]
+  },
+  {
+   "name": "Fume",
+   "url": "https://fume-studio.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:minimal",
+    "siteinspire:e-commerce"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "exaggerated-minimalism",
+    "luxury-premium",
+    "editorial-magazine"
+   ]
+  },
+  {
+   "name": "Funner",
+   "url": "https://shopfunner.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:e-commerce",
+    "siteinspire:unusual-layout"
+   ],
+   "styles": [
+    "luxury-premium",
+    "editorial-magazine",
+    "brutalism-raw",
+    "gen-z-maximalism",
+    "exaggerated-minimalism"
+   ]
+  },
+  {
+   "name": "Gandi.net",
+   "url": "https://www.gandi.net/en-GB",
+   "sources": [
+    "curated"
+   ],
+   "categories": [
+    "curated:neubrutalism"
+   ],
+   "styles": [
+    "neubrutalism"
+   ]
+  },
+  {
+   "name": "Gil Huybrecht",
+   "url": "https://gilhuybrecht.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:unusual-layout"
+   ],
+   "styles": [
+    "brutalism-raw",
+    "gen-z-maximalism",
+    "exaggerated-minimalism"
+   ]
+  },
+  {
+   "name": "GoShuin",
+   "url": "https://www.awwwards.com/sites/goshuin-every-stamp-a-memory",
+   "sources": [
+    "awwwards"
+   ],
+   "categories": [
+    "awwwards:mobile-apps"
+   ],
+   "styles": [
+    "motion-driven",
+    "glassmorphism",
+    "aurora-gradient",
+    "ai-native"
+   ]
+  },
+  {
+   "name": "Grafik",
+   "url": "https://grafik.nz",
+   "sources": [
+    "minimal-gallery"
+   ],
+   "categories": [
+    "minimal-gallery:featured"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "exaggerated-minimalism"
+   ]
+  },
+  {
+   "name": "Grail",
+   "url": "https://www.awwwards.com/sites/grail",
+   "sources": [
+    "awwwards"
+   ],
+   "categories": [
+    "awwwards:mobile-apps"
+   ],
+   "styles": [
+    "motion-driven",
+    "glassmorphism",
+    "aurora-gradient",
+    "ai-native"
+   ]
+  },
+  {
+   "name": "Grail",
+   "url": "https://www.lapa.ninja/post/grail/",
+   "sources": [
+    "lapa-ninja"
+   ],
+   "categories": [
+    "lapa-ninja:landing"
+   ],
+   "styles": [
+    "hero-conversion",
+    "bento-grid",
+    "aurora-gradient"
+   ]
+  },
+  {
+   "name": "Grapa Studio",
+   "url": "https://studiograpa.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:minimal"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "exaggerated-minimalism"
+   ]
+  },
+  {
+   "name": "Grassfeld AI-Budgeting App",
+   "url": "https://www.awwwards.com/sites/grassfeld-ai-budgeting-app",
+   "sources": [
+    "awwwards"
+   ],
+   "categories": [
+    "awwwards:mobile-apps"
+   ],
+   "styles": [
+    "motion-driven",
+    "glassmorphism",
+    "aurora-gradient",
+    "ai-native"
+   ]
+  },
+  {
+   "name": "Gumroad",
+   "url": "https://gumroad.com",
+   "sources": [
+    "curated"
+   ],
+   "categories": [
+    "curated:neubrutalism"
+   ],
+   "styles": [
+    "neubrutalism"
+   ]
+  },
+  {
+   "name": "Gusto",
+   "url": "https://www.lapa.ninja/post/gusto-5/",
+   "sources": [
+    "lapa-ninja"
+   ],
+   "categories": [
+    "lapa-ninja:landing"
+   ],
+   "styles": [
+    "hero-conversion",
+    "bento-grid",
+    "aurora-gradient"
+   ]
+  },
+  {
+   "name": "Hardholy",
+   "url": "https://www.hardholy.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:typographic",
+    "siteinspire:e-commerce"
+   ],
+   "styles": [
+    "editorial-magazine",
+    "exaggerated-minimalism",
+    "kinetic-type-parallax",
+    "luxury-premium"
+   ]
+  },
+  {
+   "name": "Heartbeat Drum Machine",
+   "url": "https://www.heartbeatdrummachine.com",
+   "sources": [
+    "httpster"
+   ],
+   "categories": [
+    "httpster:featured"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "editorial-magazine",
+    "brutalism-raw"
+   ]
+  },
+  {
+   "name": "Hedroom",
+   "url": "https://www.hedroom.fm",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:minimal",
+    "siteinspire:unusual-layout"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "exaggerated-minimalism",
+    "brutalism-raw",
+    "gen-z-maximalism"
+   ]
+  },
+  {
+   "name": "Hélène del Marmol",
+   "url": "https://helenedelmarmol.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:typographic"
+   ],
+   "styles": [
+    "editorial-magazine",
+    "exaggerated-minimalism",
+    "kinetic-type-parallax"
+   ]
+  },
+  {
+   "name": "Heliot Emil – AW 21",
+   "url": "https://aw21.heliotemil.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:unusual-layout",
+    "siteinspire:fashion"
+   ],
+   "styles": [
+    "brutalism-raw",
+    "gen-z-maximalism",
+    "exaggerated-minimalism",
+    "luxury-premium",
+    "editorial-magazine"
+   ]
+  },
+  {
+   "name": "Heyo",
+   "url": "https://www.lapa.ninja/post/heyo-3/",
+   "sources": [
+    "lapa-ninja"
+   ],
+   "categories": [
+    "lapa-ninja:landing"
+   ],
+   "styles": [
+    "hero-conversion",
+    "bento-grid",
+    "aurora-gradient"
+   ]
+  },
+  {
+   "name": "High Society",
+   "url": "https://hs68.la",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:fashion"
+   ],
+   "styles": [
+    "luxury-premium",
+    "editorial-magazine"
+   ]
+  },
+  {
+   "name": "Holographik Space",
+   "url": "https://holographik.space",
+   "sources": [
+    "minimal-gallery"
+   ],
+   "categories": [
+    "minimal-gallery:featured"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "exaggerated-minimalism"
+   ]
+  },
+  {
+   "name": "Homeroom",
+   "url": "https://www.lapa.ninja/post/homeroom/",
+   "sources": [
+    "lapa-ninja"
+   ],
+   "categories": [
+    "lapa-ninja:landing"
+   ],
+   "styles": [
+    "hero-conversion",
+    "bento-grid",
+    "aurora-gradient"
+   ]
+  },
+  {
+   "name": "How&How",
+   "url": "https://how.studio",
+   "sources": [
+    "minimal-gallery"
+   ],
+   "categories": [
+    "minimal-gallery:featured"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "exaggerated-minimalism"
+   ]
+  },
+  {
+   "name": "hungryman",
+   "url": "https://hungryman.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:unusual-layout"
+   ],
+   "styles": [
+    "brutalism-raw",
+    "gen-z-maximalism",
+    "exaggerated-minimalism"
+   ]
+  },
+  {
+   "name": "Huts",
+   "url": "https://huts.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:typographic"
+   ],
+   "styles": [
+    "editorial-magazine",
+    "exaggerated-minimalism",
+    "kinetic-type-parallax"
+   ]
+  },
+  {
+   "name": "Il Capo Production",
+   "url": "https://ilcapoproduction.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:typographic"
+   ],
+   "styles": [
+    "editorial-magazine",
+    "exaggerated-minimalism",
+    "kinetic-type-parallax"
+   ]
+  },
+  {
+   "name": "Isaac Fayemi",
+   "url": "https://fayemi.design",
+   "sources": [
+    "minimal-gallery"
+   ],
+   "categories": [
+    "minimal-gallery:featured"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "exaggerated-minimalism"
+   ]
+  },
+  {
+   "name": "IWONDERU Studios",
+   "url": "https://www.iwonderu.se",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:fashion"
+   ],
+   "styles": [
+    "luxury-premium",
+    "editorial-magazine"
+   ]
+  },
+  {
+   "name": "Jack & Jill",
+   "url": "https://www.jackandjill.ai",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:minimal"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "exaggerated-minimalism"
+   ]
+  },
+  {
+   "name": "Jack McEntee",
+   "url": "https://jackentee.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:grid-layout"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "bento-grid",
+    "editorial-magazine"
+   ]
+  },
+  {
+   "name": "Jacky Winter Gallery",
+   "url": "https://www.jackywinter.gallery",
+   "sources": [
+    "httpster"
+   ],
+   "categories": [
+    "httpster:featured"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "editorial-magazine",
+    "brutalism-raw"
+   ]
+  },
+  {
+   "name": "Jakobsen Copenhagen",
+   "url": "https://jakobsencopenhagen.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:minimal",
+    "siteinspire:e-commerce"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "exaggerated-minimalism",
+    "luxury-premium",
+    "editorial-magazine"
+   ]
+  },
+  {
+   "name": "James Walsh Studio",
+   "url": "https://www.jameswalsh.studio",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:unusual-layout"
+   ],
+   "styles": [
+    "brutalism-raw",
+    "gen-z-maximalism",
+    "exaggerated-minimalism"
+   ]
+  },
+  {
+   "name": "Jason Bradley",
+   "url": "https://jasonbradley.co",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:unusual-layout"
+   ],
+   "styles": [
+    "brutalism-raw",
+    "gen-z-maximalism",
+    "exaggerated-minimalism"
+   ]
+  },
+  {
+   "name": "Jin Su Park",
+   "url": "https://jinsupark.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:grid-layout"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "bento-grid",
+    "editorial-magazine"
+   ]
+  },
+  {
+   "name": "Jordan Robson",
+   "url": "https://jordandrobson.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:grid-layout"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "bento-grid",
+    "editorial-magazine"
+   ]
+  },
+  {
+   "name": "JW Anderson",
+   "url": "https://jwanderson.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:fashion"
+   ],
+   "styles": [
+    "luxury-premium",
+    "editorial-magazine"
+   ]
+  },
+  {
+   "name": "Kai Blamey Nguyen",
+   "url": "https://kaiblamey.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:minimal",
+    "siteinspire:unusual-layout"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "exaggerated-minimalism",
+    "brutalism-raw",
+    "gen-z-maximalism"
+   ]
+  },
+  {
+   "name": "Kenj Pena",
+   "url": "https://kenjpena.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:grid-layout"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "bento-grid",
+    "editorial-magazine"
+   ]
+  },
+  {
+   "name": "Kieran Timberlake",
+   "url": "https://kierantimberlake.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:grid-layout",
+    "siteinspire:unusual-layout"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "bento-grid",
+    "editorial-magazine",
+    "brutalism-raw",
+    "gen-z-maximalism",
+    "exaggerated-minimalism"
+   ]
+  },
+  {
+   "name": "Kinfolk",
+   "url": "https://www.kinfolk.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:grid-layout"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "bento-grid",
+    "editorial-magazine"
+   ]
+  },
+  {
+   "name": "Klikkenthéke",
+   "url": "https://klikkentheke.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:grid-layout"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "bento-grid",
+    "editorial-magazine"
+   ]
+  },
+  {
+   "name": "Komma Komma",
+   "url": "https://kommakomma.is",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:minimal",
+    "siteinspire:typographic"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "exaggerated-minimalism",
+    "editorial-magazine",
+    "kinetic-type-parallax"
+   ]
+  },
+  {
+   "name": "KÖPPEN",
+   "url": "https://www.koppen.co",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:e-commerce"
+   ],
+   "styles": [
+    "luxury-premium",
+    "editorial-magazine"
+   ]
+  },
+  {
+   "name": "Lafour",
+   "url": "https://lafour.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:fashion"
+   ],
+   "styles": [
+    "luxury-premium",
+    "editorial-magazine"
+   ]
+  },
+  {
+   "name": "Lambert",
+   "url": "Lambert",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:minimal"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "exaggerated-minimalism"
+   ]
+  },
+  {
+   "name": "Les Grands Chênes",
+   "url": "https://www.maisonlesgrandschenes.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:minimal"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "exaggerated-minimalism"
+   ]
+  },
+  {
+   "name": "Life Stories",
+   "url": "https://lifestories.org",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:minimal"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "exaggerated-minimalism"
+   ]
+  },
+  {
+   "name": "Lift Foils",
+   "url": "https://liftfoils.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:e-commerce"
+   ],
+   "styles": [
+    "luxury-premium",
+    "editorial-magazine"
+   ]
+  },
+  {
+   "name": "Lift Type",
+   "url": "https://www.lift-type.fr",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:typographic",
+    "siteinspire:e-commerce"
+   ],
+   "styles": [
+    "editorial-magazine",
+    "exaggerated-minimalism",
+    "kinetic-type-parallax",
+    "luxury-premium"
+   ]
+  },
+  {
+   "name": "Linear",
+   "url": "https://linear.app",
+   "sources": [
+    "curated"
+   ],
+   "categories": [
+    "curated:dark"
+   ],
+   "styles": [
+    "dark-oled"
+   ]
+  },
+  {
+   "name": "Linearity.ai",
+   "url": "https://www.awwwards.com/sites/linearity-ai",
+   "sources": [
+    "awwwards"
+   ],
+   "categories": [
+    "awwwards:mobile-apps"
+   ],
+   "styles": [
+    "motion-driven",
+    "glassmorphism",
+    "aurora-gradient",
+    "ai-native"
+   ]
+  },
+  {
+   "name": "Little Plains",
+   "url": "https://www.littleplains.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:grid-layout"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "bento-grid",
+    "editorial-magazine"
+   ]
+  },
+  {
+   "name": "Little Website Co.",
+   "url": "https://littlewebsite.co",
+   "sources": [
+    "minimal-gallery"
+   ],
+   "categories": [
+    "minimal-gallery:featured"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "exaggerated-minimalism"
+   ]
+  },
+  {
+   "name": "Loewe",
+   "url": "https://www.loewe.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:fashion"
+   ],
+   "styles": [
+    "luxury-premium",
+    "editorial-magazine"
+   ]
+  },
+  {
+   "name": "Love and Money",
+   "url": "https://loveandmoney.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:minimal"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "exaggerated-minimalism"
+   ]
+  },
+  {
+   "name": "Lundgren+Lindqvist",
+   "url": "https://www.lundgrenlindqvist.se",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:grid-layout"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "bento-grid",
+    "editorial-magazine"
+   ]
+  },
+  {
+   "name": "Mac Moss Studio",
+   "url": "https://macmoss.studio",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:minimal",
+    "siteinspire:grid-layout"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "exaggerated-minimalism",
+    "bento-grid",
+    "editorial-magazine"
+   ]
+  },
+  {
+   "name": "MADH",
+   "url": "https://www.madhstore.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:fashion"
+   ],
+   "styles": [
+    "luxury-premium",
+    "editorial-magazine"
+   ]
+  },
+  {
+   "name": "Making Software",
+   "url": "https://www.makingsoftware.com",
+   "sources": [
+    "httpster"
+   ],
+   "categories": [
+    "httpster:featured"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "editorial-magazine",
+    "brutalism-raw"
+   ]
+  },
+  {
+   "name": "Mammoth Brands",
+   "url": "https://mammothbrands.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:typographic"
+   ],
+   "styles": [
+    "editorial-magazine",
+    "exaggerated-minimalism",
+    "kinetic-type-parallax"
+   ]
+  },
+  {
+   "name": "Maximilian Kaspar",
+   "url": "https://www.maximiliankaspar.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:minimal"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "exaggerated-minimalism"
+   ]
+  },
+  {
+   "name": "Melius",
+   "url": "https://www.melius.com",
+   "sources": [
+    "minimal-gallery"
+   ],
+   "categories": [
+    "minimal-gallery:featured"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "exaggerated-minimalism"
+   ]
+  },
+  {
+   "name": "Minimalissimo",
+   "url": "http://minimalissimo.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:grid-layout"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "bento-grid",
+    "editorial-magazine"
+   ]
+  },
+  {
+   "name": "miralife.app",
+   "url": "https://www.awwwards.com/sites/miralife-app",
+   "sources": [
+    "awwwards"
+   ],
+   "categories": [
+    "awwwards:mobile-apps"
+   ],
+   "styles": [
+    "motion-driven",
+    "glassmorphism",
+    "aurora-gradient",
+    "ai-native"
+   ]
+  },
+  {
+   "name": "MMXX Artists",
+   "url": "https://mmxxartists.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:typographic"
+   ],
+   "styles": [
+    "editorial-magazine",
+    "exaggerated-minimalism",
+    "kinetic-type-parallax"
+   ]
+  },
+  {
+   "name": "Mnmllist",
+   "url": "https://mnmll.ist",
+   "sources": [
+    "httpster"
+   ],
+   "categories": [
+    "httpster:featured"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "editorial-magazine",
+    "brutalism-raw"
+   ]
+  },
+  {
+   "name": "Mosaic",
+   "url": "https://www.awwwards.com/sites/mosaic-2",
+   "sources": [
+    "awwwards"
+   ],
+   "categories": [
+    "awwwards:mobile-apps"
+   ],
+   "styles": [
+    "motion-driven",
+    "glassmorphism",
+    "aurora-gradient",
+    "ai-native"
+   ]
+  },
+  {
+   "name": "Moving Parts",
+   "url": "https://www.lapa.ninja/post/moving-parts/",
+   "sources": [
+    "lapa-ninja"
+   ],
+   "categories": [
+    "lapa-ninja:landing"
+   ],
+   "styles": [
+    "hero-conversion",
+    "bento-grid",
+    "aurora-gradient"
+   ]
+  },
+  {
+   "name": "Mozilla Firefox Family",
+   "url": "https://www.mozilla.org/en-US/firefox/family/",
+   "sources": [
+    "curated"
+   ],
+   "categories": [
+    "curated:neubrutalism"
+   ],
+   "styles": [
+    "neubrutalism"
+   ]
+  },
+  {
+   "name": "Mubien",
+   "url": "https://www.awwwards.com/sites/mubien",
+   "sources": [
+    "awwwards"
+   ],
+   "categories": [
+    "awwwards:mobile-apps"
+   ],
+   "styles": [
+    "motion-driven",
+    "glassmorphism",
+    "aurora-gradient",
+    "ai-native"
+   ]
+  },
+  {
+   "name": "Nick Clement",
+   "url": "https://nickclement.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:typographic"
+   ],
+   "styles": [
+    "editorial-magazine",
+    "exaggerated-minimalism",
+    "kinetic-type-parallax"
+   ]
+  },
+  {
+   "name": "Nima Kaufmann",
+   "url": "https://nimakaufmann.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:fashion"
+   ],
+   "styles": [
+    "luxury-premium",
+    "editorial-magazine"
+   ]
+  },
+  {
+   "name": "nitex",
+   "url": "https://nitex.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:fashion"
+   ],
+   "styles": [
+    "luxury-premium",
+    "editorial-magazine"
+   ]
+  },
+  {
+   "name": "No Fear",
+   "url": "https://www.nofear.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:fashion"
+   ],
+   "styles": [
+    "luxury-premium",
+    "editorial-magazine"
+   ]
+  },
+  {
+   "name": "Norma",
+   "url": "https://nor.ma",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:e-commerce"
+   ],
+   "styles": [
+    "luxury-premium",
+    "editorial-magazine"
+   ]
+  },
+  {
+   "name": "Notion",
+   "url": "https://www.notion.com",
+   "sources": [
+    "curated"
+   ],
+   "categories": [
+    "curated:saas-clean"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "hero-conversion"
+   ]
+  },
+  {
+   "name": "NOUN",
+   "url": "https://www.nounagency.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:grid-layout"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "bento-grid",
+    "editorial-magazine"
+   ]
+  },
+  {
+   "name": "Oath Biome",
+   "url": "https://www.oathbiome.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:minimal"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "exaggerated-minimalism"
+   ]
+  },
+  {
+   "name": "Odyssee",
+   "url": "https://www.odysseeclinic.com.au",
+   "sources": [
+    "minimal-gallery"
+   ],
+   "categories": [
+    "minimal-gallery:featured"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "exaggerated-minimalism"
+   ]
+  },
+  {
+   "name": "OFFFForum",
+   "url": "https://www.awwwards.com/sites/offfforum",
+   "sources": [
+    "awwwards"
+   ],
+   "categories": [
+    "awwwards:winners"
+   ],
+   "styles": [
+    "kinetic-type-parallax",
+    "3d-hyperreal",
+    "motion-driven"
+   ]
+  },
+  {
+   "name": "Offsuit Games",
+   "url": "https://offsuit.app",
+   "sources": [
+    "minimal-gallery"
+   ],
+   "categories": [
+    "minimal-gallery:featured"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "exaggerated-minimalism"
+   ]
+  },
+  {
+   "name": "Ossou",
+   "url": "https://ossou.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:e-commerce",
+    "siteinspire:fashion"
+   ],
+   "styles": [
+    "luxury-premium",
+    "editorial-magazine"
+   ]
+  },
+  {
+   "name": "Overworld Audio",
+   "url": "https://www.awwwards.com/sites/overworld-audio",
+   "sources": [
+    "awwwards"
+   ],
+   "categories": [
+    "awwwards:winners"
+   ],
+   "styles": [
+    "kinetic-type-parallax",
+    "3d-hyperreal",
+    "motion-driven"
+   ]
+  },
+  {
+   "name": "Panconesi",
+   "url": "https://marcopanconesi.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:e-commerce",
+    "siteinspire:fashion"
+   ],
+   "styles": [
+    "luxury-premium",
+    "editorial-magazine"
+   ]
+  },
+  {
+   "name": "Pasqua Wines",
+   "url": "https://www.pasqua.it",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:typographic",
+    "siteinspire:e-commerce"
+   ],
+   "styles": [
+    "editorial-magazine",
+    "exaggerated-minimalism",
+    "kinetic-type-parallax",
+    "luxury-premium"
+   ]
+  },
+  {
+   "name": "Pattern Breaking",
+   "url": "https://patternbreak.ing",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:unusual-layout"
+   ],
+   "styles": [
+    "brutalism-raw",
+    "gen-z-maximalism",
+    "exaggerated-minimalism"
+   ]
+  },
+  {
+   "name": "Pear",
+   "url": "https://pear.no",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:typographic",
+    "siteinspire:unusual-layout"
+   ],
+   "styles": [
+    "editorial-magazine",
+    "exaggerated-minimalism",
+    "kinetic-type-parallax",
+    "brutalism-raw",
+    "gen-z-maximalism"
+   ]
+  },
+  {
+   "name": "Pentagram",
+   "url": "http://www.pentagram.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:grid-layout"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "bento-grid",
+    "editorial-magazine"
+   ]
+  },
+  {
+   "name": "PERFECT DAYS",
+   "url": "https://perfectdays-movie.jp",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:typographic"
+   ],
+   "styles": [
+    "editorial-magazine",
+    "exaggerated-minimalism",
+    "kinetic-type-parallax"
+   ]
+  },
+  {
+   "name": "PETHROOM",
+   "url": "https://pethroom.jp",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:e-commerce"
+   ],
+   "styles": [
+    "luxury-premium",
+    "editorial-magazine"
+   ]
+  },
+  {
+   "name": "PlanetScale",
+   "url": "https://planetscale.com",
+   "sources": [
+    "curated"
+   ],
+   "categories": [
+    "curated:dark"
+   ],
+   "styles": [
+    "dark-oled"
+   ]
+  },
+  {
+   "name": "Ploy",
+   "url": "https://www.lapa.ninja/post/ploy/",
+   "sources": [
+    "lapa-ninja"
+   ],
+   "categories": [
+    "lapa-ninja:landing"
+   ],
+   "styles": [
+    "hero-conversion",
+    "bento-grid",
+    "aurora-gradient"
+   ]
+  },
+  {
+   "name": "Pressed Objects",
+   "url": "https://www.lapa.ninja/post/pressed-objects/",
+   "sources": [
+    "lapa-ninja"
+   ],
+   "categories": [
+    "lapa-ninja:landing"
+   ],
+   "styles": [
+    "hero-conversion",
+    "bento-grid",
+    "aurora-gradient"
+   ]
+  },
+  {
+   "name": "Pro Shop",
+   "url": "https://proshop.nyc",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:fashion"
+   ],
+   "styles": [
+    "luxury-premium",
+    "editorial-magazine"
+   ]
+  },
+  {
+   "name": "pu—ente",
+   "url": "https://www.pu-ente.com/en/",
+   "sources": [
+    "minimal-gallery"
+   ],
+   "categories": [
+    "minimal-gallery:featured"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "exaggerated-minimalism"
+   ]
+  },
+  {
+   "name": "Pulse Bridge",
+   "url": "https://www.awwwards.com/sites/pulse-bridge",
+   "sources": [
+    "awwwards"
+   ],
+   "categories": [
+    "awwwards:mobile-apps"
+   ],
+   "styles": [
+    "motion-driven",
+    "glassmorphism",
+    "aurora-gradient",
+    "ai-native"
+   ]
+  },
+  {
+   "name": "QP Magazine",
+   "url": "https://www.qpmagazine.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:fashion"
+   ],
+   "styles": [
+    "luxury-premium",
+    "editorial-magazine"
+   ]
+  },
+  {
+   "name": "Quatrième Étage",
+   "url": "https://quatriemeetage.studio",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:minimal",
+    "siteinspire:grid-layout"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "exaggerated-minimalism",
+    "bento-grid",
+    "editorial-magazine"
+   ]
+  },
+  {
+   "name": "R100",
+   "url": "https://www.r-100.no",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:grid-layout"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "bento-grid",
+    "editorial-magazine"
+   ]
+  },
+  {
+   "name": "Raycast",
+   "url": "https://raycast.com",
+   "sources": [
+    "curated"
+   ],
+   "categories": [
+    "curated:dark"
+   ],
+   "styles": [
+    "dark-oled"
+   ]
+  },
+  {
+   "name": "Reed Hilderbrand",
+   "url": "https://www.reedhilderbrand.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:unusual-layout"
+   ],
+   "styles": [
+    "brutalism-raw",
+    "gen-z-maximalism",
+    "exaggerated-minimalism"
+   ]
+  },
+  {
+   "name": "Replay",
+   "url": "https://www.lapa.ninja/post/replay-3/",
+   "sources": [
+    "lapa-ninja"
+   ],
+   "categories": [
+    "lapa-ninja:landing"
+   ],
+   "styles": [
+    "hero-conversion",
+    "bento-grid",
+    "aurora-gradient"
+   ]
+  },
+  {
+   "name": "Resend",
+   "url": "https://resend.com",
+   "sources": [
+    "curated"
+   ],
+   "categories": [
+    "curated:dark"
+   ],
+   "styles": [
+    "dark-oled"
+   ]
+  },
+  {
+   "name": "RideNow",
+   "url": "https://www.awwwards.com/sites/ridenow-carsharing-in-cyprus",
+   "sources": [
+    "awwwards"
+   ],
+   "categories": [
+    "awwwards:mobile-apps"
+   ],
+   "styles": [
+    "motion-driven",
+    "glassmorphism",
+    "aurora-gradient",
+    "ai-native"
+   ]
+  },
+  {
+   "name": "Robert Feasley",
+   "url": "https://rfeasley.io",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:typographic"
+   ],
+   "styles": [
+    "editorial-magazine",
+    "exaggerated-minimalism",
+    "kinetic-type-parallax"
+   ]
+  },
+  {
+   "name": "Royal Sites Ireland",
+   "url": "https://royalsites.ie",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:minimal"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "exaggerated-minimalism"
+   ]
+  },
+  {
+   "name": "Sam Thies",
+   "url": "https://samthies.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:minimal"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "exaggerated-minimalism"
+   ]
+  },
+  {
+   "name": "SAMO ONDOH",
+   "url": "https://samoondoh.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:fashion"
+   ],
+   "styles": [
+    "luxury-premium",
+    "editorial-magazine"
+   ]
+  },
+  {
+   "name": "Samuel Snider",
+   "url": "https://samuelsnider.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:e-commerce",
+    "siteinspire:fashion"
+   ],
+   "styles": [
+    "luxury-premium",
+    "editorial-magazine"
+   ]
+  },
+  {
+   "name": "Satoshi Watanabe",
+   "url": "https://satoshiwatanabe.org",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:grid-layout"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "bento-grid",
+    "editorial-magazine"
+   ]
+  },
+  {
+   "name": "Scotch",
+   "url": "https://www.lapa.ninja/post/scotch/",
+   "sources": [
+    "lapa-ninja"
+   ],
+   "categories": [
+    "lapa-ninja:landing"
+   ],
+   "styles": [
+    "hero-conversion",
+    "bento-grid",
+    "aurora-gradient"
+   ]
+  },
+  {
+   "name": "Scullion Architects",
+   "url": "https://scullion.ie",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:minimal"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "exaggerated-minimalism"
+   ]
+  },
+  {
+   "name": "Senthora AI Language Tutor",
+   "url": "https://www.awwwards.com/sites/senthora-ai-language-tutor",
+   "sources": [
+    "awwwards"
+   ],
+   "categories": [
+    "awwwards:mobile-apps"
+   ],
+   "styles": [
+    "motion-driven",
+    "glassmorphism",
+    "aurora-gradient",
+    "ai-native"
+   ]
+  },
+  {
+   "name": "Sentient Foundation",
+   "url": "https://www.lapa.ninja/post/sentient-foundation/",
+   "sources": [
+    "lapa-ninja"
+   ],
+   "categories": [
+    "lapa-ninja:landing"
+   ],
+   "styles": [
+    "hero-conversion",
+    "bento-grid",
+    "aurora-gradient"
+   ]
+  },
+  {
+   "name": "Sentry",
+   "url": "https://sentry.io",
+   "sources": [
+    "curated"
+   ],
+   "categories": [
+    "curated:dark"
+   ],
+   "styles": [
+    "dark-oled"
+   ]
+  },
+  {
+   "name": "Serena Congiu",
+   "url": "https://www.serenacongiu.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:unusual-layout",
+    "siteinspire:fashion"
+   ],
+   "styles": [
+    "brutalism-raw",
+    "gen-z-maximalism",
+    "exaggerated-minimalism",
+    "luxury-premium",
+    "editorial-magazine"
+   ]
+  },
+  {
+   "name": "Seunghyuk Kim",
+   "url": "https://seunghyuk.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:unusual-layout"
+   ],
+   "styles": [
+    "brutalism-raw",
+    "gen-z-maximalism",
+    "exaggerated-minimalism"
+   ]
+  },
+  {
+   "name": "Sézane",
+   "url": "https://www.sezane.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:e-commerce",
+    "siteinspire:fashion"
+   ],
+   "styles": [
+    "luxury-premium",
+    "editorial-magazine"
+   ]
+  },
+  {
+   "name": "Short Sentence",
+   "url": "https://shortsentence.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:fashion"
+   ],
+   "styles": [
+    "luxury-premium",
+    "editorial-magazine"
+   ]
+  },
+  {
+   "name": "Signal-A Studio",
+   "url": "https://www.awwwards.com/sites/signal-a-studio",
+   "sources": [
+    "awwwards"
+   ],
+   "categories": [
+    "awwwards:winners"
+   ],
+   "styles": [
+    "kinetic-type-parallax",
+    "3d-hyperreal",
+    "motion-driven"
+   ]
+  },
+  {
+   "name": "SIHA",
+   "url": "https://siha.com.au",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:e-commerce"
+   ],
+   "styles": [
+    "luxury-premium",
+    "editorial-magazine"
+   ]
+  },
+  {
+   "name": "Skylrk",
+   "url": "https://skylrk.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:e-commerce",
+    "siteinspire:fashion"
+   ],
+   "styles": [
+    "luxury-premium",
+    "editorial-magazine"
+   ]
+  },
+  {
+   "name": "Slav Vitanov",
+   "url": "https://slavvitanov.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:typographic"
+   ],
+   "styles": [
+    "editorial-magazine",
+    "exaggerated-minimalism",
+    "kinetic-type-parallax"
+   ]
+  },
+  {
+   "name": "Small Talk Studio",
+   "url": "https://smalltalkstudio.biz",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:typographic",
+    "siteinspire:fashion"
+   ],
+   "styles": [
+    "editorial-magazine",
+    "exaggerated-minimalism",
+    "kinetic-type-parallax",
+    "luxury-premium"
+   ]
+  },
+  {
+   "name": "Snøhetta",
+   "url": "https://www.snohetta.com",
+   "sources": [
+    "httpster"
+   ],
+   "categories": [
+    "httpster:featured"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "editorial-magazine",
+    "brutalism-raw"
+   ]
+  },
+  {
+   "name": "SORT Office",
+   "url": "https://sort-office.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:minimal",
+    "siteinspire:grid-layout"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "exaggerated-minimalism",
+    "bento-grid",
+    "editorial-magazine"
+   ]
+  },
+  {
+   "name": "Special Offer, Inc.",
+   "url": "https://specialoffer.inc",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:unusual-layout"
+   ],
+   "styles": [
+    "brutalism-raw",
+    "gen-z-maximalism",
+    "exaggerated-minimalism"
+   ]
+  },
+  {
+   "name": "Specs",
+   "url": "https://www.lapa.ninja/post/specs/",
+   "sources": [
+    "lapa-ninja"
+   ],
+   "categories": [
+    "lapa-ninja:landing"
+   ],
+   "styles": [
+    "hero-conversion",
+    "bento-grid",
+    "aurora-gradient"
+   ]
+  },
+  {
+   "name": "Spotify",
+   "url": "https://www.spotify.com",
+   "sources": [
+    "curated"
+   ],
+   "categories": [
+    "curated:dark"
+   ],
+   "styles": [
+    "dark-oled"
+   ]
+  },
+  {
+   "name": "Spotify Wrapped Party",
+   "url": "https://www.awwwards.com/sites/spotify-wrapped-party",
+   "sources": [
+    "awwwards"
+   ],
+   "categories": [
+    "awwwards:mobile-apps"
+   ],
+   "styles": [
+    "motion-driven",
+    "glassmorphism",
+    "aurora-gradient",
+    "ai-native"
+   ]
+  },
+  {
+   "name": "Stack Health",
+   "url": "https://www.lapa.ninja/post/stack-health/",
+   "sources": [
+    "lapa-ninja"
+   ],
+   "categories": [
+    "lapa-ninja:landing"
+   ],
+   "styles": [
+    "hero-conversion",
+    "bento-grid",
+    "aurora-gradient"
+   ]
+  },
+  {
+   "name": "STAGECREW",
+   "url": "https://stagecrew.studio",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:unusual-layout"
+   ],
+   "styles": [
+    "brutalism-raw",
+    "gen-z-maximalism",
+    "exaggerated-minimalism"
+   ]
+  },
+  {
+   "name": "Stephen Kent Johnson",
+   "url": "https://stephenkentjohnson.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:grid-layout"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "bento-grid",
+    "editorial-magazine"
+   ]
+  },
+  {
+   "name": "Stereoscope Coffee",
+   "url": "https://www.stereoscopecoffee.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:minimal",
+    "siteinspire:e-commerce"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "exaggerated-minimalism",
+    "luxury-premium",
+    "editorial-magazine"
+   ]
+  },
+  {
+   "name": "Stream Ring",
+   "url": "https://www.sandbar.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:fashion"
+   ],
+   "styles": [
+    "luxury-premium",
+    "editorial-magazine"
+   ]
+  },
+  {
+   "name": "Stripe",
+   "url": "https://stripe.com",
+   "sources": [
+    "curated"
+   ],
+   "categories": [
+    "curated:saas-clean"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "hero-conversion"
+   ]
+  },
+  {
+   "name": "Studio Bruch",
+   "url": "https://studiobruch.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:unusual-layout"
+   ],
+   "styles": [
+    "brutalism-raw",
+    "gen-z-maximalism",
+    "exaggerated-minimalism"
+   ]
+  },
+  {
+   "name": "Studio Gerosa",
+   "url": "https://www.studio-gerosa.it",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:minimal"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "exaggerated-minimalism"
+   ]
+  },
+  {
+   "name": "Studio Krisztián Éder",
+   "url": "https://krisztianeder.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:unusual-layout"
+   ],
+   "styles": [
+    "brutalism-raw",
+    "gen-z-maximalism",
+    "exaggerated-minimalism"
+   ]
+  },
+  {
+   "name": "Studio OL",
+   "url": "https://ol.studio",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:minimal"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "exaggerated-minimalism"
+   ]
+  },
+  {
+   "name": "Subscrr",
+   "url": "https://www.awwwards.com/sites/subscrr",
+   "sources": [
+    "awwwards"
+   ],
+   "categories": [
+    "awwwards:mobile-apps"
+   ],
+   "styles": [
+    "motion-driven",
+    "glassmorphism",
+    "aurora-gradient",
+    "ai-native"
+   ]
+  },
+  {
+   "name": "Supabase",
+   "url": "https://supabase.com",
+   "sources": [
+    "curated"
+   ],
+   "categories": [
+    "curated:dark"
+   ],
+   "styles": [
+    "dark-oled"
+   ]
+  },
+  {
+   "name": "Super Keen",
+   "url": "https://www.superkeen.studio",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:grid-layout"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "bento-grid",
+    "editorial-magazine"
+   ]
+  },
+  {
+   "name": "Superhuman",
+   "url": "https://superhuman.com",
+   "sources": [
+    "curated"
+   ],
+   "categories": [
+    "curated:dark"
+   ],
+   "styles": [
+    "dark-oled"
+   ]
+  },
+  {
+   "name": "Susanne Kaufmann",
+   "url": "https://www.susannekaufmann.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:e-commerce"
+   ],
+   "styles": [
+    "luxury-premium",
+    "editorial-magazine"
+   ]
+  },
+  {
+   "name": "SWSH",
+   "url": "https://www.awwwards.com/sites/swsh",
+   "sources": [
+    "awwwards"
+   ],
+   "categories": [
+    "awwwards:mobile-apps"
+   ],
+   "styles": [
+    "motion-driven",
+    "glassmorphism",
+    "aurora-gradient",
+    "ai-native"
+   ]
+  },
+  {
+   "name": "TaylorHare Architects",
+   "url": "https://taylorhare.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:minimal"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "exaggerated-minimalism"
+   ]
+  },
+  {
+   "name": "Tekt",
+   "url": "https://tekt.com.au",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:minimal"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "exaggerated-minimalism"
+   ]
+  },
+  {
+   "name": "Templo",
+   "url": "http://templo.co.uk",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:grid-layout"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "bento-grid",
+    "editorial-magazine"
+   ]
+  },
+  {
+   "name": "tessa van den berg",
+   "url": "https://tessavandenberg.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:grid-layout"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "bento-grid",
+    "editorial-magazine"
+   ]
+  },
+  {
+   "name": "The Future In Black",
+   "url": "https://www.thefutureinblack.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:typographic"
+   ],
+   "styles": [
+    "editorial-magazine",
+    "exaggerated-minimalism",
+    "kinetic-type-parallax"
+   ]
+  },
+  {
+   "name": "The Linearity",
+   "url": "https://thelinearity.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:e-commerce",
+    "siteinspire:fashion"
+   ],
+   "styles": [
+    "luxury-premium",
+    "editorial-magazine"
+   ]
+  },
+  {
+   "name": "The Red",
+   "url": "https://www.333southwabash.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:typographic"
+   ],
+   "styles": [
+    "editorial-magazine",
+    "exaggerated-minimalism",
+    "kinetic-type-parallax"
+   ]
+  },
+  {
+   "name": "The Surfer's Journal Archives",
+   "url": "https://archives.surfersjournal.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:minimal"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "exaggerated-minimalism"
+   ]
+  },
+  {
+   "name": "There to There",
+   "url": "https://theretothere.co.nz",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:typographic",
+    "siteinspire:unusual-layout"
+   ],
+   "styles": [
+    "editorial-magazine",
+    "exaggerated-minimalism",
+    "kinetic-type-parallax",
+    "brutalism-raw",
+    "gen-z-maximalism"
+   ]
+  },
+  {
+   "name": "Thérèse of Lisieux",
+   "url": "https://thereseoflisieux.co.nz",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:typographic"
+   ],
+   "styles": [
+    "editorial-magazine",
+    "exaggerated-minimalism",
+    "kinetic-type-parallax"
+   ]
+  },
+  {
+   "name": "Third",
+   "url": "https://www.thirdfind.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:fashion"
+   ],
+   "styles": [
+    "luxury-premium",
+    "editorial-magazine"
+   ]
+  },
+  {
+   "name": "This Design",
+   "url": "https://this.design",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:typographic"
+   ],
+   "styles": [
+    "editorial-magazine",
+    "exaggerated-minimalism",
+    "kinetic-type-parallax"
+   ]
+  },
+  {
+   "name": "Thomas Hervé",
+   "url": "https://hervethomas.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:grid-layout"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "bento-grid",
+    "editorial-magazine"
+   ]
+  },
+  {
+   "name": "Tillmann Franzen",
+   "url": "https://tillmannfranzen.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:grid-layout"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "bento-grid",
+    "editorial-magazine"
+   ]
+  },
+  {
+   "name": "Topicals",
+   "url": "https://mytopicals.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:e-commerce"
+   ],
+   "styles": [
+    "luxury-premium",
+    "editorial-magazine"
+   ]
+  },
+  {
+   "name": "Town",
+   "url": "https://www.town.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:minimal"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "exaggerated-minimalism"
+   ]
+  },
+  {
+   "name": "Two-Do",
+   "url": "https://www.awwwards.com/sites/two-do",
+   "sources": [
+    "awwwards"
+   ],
+   "categories": [
+    "awwwards:mobile-apps"
+   ],
+   "styles": [
+    "motion-driven",
+    "glassmorphism",
+    "aurora-gradient",
+    "ai-native"
+   ]
+  },
+  {
+   "name": "TypeSafe AI",
+   "url": "https://www.lapa.ninja/post/typesafe-ai/",
+   "sources": [
+    "lapa-ninja"
+   ],
+   "categories": [
+    "lapa-ninja:landing"
+   ],
+   "styles": [
+    "hero-conversion",
+    "bento-grid",
+    "aurora-gradient"
+   ]
+  },
+  {
+   "name": "Union Boulangerie",
+   "url": "https://unionboulangerie.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:minimal"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "exaggerated-minimalism"
+   ]
+  },
+  {
+   "name": "Uno",
+   "url": "https://uno.app",
+   "sources": [
+    "httpster"
+   ],
+   "categories": [
+    "httpster:featured"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "editorial-magazine",
+    "brutalism-raw"
+   ]
+  },
+  {
+   "name": "Vercel",
+   "url": "https://www.lapa.ninja/post/vercel-3/",
+   "sources": [
+    "lapa-ninja"
+   ],
+   "categories": [
+    "lapa-ninja:landing"
+   ],
+   "styles": [
+    "hero-conversion",
+    "bento-grid",
+    "aurora-gradient"
+   ]
+  },
+  {
+   "name": "Vercel",
+   "url": "https://vercel.com",
+   "sources": [
+    "curated"
+   ],
+   "categories": [
+    "curated:dark"
+   ],
+   "styles": [
+    "dark-oled"
+   ]
+  },
+  {
+   "name": "VibeMe AI",
+   "url": "https://www.awwwards.com/sites/vibeme-ai",
+   "sources": [
+    "awwwards"
+   ],
+   "categories": [
+    "awwwards:mobile-apps"
+   ],
+   "styles": [
+    "motion-driven",
+    "glassmorphism",
+    "aurora-gradient",
+    "ai-native"
+   ]
+  },
+  {
+   "name": "Viktor Horváth",
+   "url": "https://viktorhor.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:unusual-layout"
+   ],
+   "styles": [
+    "brutalism-raw",
+    "gen-z-maximalism",
+    "exaggerated-minimalism"
+   ]
+  },
+  {
+   "name": "Virgil Abloh Archive",
+   "url": "https://virgilabloh.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:fashion"
+   ],
+   "styles": [
+    "luxury-premium",
+    "editorial-magazine"
+   ]
+  },
+  {
+   "name": "Visual (Archives) Society",
+   "url": "https://visualsociety.ch",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:e-commerce",
+    "siteinspire:unusual-layout",
+    "siteinspire:fashion"
+   ],
+   "styles": [
+    "luxury-premium",
+    "editorial-magazine",
+    "brutalism-raw",
+    "gen-z-maximalism",
+    "exaggerated-minimalism"
+   ]
+  },
+  {
+   "name": "Visual Journal",
+   "url": "https://visualjournal.it",
+   "sources": [
+    "httpster"
+   ],
+   "categories": [
+    "httpster:featured"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "editorial-magazine",
+    "brutalism-raw"
+   ]
+  },
+  {
+   "name": "ViV Management",
+   "url": "https://vivmgmt.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:fashion"
+   ],
+   "styles": [
+    "luxury-premium",
+    "editorial-magazine"
+   ]
+  },
+  {
+   "name": "VOID Messenger",
+   "url": "https://www.awwwards.com/sites/void-messenger",
+   "sources": [
+    "awwwards"
+   ],
+   "categories": [
+    "awwwards:mobile-apps"
+   ],
+   "styles": [
+    "motion-driven",
+    "glassmorphism",
+    "aurora-gradient",
+    "ai-native"
+   ]
+  },
+  {
+   "name": "WAKA-WAKA",
+   "url": "https://wakawaka.world",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:e-commerce"
+   ],
+   "styles": [
+    "luxury-premium",
+    "editorial-magazine"
+   ]
+  },
+  {
+   "name": "Warp",
+   "url": "https://www.warp.dev",
+   "sources": [
+    "curated"
+   ],
+   "categories": [
+    "curated:dark"
+   ],
+   "styles": [
+    "dark-oled"
+   ]
+  },
+  {
+   "name": "Warren & Mahoney Architects",
+   "url": "https://wam.studio",
+   "sources": [
+    "httpster"
+   ],
+   "categories": [
+    "httpster:featured"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "editorial-magazine",
+    "brutalism-raw"
+   ]
+  },
+  {
+   "name": "Whole Earth Index",
+   "url": "https://wholeearth.info",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:grid-layout"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "bento-grid",
+    "editorial-magazine"
+   ]
+  },
+  {
+   "name": "WISPR FLOW",
+   "url": "https://www.awwwards.com/sites/wispr-flow",
+   "sources": [
+    "awwwards"
+   ],
+   "categories": [
+    "awwwards:mobile-apps"
+   ],
+   "styles": [
+    "motion-driven",
+    "glassmorphism",
+    "aurora-gradient",
+    "ai-native"
+   ]
+  },
+  {
+   "name": "Wiz",
+   "url": "https://www.wiz.io",
+   "sources": [
+    "httpster"
+   ],
+   "categories": [
+    "httpster:featured"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "editorial-magazine",
+    "brutalism-raw"
+   ]
+  },
+  {
+   "name": "Woodid",
+   "url": "https://wearewoodid.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:e-commerce"
+   ],
+   "styles": [
+    "luxury-premium",
+    "editorial-magazine"
+   ]
+  },
+  {
+   "name": "WSM",
+   "url": "https://wschupfer.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:minimal"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "exaggerated-minimalism"
+   ]
+  },
+  {
+   "name": "WWAKE",
+   "url": "https://wwake.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:minimal",
+    "siteinspire:e-commerce",
+    "siteinspire:fashion"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "exaggerated-minimalism",
+    "luxury-premium",
+    "editorial-magazine"
+   ]
+  },
+  {
+   "name": "X-Bionic",
+   "url": "https://www.x-bionic.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:fashion"
+   ],
+   "styles": [
+    "luxury-premium",
+    "editorial-magazine"
+   ]
+  },
+  {
+   "name": "Yuri Roga",
+   "url": "https://yuriroga.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:grid-layout"
+   ],
+   "styles": [
+    "minimal-swiss",
+    "bento-grid",
+    "editorial-magazine"
+   ]
+  },
+  {
+   "name": "Zauberberg",
+   "url": "https://zauberbergproductions.com",
+   "sources": [
+    "siteinspire"
+   ],
+   "categories": [
+    "siteinspire:unusual-layout"
+   ],
+   "styles": [
+    "brutalism-raw",
+    "gen-z-maximalism",
+    "exaggerated-minimalism"
+   ]
+  }
+ ]
+}
