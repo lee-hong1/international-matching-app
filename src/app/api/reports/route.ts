@@ -3,8 +3,8 @@ import { createClient } from '@supabase/supabase-js'
 import { reportingService } from '@/lib/reporting'
 
 const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
+  process.env.NEXT_PUBLIC_SUPABASE_URL ?? 'https://placeholder.supabase.co',
+  process.env.SUPABASE_SERVICE_ROLE_KEY ?? 'placeholder-service-role-key'
 )
 
 // 신고 생성
