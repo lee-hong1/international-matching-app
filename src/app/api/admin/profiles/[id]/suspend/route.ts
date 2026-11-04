@@ -74,6 +74,16 @@ export async function PATCH(
     return NextResponse.json({ error: 'Failed to update profile' }, { status: 500 })
   }
 
+  // JWT app_metadata에 is_suspended 반영 → 미들웨어에서 DB 조회 없이 체크 가능
+  // (최대 JWT 만료 1시간 지연 허용, DB는 즉시 반영)
+  const { error: authUpdateErr } = await supabaseService.auth.admin.updateUserById(id, {
+    app_metadata: { is_suspended: action === 'suspend' },
+  })
+  if (authUpdateErr) {
+    // app_metadata 업데이트 실패는 치명적이지 않음 (DB가 최종 방어선)
+    console.error('[admin suspend] app_metadata update error:', authUpdateErr.message)
+  }
+
   // 감사 로그 기록 (fire-and-forget — 로그 실패가 응답에 영향 없음)
   void (async () => {
     try {
