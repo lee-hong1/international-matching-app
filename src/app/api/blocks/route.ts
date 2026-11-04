@@ -1,27 +1,46 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { createClient } from '@supabase/supabase-js'
 import { reportingService } from '@/lib/reporting'
 
-// 사용자 차단
-export async function POST(req: NextRequest) {
-  try {
-    const { blockerId, blockedUserId, reason } = await req.json()
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL ?? 'https://placeholder.supabase.co',
+  process.env.SUPABASE_SERVICE_ROLE_KEY ?? 'placeholder-service-role-key'
+)
 
-    if (!blockerId || !blockedUserId) {
+async function getAuthUser(req: NextRequest) {
+  const authHeader = req.headers.get('authorization')
+  if (!authHeader) return null
+  const token = authHeader.replace('Bearer ', '')
+  const { data: { user } } = await supabase.auth.getUser(token)
+  return user
+}
+
+// 사용자 차단 — blockerId는 JWT에서 추출 (IDOR 방지)
+export async function POST(req: NextRequest) {
+  const user = await getAuthUser(req)
+  if (!user) {
+    return NextResponse.json({ error: '인증이 필요합니다' }, { status: 401 })
+  }
+
+  try {
+    const { blockedUserId, reason } = await req.json()
+
+    if (!blockedUserId) {
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }
       )
     }
 
-    if (blockerId === blockedUserId) {
+    if (user.id === blockedUserId) {
       return NextResponse.json(
         { error: 'Cannot block yourself' },
         { status: 400 }
       )
     }
 
-    const success = await reportingService.blockUser(blockerId, blockedUserId, reason || '차단됨')
-    
+    const success = await reportingService.blockUser(user.id, blockedUserId, reason || '차단됨')
+
     if (!success) {
       return NextResponse.json(
         { error: 'User is already blocked or operation failed' },
@@ -31,7 +50,6 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ message: 'User blocked successfully' })
   } catch (error: any) {
-    console.error('Block user error:', error)
     return NextResponse.json(
       { error: error.message || 'Internal server error' },
       { status: 500 }
@@ -39,32 +57,28 @@ export async function POST(req: NextRequest) {
   }
 }
 
-// 차단된 사용자 목록
+// 내 차단 목록 — JWT에서 userId 추출 (타인 차단 목록 조회 방지)
 export async function GET(req: NextRequest) {
+  const user = await getAuthUser(req)
+  if (!user) {
+    return NextResponse.json({ error: '인증이 필요합니다' }, { status: 401 })
+  }
+
   try {
     const { searchParams } = new URL(req.url)
-    const userId = searchParams.get('userId')
     const page = parseInt(searchParams.get('page') || '1')
-    const limit = parseInt(searchParams.get('limit') || '20')
+    const limit = Math.min(parseInt(searchParams.get('limit') || '20'), 100)
 
-    if (!userId) {
-      return NextResponse.json(
-        { error: 'User ID is required' },
-        { status: 400 }
-      )
-    }
-
-    const { blocks, total } = await reportingService.getBlockedUsers(userId, page, limit)
+    const { blocks, total } = await reportingService.getBlockedUsers(user.id, page, limit)
 
     return NextResponse.json({
       blocks,
       total,
       page,
       limit,
-      totalPages: Math.ceil(total / limit)
+      totalPages: Math.ceil(total / limit),
     })
   } catch (error: any) {
-    console.error('Error fetching blocked users:', error)
     return NextResponse.json(
       { error: error.message || 'Internal server error' },
       { status: 500 }
