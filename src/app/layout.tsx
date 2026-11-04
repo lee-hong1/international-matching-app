@@ -41,7 +41,8 @@ export default function RootLayout({
             __html: `
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', function() {
-    navigator.serviceWorker.register('/sw.js', { scope: '/' })
+    var buildId = ${JSON.stringify(process.env.NEXT_PUBLIC_BUILD_ID ?? 'v1')};
+    navigator.serviceWorker.register('/sw.js?v=' + buildId, { scope: '/' })
       .catch(function() {});
   });
 }

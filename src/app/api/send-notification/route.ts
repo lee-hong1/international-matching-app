@@ -54,6 +54,7 @@ export async function POST(req: NextRequest) {
     }
 
     const results = []
+    const staleTokens: string[] = []
 
     for (const tokenData of tokens) {
       try {
@@ -78,15 +79,19 @@ export async function POST(req: NextRequest) {
         const result = await messaging.send(message)
         results.push({ token: tokenData.token, success: true, messageId: result })
       } catch (error: any) {
-        console.error('Error sending notification:', tokenData.token, error)
         if (
           error.code === 'messaging/registration-token-not-registered' ||
           error.code === 'messaging/invalid-registration-token'
         ) {
-          await supabase.from('device_tokens').delete().eq('token', tokenData.token)
+          staleTokens.push(tokenData.token)
         }
         results.push({ token: tokenData.token, success: false, error: error.message })
       }
+    }
+
+    // 만료 토큰 일괄 삭제 (N+1 방지)
+    if (staleTokens.length > 0) {
+      await supabase.from('device_tokens').delete().in('token', staleTokens)
     }
 
     return NextResponse.json({

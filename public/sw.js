@@ -1,5 +1,9 @@
 // GlobalMatch Service Worker — Cache First (static) / Network First (API)
-const CACHE_NAME = 'globalmatch-v1'
+// BUILD_ID는 layout.tsx inline script가 window.__BUILD_ID로 주입 후
+// postMessage로 SW에 전달하거나, SW 등록 URL 쿼리로 전달 가능.
+// 여기서는 SW 등록 URL의 ?v= 파라미터로 받아 캐시 이름에 사용.
+const buildId = new URL(self.location).searchParams.get('v') || 'v1'
+const CACHE_NAME = `globalmatch-${buildId}`
 const STATIC_ASSETS = ['/', '/offline.html', '/manifest.json']
 
 // ── Install: pre-cache static assets ─────────────────────────────────────
