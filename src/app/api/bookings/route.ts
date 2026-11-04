@@ -1,15 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthUser, supabaseService, isValidUuid } from '@/lib/commerce'
 import { formatBookingTime } from '@/lib/datetime'
-import { detectLangFromHeader } from '@/lib/i18n'
+import { detectLangFromHeader, t, type Lang } from '@/lib/i18n'
 import { checkRateLimit, rateLimitResponse } from '@/lib/ratelimit'
 
 // ── Fire-and-forget 알림 헬퍼 ─────────────────────────────────────────────────
 async function sendBookingNotification(
   req: NextRequest,
-  opts: { recipientId: string; type: string; bookingId: string }
+  opts: {
+    recipientId: string
+    type: 'new_booking' | 'confirmed' | 'cancelled' | 'completed'
+    bookingId: string
+    lang?: Lang
+    vars?: Record<string, string>
+  }
 ): Promise<void> {
   try {
+    const lang: Lang = opts.lang ?? 'ko'
+    const titleKey = `notification.${opts.type}.title`
+    const bodyKey  = `notification.${opts.type}.body`
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? `https://${req.headers.get('host')}`
     await fetch(`${baseUrl}/api/send-notification`, {
       method: 'POST',
@@ -17,6 +26,8 @@ async function sendBookingNotification(
       body: JSON.stringify({
         user_id: opts.recipientId,
         type: opts.type,
+        title: t(titleKey, lang, opts.vars),
+        body:  t(bodyKey,  lang, opts.vars),
         data: { booking_id: opts.bookingId },
       }),
     })
@@ -255,6 +266,28 @@ export async function POST(req: NextRequest) {
     }
   } else if (overlapResult === true) {
     return NextResponse.json({ error: 'Time slot already booked' }, { status: 409 })
+  }
+
+  // ── 가용 시간 체크 (host_availability 등록 시에만 강제) ─────────────────────
+  const { count: availCount } = await supabaseService
+    .from('host_availability')
+    .select('id', { count: 'exact', head: true })
+    .eq('host_id', host_id)
+    .eq('is_active', true)
+
+  if ((availCount ?? 0) > 0) {
+    const { data: inSlot, error: availErr } = await supabaseService
+      .rpc('check_availability_slot', {
+        p_host_id: host_id,
+        p_booked_at: bookedAtIso,
+        p_timezone: validatedTz,
+      })
+    if (!availErr && inSlot === false) {
+      return NextResponse.json(
+        { error: 'Requested time is outside the host\'s available hours' },
+        { status: 400 }
+      )
+    }
   }
 
   // ── 예약 생성 ─────────────────────────────────────────────────────────────

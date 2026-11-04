@@ -42,3 +42,31 @@ EXCEPTION WHEN invalid_parameter_value THEN
   RETURN FALSE;
 END;
 $$;
+
+-- ── 가용 시간 체크 함수 ───────────────────────────────────────────────────────
+-- bookings POST에서 RPC로 호출: 해당 시간에 호스트 가용 슬롯이 있는지 확인.
+-- 없으면 FALSE (가용 시간 미등록 호스트는 항상 TRUE로 처리는 애플리케이션 레이어에서).
+CREATE OR REPLACE FUNCTION check_availability_slot(
+  p_host_id UUID,
+  p_booked_at TIMESTAMPTZ,
+  p_timezone TEXT
+) RETURNS BOOLEAN LANGUAGE plpgsql STABLE SECURITY DEFINER SET search_path = public AS $$
+DECLARE
+  v_dow INTEGER;
+  v_time TIME;
+BEGIN
+  -- UTC → 호스트 타임존으로 변환
+  v_dow  := EXTRACT(DOW FROM p_booked_at AT TIME ZONE p_timezone)::INTEGER;
+  v_time := (p_booked_at AT TIME ZONE p_timezone)::TIME;
+
+  RETURN EXISTS (
+    SELECT 1 FROM host_availability
+    WHERE host_id    = p_host_id
+      AND is_active  = true
+      AND day_of_week = v_dow
+      AND start_time <= v_time
+      AND end_time   >  v_time
+      AND timezone   = p_timezone
+  );
+END;
+$$;

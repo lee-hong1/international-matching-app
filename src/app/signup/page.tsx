@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { authService } from '@/lib/auth'
 import { supabase } from '@/lib/supabase'
+import { t, detectLangFromNavigator } from '@/lib/i18n'
 
 const COUNTRIES = [
   '한국', '미국', '캐나다', '영국', '독일', '프랑스', '이탈리아', '스페인',
@@ -54,6 +55,7 @@ export default function SignUpPage() {
   const [agreed, setAgreed] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
+  const lang = detectLangFromNavigator()
 
   function update(key: keyof FormData, value: any) {
     setForm((p) => ({ ...p, [key]: value }))
@@ -76,23 +78,23 @@ export default function SignUpPage() {
   }
 
   function validateStep1(): string | null {
-    if (!form.email) return '이메일을 입력하세요.'
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) return '올바른 이메일 형식을 입력하세요.'
-    if (!form.password) return '비밀번호를 입력하세요.'
-    if (form.password.length < 8) return '비밀번호는 최소 8자 이상이어야 합니다.'
+    if (!form.email) return t('signup.err_email_required', lang)
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) return t('signup.err_email_invalid', lang)
+    if (!form.password) return t('signup.err_password_required', lang)
+    if (form.password.length < 8) return t('signup.err_password_short', lang)
     if (!/[A-Za-z]/.test(form.password) || !/[0-9]/.test(form.password))
-      return '비밀번호는 영문과 숫자를 포함해야 합니다.'
-    if (form.password !== confirmPassword) return '비밀번호가 일치하지 않습니다.'
-    if (!agreed) return '이용약관에 동의해 주세요.'
+      return t('signup.err_password_weak', lang)
+    if (form.password !== confirmPassword) return t('signup.err_password_mismatch', lang)
+    if (!agreed) return t('signup.err_terms', lang)
     return null
   }
 
   function validateStep2(): string | null {
-    if (!form.fullName.trim()) return '이름을 입력하세요.'
-    if (!form.birthDate) return '생년월일을 입력하세요.'
+    if (!form.fullName.trim()) return t('signup.err_name_required', lang)
+    if (!form.birthDate) return t('signup.err_birthdate_required', lang)
     const age = Math.floor((Date.now() - new Date(form.birthDate).getTime()) / (365.25 * 24 * 60 * 60 * 1000))
-    if (age < 18) return '18세 이상만 가입 가능합니다.'
-    if (!form.country) return '국가를 선택하세요.'
+    if (age < 18) return t('signup.err_birthdate_required', lang)
+    if (!form.country) return t('signup.err_country_required', lang)
     return null
   }
 
@@ -121,9 +123,9 @@ export default function SignUpPage() {
         const msg = signUpError.message ?? ''
         // 이메일 존재 여부를 노출하지 않는 일반적인 오류 메시지
         if (msg.includes('already registered') || msg.includes('already exists')) {
-          setError('입력하신 정보로 가입을 진행할 수 없습니다. 이미 가입된 이메일이면 로그인을 이용해주세요.')
+          setError(t('signup.err_duplicate', lang))
         } else {
-          setError(msg || '회원가입에 실패했습니다.')
+          setError(msg || t('signup.err_generic', lang))
         }
         return
       }
@@ -162,7 +164,7 @@ export default function SignUpPage() {
         router.push('/signup/verify-email')
       }
     } catch {
-      setError('회원가입 중 오류가 발생했습니다.')
+      setError(t('signup.err_server', lang))
     } finally {
       setLoading(false)
     }
@@ -179,10 +181,20 @@ export default function SignUpPage() {
     return score
   })()
 
-  const strengthLabel = ['', '약함', '보통', '강함', '매우 강함'][passwordStrength]
+  const strengthLabel = [
+    '',
+    t('signup.strength_weak', lang),
+    t('signup.strength_fair', lang),
+    t('signup.strength_strong', lang),
+    t('signup.strength_very_strong', lang),
+  ][passwordStrength]
   const strengthColor = ['', 'bg-red-400', 'bg-yellow-400', 'bg-blue-400', 'bg-green-400'][passwordStrength]
 
-  const STEPS = ['계정 정보', '개인 정보', '프로필 설정']
+  const STEPS = [
+    t('signup.step_account', lang),
+    t('signup.step_personal', lang),
+    t('signup.step_profile', lang),
+  ]
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-purple-50 flex items-center justify-center p-4">
@@ -271,7 +283,7 @@ export default function SignUpPage() {
                     type={showPassword ? 'text' : 'password'}
                     value={form.password}
                     onChange={(e) => update('password', e.target.value)}
-                    placeholder="영문+숫자 8자 이상"
+                    placeholder={t('signup.password_placeholder', lang)}
                     className="w-full pl-10 pr-12 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-pink-400 bg-gray-50/50"
                   />
                   <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
@@ -304,7 +316,7 @@ export default function SignUpPage() {
                     type="password"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    placeholder="비밀번호 재입력"
+                    placeholder={t('signup.confirm_password', lang)}
                     className={`w-full pl-10 pr-4 py-3 border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-pink-400 bg-gray-50/50 ${confirmPassword && form.password !== confirmPassword ? 'border-red-300' : 'border-gray-200'}`}
                   />
                   {confirmPassword && form.password === confirmPassword && (
@@ -342,7 +354,7 @@ export default function SignUpPage() {
                   type="text"
                   value={form.fullName}
                   onChange={(e) => update('fullName', e.target.value)}
-                  placeholder="이름을 입력하세요"
+                  placeholder={t('signup.name_placeholder', lang)}
                   className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-pink-400 bg-gray-50/50"
                 />
               </div>
@@ -434,7 +446,7 @@ export default function SignUpPage() {
                 <textarea
                   value={form.bio}
                   onChange={(e) => update('bio', e.target.value)}
-                  placeholder="자신을 소개해 주세요..."
+                  placeholder={t('signup.bio_placeholder', lang)}
                   rows={3}
                   maxLength={200}
                   className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-pink-400 bg-gray-50/50 resize-none"
@@ -482,7 +494,7 @@ export default function SignUpPage() {
                       </svg>
                       가입 중...
                     </span>
-                  ) : '가입 완료'}
+                  ) : t('signup.submit', lang)}
                 </button>
               </div>
             </form>

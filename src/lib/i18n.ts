@@ -381,10 +381,97 @@ export function detectLangFromNavigator(): Lang {
   return normalizeLang(navigator.language)
 }
 
+  // ── 회원가입 ──────────────────────────────────────────────────────────────
+  'signup.title': { ko: '회원가입', en: 'Sign Up', ja: '新規登録', zh: '注册' },
+  'signup.step_account': { ko: '계정 정보', en: 'Account Info', ja: 'アカウント情報', zh: '账户信息' },
+  'signup.step_personal': { ko: '개인 정보', en: 'Personal Info', ja: '個人情報', zh: '个人信息' },
+  'signup.step_profile': { ko: '프로필 설정', en: 'Profile Setup', ja: 'プロフィール設定', zh: '个人档案' },
+  'signup.email_placeholder': { ko: '이메일 주소', en: 'Email address', ja: 'メールアドレス', zh: '电子邮箱' },
+  'signup.password_placeholder': { ko: '영문+숫자 8자 이상', en: '8+ chars with letter & number', ja: '英数字8文字以上', zh: '8位以上含字母和数字' },
+  'signup.confirm_password': { ko: '비밀번호 재입력', en: 'Confirm password', ja: 'パスワード確認', zh: '确认密码' },
+  'signup.name_placeholder': { ko: '이름을 입력하세요', en: 'Enter your name', ja: '名前を入力', zh: '输入姓名' },
+  'signup.bio_placeholder': { ko: '자신을 소개해 주세요...', en: 'Tell us about yourself...', ja: '自己紹介...', zh: '介绍一下自己...' },
+  'signup.submit': { ko: '가입 완료', en: 'Complete Sign Up', ja: '登録完了', zh: '完成注册' },
+  'signup.err_email_required': { ko: '이메일을 입력하세요.', en: 'Email is required.', ja: 'メールを入力してください。', zh: '请输入邮箱。' },
+  'signup.err_email_invalid': { ko: '올바른 이메일 형식을 입력하세요.', en: 'Enter a valid email.', ja: '正しいメール形式を入力してください。', zh: '请输入有效的邮箱格式。' },
+  'signup.err_password_required': { ko: '비밀번호를 입력하세요.', en: 'Password is required.', ja: 'パスワードを入力してください。', zh: '请输入密码。' },
+  'signup.err_password_short': { ko: '비밀번호는 최소 8자 이상이어야 합니다.', en: 'Password must be at least 8 characters.', ja: 'パスワードは8文字以上必要です。', zh: '密码至少需要8个字符。' },
+  'signup.err_password_weak': { ko: '비밀번호는 영문과 숫자를 포함해야 합니다.', en: 'Password must include letters and numbers.', ja: 'パスワードは英字と数字を含む必要があります。', zh: '密码必须包含字母和数字。' },
+  'signup.err_password_mismatch': { ko: '비밀번호가 일치하지 않습니다.', en: 'Passwords do not match.', ja: 'パスワードが一致しません。', zh: '密码不匹配。' },
+  'signup.err_terms': { ko: '이용약관에 동의해 주세요.', en: 'Please agree to the terms.', ja: '利用規約に同意してください。', zh: '请同意使用条款。' },
+  'signup.err_name_required': { ko: '이름을 입력하세요.', en: 'Name is required.', ja: '名前を入力してください。', zh: '请输入姓名。' },
+  'signup.err_birthdate_required': { ko: '생년월일을 입력하세요.', en: 'Date of birth is required.', ja: '生年月日を入力してください。', zh: '请输入生日。' },
+  'signup.err_country_required': { ko: '국가를 선택하세요.', en: 'Please select a country.', ja: '国を選択してください。', zh: '请选择国家。' },
+  'signup.err_duplicate': { ko: '입력하신 정보로 가입을 진행할 수 없습니다. 이미 가입된 이메일이면 로그인을 이용해주세요.', en: 'Unable to sign up with this info. If already registered, please log in.', ja: 'この情報では登録できません。登録済みの場合はログインしてください。', zh: '无法用此信息注册。如已注册，请登录。' },
+  'signup.err_generic': { ko: '회원가입에 실패했습니다.', en: 'Sign up failed.', ja: '登録に失敗しました。', zh: '注册失败。' },
+  'signup.err_server': { ko: '회원가입 중 오류가 발생했습니다.', en: 'An error occurred during sign up.', ja: '登録中にエラーが発生しました。', zh: '注册时出错。' },
+  'signup.strength_weak': { ko: '약함', en: 'Weak', ja: '弱い', zh: '弱' },
+  'signup.strength_fair': { ko: '보통', en: 'Fair', ja: '普通', zh: '一般' },
+  'signup.strength_strong': { ko: '강함', en: 'Strong', ja: '強い', zh: '强' },
+  'signup.strength_very_strong': { ko: '매우 강함', en: 'Very Strong', ja: 'とても強い', zh: '非常强' },
+
+  // ── 알림 메시지 (FCM push 본문) ──────────────────────────────────────────
+  'notification.new_booking.title': {
+    ko: '새 예약',
+    en: 'New Booking',
+    ja: '新しい予約',
+    zh: '新预约',
+  },
+  'notification.new_booking.body': {
+    ko: '{name}님이 {date}에 예약했습니다',
+    en: '{name} booked for {date}',
+    ja: '{name}さんが{date}に予約しました',
+    zh: '{name}已预约{date}',
+  },
+  'notification.confirmed.title': {
+    ko: '예약 확정',
+    en: 'Booking Confirmed',
+    ja: '予約確定',
+    zh: '预约已确认',
+  },
+  'notification.confirmed.body': {
+    ko: '{date} 예약이 확정되었습니다',
+    en: 'Your booking for {date} has been confirmed',
+    ja: '{date}の予約が確定しました',
+    zh: '{date}的预约已确认',
+  },
+  'notification.cancelled.title': {
+    ko: '예약 취소',
+    en: 'Booking Cancelled',
+    ja: '予約キャンセル',
+    zh: '预约已取消',
+  },
+  'notification.cancelled.body': {
+    ko: '{date} 예약이 취소되었습니다',
+    en: 'The booking for {date} has been cancelled',
+    ja: '{date}の予約がキャンセルされました',
+    zh: '{date}的预约已取消',
+  },
+  'notification.completed.title': {
+    ko: '서비스 완료',
+    en: 'Service Completed',
+    ja: 'サービス完了',
+    zh: '服务已完成',
+  },
+  'notification.completed.body': {
+    ko: '서비스가 완료되었습니다. 리뷰를 남겨보세요!',
+    en: 'Service completed. Please leave a review!',
+    ja: 'サービスが完了しました。レビューをお願いします！',
+    zh: '服务已完成，请留下评价！',
+  },
+}
+
 /**
  * 번역 조회.
  * 키가 없으면 key를 그대로 반환 (graceful fallback).
+ * vars: 템플릿 변수 치환 ex) t('notification.new_booking.body', 'ko', { name: '김철수', date: '12/25' })
  */
-export function t(key: string, lang: Lang): string {
-  return MESSAGES[key]?.[lang] ?? MESSAGES[key]?.['en'] ?? key
+export function t(key: string, lang: Lang, vars?: Record<string, string>): string {
+  let msg = MESSAGES[key]?.[lang] ?? MESSAGES[key]?.['en'] ?? key
+  if (vars) {
+    for (const [k, v] of Object.entries(vars)) {
+      msg = msg.replace(new RegExp(`\\{${k}\\}`, 'g'), v)
+    }
+  }
+  return msg
 }

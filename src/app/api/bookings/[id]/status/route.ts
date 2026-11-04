@@ -1,21 +1,34 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthUser, supabaseService, isValidUuid } from '@/lib/commerce'
 import { checkRateLimit, rateLimitResponse } from '@/lib/ratelimit'
+import { t, type Lang } from '@/lib/i18n'
 
 type BookingStatus = 'pending' | 'confirmed' | 'completed' | 'cancelled'
+type NotifiableStatus = 'confirmed' | 'cancelled' | 'completed'
 
 async function sendStatusNotification(
   req: NextRequest,
-  opts: { recipientId: string; newStatus: BookingStatus; bookingId: string }
+  opts: {
+    recipientId: string
+    newStatus: NotifiableStatus
+    bookingId: string
+    lang?: Lang
+    vars?: Record<string, string>
+  }
 ): Promise<void> {
   try {
+    const lang: Lang = opts.lang ?? 'ko'
+    const titleKey = `notification.${opts.newStatus}.title`
+    const bodyKey  = `notification.${opts.newStatus}.body`
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? `https://${req.headers.get('host')}`
     await fetch(`${baseUrl}/api/send-notification`, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({
         user_id: opts.recipientId,
-        type: `booking_${opts.newStatus}`,
+        type: opts.newStatus,
+        title: t(titleKey, lang, opts.vars),
+        body:  t(bodyKey,  lang, opts.vars),
         data: { booking_id: opts.bookingId },
       }),
     })
