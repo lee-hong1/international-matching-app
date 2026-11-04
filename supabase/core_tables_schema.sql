@@ -140,3 +140,29 @@ ALTER TABLE matching_preferences ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "users manage own matching prefs" ON matching_preferences;
 CREATE POLICY "users manage own matching prefs" ON matching_preferences
   FOR ALL USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
+
+-- ── user_photos ───────────────────────────────────────────────────────────────
+-- 사용자 프로필 사진: 본인만 쓰기, 타인은 공개 프로필 조회만
+CREATE TABLE IF NOT EXISTS user_photos (
+  id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id    UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  photo_url  TEXT NOT NULL,
+  is_primary BOOLEAN NOT NULL DEFAULT false,
+  order_idx  INTEGER NOT NULL DEFAULT 0,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_user_photos_user ON user_photos(user_id, order_idx);
+
+ALTER TABLE user_photos ENABLE ROW LEVEL SECURITY;
+
+-- 본인 사진 전체 관리
+DROP POLICY IF EXISTS "users manage own photos" ON user_photos;
+CREATE POLICY "users manage own photos" ON user_photos
+  FOR ALL USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
+
+-- 인증된 사용자는 타인 프로필 사진 조회 가능 (매칭 화면 필요)
+-- photo_url만 노출; 중복 검사(checkDuplicate)는 service_role로만
+DROP POLICY IF EXISTS "authenticated read others photos" ON user_photos;
+CREATE POLICY "authenticated read others photos" ON user_photos
+  FOR SELECT USING (auth.role() = 'authenticated');
