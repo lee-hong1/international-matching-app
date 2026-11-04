@@ -1,4 +1,5 @@
 import { supabase } from './supabase'
+import { supabaseService } from './commerce'
 import { notificationService } from './notifications'
 
 export interface ReportData {
@@ -238,7 +239,7 @@ class ReportingService {
   // 신고 처리 (관리자용)
   async processReport(reportId: string, status: ReportData['status'], resolutionNotes: string, adminId: string) {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await supabaseService
         .from('reports')
         .update({
           status,
@@ -278,7 +279,7 @@ class ReportingService {
   private async checkForAutomaticActions(userId: string, reportType: ReportData['report_type']) {
     try {
       // 최근 30일간 같은 사용자에 대한 신고 수 확인
-      const { data: recentReports, count } = await supabase
+      const { data: recentReports, count } = await supabaseService
         .from('reports')
         .select('id', { count: 'exact' })
         .eq('reported_user_id', userId)
@@ -355,19 +356,19 @@ class ReportingService {
   private async deactivateUserInteractions(userId1: string, userId2: string) {
     try {
       // 매치 비활성화
-      await supabase
+      await supabaseService
         .from('matches')
         .update({ is_active: false })
         .or(`and(user1_id.eq.${userId1},user2_id.eq.${userId2}),and(user1_id.eq.${userId2},user2_id.eq.${userId1})`)
 
       // 채팅방 비활성화
-      const { data: chatRooms } = await supabase
+      const { data: chatRooms } = await supabaseService
         .from('chat_rooms')
         .select('id')
         .contains('participants', [userId1, userId2])
 
       if (chatRooms && chatRooms.length > 0) {
-        await supabase
+        await supabaseService
           .from('chat_rooms')
           .update({ is_active: false })
           .in('id', chatRooms.map(room => room.id))
@@ -381,7 +382,7 @@ class ReportingService {
   private async notifyAdminsOfNewReport(report: ReportData) {
     try {
       // 관리자 사용자들 조회
-      const { data: admins } = await supabase
+      const { data: admins } = await supabaseService
         .from('profiles')
         .select('id')
         .eq('role', 'admin')
@@ -409,19 +410,19 @@ class ReportingService {
       const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString()
       
       // 신고 유형별 통계
-      const { data: reportsByType } = await supabase
+      const { data: reportsByType } = await supabaseService
         .from('reports')
         .select('report_type')
         .gte('created_at', since)
 
       // 상태별 통계
-      const { data: reportsByStatus } = await supabase
+      const { data: reportsByStatus } = await supabaseService
         .from('reports')
         .select('status')
         .gte('created_at', since)
 
       // 우선순위별 통계
-      const { data: reportsByPriority } = await supabase
+      const { data: reportsByPriority } = await supabaseService
         .from('reports')
         .select('priority')
         .gte('created_at', since)
@@ -460,7 +461,7 @@ class ReportingService {
       const { status, priority, report_type, reporter_id, reported_user_id, page = 1, limit = 20 } = query
       const from = (page - 1) * limit
       
-      let queryBuilder = supabase
+      let queryBuilder = supabaseService
         .from('reports')
         .select(`
           *,

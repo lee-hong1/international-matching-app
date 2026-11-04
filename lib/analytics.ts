@@ -1,4 +1,5 @@
 import { supabase } from './supabase'
+import { supabaseService } from './commerce'
 
 export interface UserActivity {
   id: string
@@ -268,22 +269,22 @@ class AnalyticsService {
         premiumUsersResult,
         paymentsResult
       ] = await Promise.all([
-        supabase.from('profiles').select('id', { count: 'exact' }),
-        supabase.from('user_activities').select('user_id', { count: 'exact' }).gte('created_at', today).eq('activity_type', 'login'),
-        supabase.from('user_activities').select('user_id', { count: 'exact' }).gte('created_at', weekAgo),
-        supabase.from('user_activities').select('user_id', { count: 'exact' }).gte('created_at', monthAgo),
-        supabase.from('matches').select('id', { count: 'exact' }),
-        supabase.from('matches').select('id', { count: 'exact' }).gte('created_at', today),
-        supabase.from('messages').select('id', { count: 'exact' }),
-        supabase.from('messages').select('id', { count: 'exact' }).gte('created_at', today),
-        supabase.from('subscriptions').select('id', { count: 'exact' }).eq('status', 'active'),
-        supabase.from('payments').select('amount').eq('status', 'completed')
+        supabaseService.from('profiles').select('id', { count: 'exact' }),
+        supabaseService.from('user_activities').select('user_id', { count: 'exact' }).gte('created_at', today).eq('activity_type', 'login'),
+        supabaseService.from('user_activities').select('user_id', { count: 'exact' }).gte('created_at', weekAgo),
+        supabaseService.from('user_activities').select('user_id', { count: 'exact' }).gte('created_at', monthAgo),
+        supabaseService.from('matches').select('id', { count: 'exact' }),
+        supabaseService.from('matches').select('id', { count: 'exact' }).gte('created_at', today),
+        supabaseService.from('messages').select('id', { count: 'exact' }),
+        supabaseService.from('messages').select('id', { count: 'exact' }).gte('created_at', today),
+        supabaseService.from('subscriptions').select('id', { count: 'exact' }).eq('status', 'active'),
+        supabaseService.from('payments').select('amount').eq('status', 'completed')
       ])
 
       // 수익 계산
       const totalRevenue = paymentsResult.data?.reduce((sum, payment) => sum + payment.amount, 0) || 0
       
-      const { data: monthlyPayments } = await supabase
+      const { data: monthlyPayments } = await supabaseService
         .from('payments')
         .select('amount')
         .eq('status', 'completed')
@@ -373,15 +374,15 @@ class AnalyticsService {
 
       for (const country of uniqueCountries) {
         const [userCountResult, activeUsersResult, matchesResult, premiumResult, engagementResult] = await Promise.all([
-          supabase.from('profiles').select('id', { count: 'exact' }).eq('country', country),
-          supabase.from('user_behavior_stats').select('user_id', { count: 'exact' })
+          supabaseService.from('profiles').select('id', { count: 'exact' }).eq('country', country),
+          supabaseService.from('user_behavior_stats').select('user_id', { count: 'exact' })
             .gte('last_active_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString())
             .in('user_id', countries?.filter(c => c.country === country).map(c => c) || []),
-          supabase.from('matches').select('id', { count: 'exact' }).or(`user1_country.eq.${country},user2_country.eq.${country}`),
-          supabase.from('subscriptions').select('user_id', { count: 'exact' })
+          supabaseService.from('matches').select('id', { count: 'exact' }).or(`user1_country.eq.${country},user2_country.eq.${country}`),
+          supabaseService.from('subscriptions').select('user_id', { count: 'exact' })
             .eq('status', 'active')
             .in('user_id', countries?.filter(c => c.country === country).map(c => c) || []),
-          supabase.from('user_behavior_stats').select('engagement_score')
+          supabaseService.from('user_behavior_stats').select('engagement_score')
             .in('user_id', countries?.filter(c => c.country === country).map(c => c) || [])
         ])
 
@@ -451,12 +452,12 @@ class AnalyticsService {
   }> {
     try {
       // 전체 성공률
-      const { count: totalLikes } = await supabase
+      const { count: totalLikes } = await supabaseService
         .from('user_activities')
         .select('id', { count: 'exact' })
         .eq('activity_type', 'like')
 
-      const { count: totalMatches } = await supabase
+      const { count: totalMatches } = await supabaseService
         .from('matches')
         .select('id', { count: 'exact' })
 
