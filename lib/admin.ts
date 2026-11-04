@@ -1,4 +1,5 @@
 import { supabase } from './supabase'
+import { supabaseService } from './commerce'
 
 export interface AdminStats {
   totalUsers: number
@@ -77,15 +78,15 @@ export const adminService = {
         revenueQuery,
         pendingReportsQuery
       ] = await Promise.all([
-        supabase.from('profiles').select('id', { count: 'exact', head: true }),
-        supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('verification_status', 'verified'),
-        supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('is_premium', true),
-        supabase.from('matches').select('id', { count: 'exact', head: true }),
-        supabase.from('messages').select('id', { count: 'exact', head: true }),
-        supabase.from('profiles').select('id', { count: 'exact', head: true })
+        supabaseService.from('profiles').select('id', { count: 'exact', head: true }),
+        supabaseService.from('profiles').select('id', { count: 'exact', head: true }).eq('verification_status', 'verified'),
+        supabaseService.from('profiles').select('id', { count: 'exact', head: true }).eq('is_premium', true),
+        supabaseService.from('matches').select('id', { count: 'exact', head: true }),
+        supabaseService.from('messages').select('id', { count: 'exact', head: true }),
+        supabaseService.from('profiles').select('id', { count: 'exact', head: true })
           .gte('last_active', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()),
-        supabase.from('payments').select('amount').eq('payment_status', 'completed'),
-        supabase.from('reports').select('id', { count: 'exact', head: true }).eq('status', 'pending')
+        supabaseService.from('payments').select('amount').eq('payment_status', 'completed'),
+        supabaseService.from('reports').select('id', { count: 'exact', head: true }).eq('status', 'pending')
       ])
 
       // 수익 계산
