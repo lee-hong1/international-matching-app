@@ -1,7 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
 
 // 이메일 전송 API (실제 구현에서는 SendGrid, AWS SES, Mailgun 등 사용)
 export async function POST(req: NextRequest) {
+  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
+  const rl = await checkRateLimit(`email-send:${ip}`, 'general')
+  if (!rl.allowed) {
+    const r = rateLimitResponse(rl.resetAt)
+    return NextResponse.json(r.body, { status: r.status, headers: r.headers })
+  }
+
   try {
     const { to, subject, html, text, recipientName } = await req.json()
 

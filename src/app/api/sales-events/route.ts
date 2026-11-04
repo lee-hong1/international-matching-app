@@ -1,9 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseService, isAllowedUrl, getAuthUser, hasForbiddenContent } from '@src/lib/commerce'
 import { isSuspended } from '@src/lib/suspended-check'
+import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
 
 // 판매 이벤트/공구 공지 목록 (발견 피드)
 export async function GET(req: NextRequest) {
+  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
+  const rl = await checkRateLimit(`sales-events-get:${ip}`, 'general')
+  if (!rl.allowed) {
+    const r = rateLimitResponse(rl.resetAt)
+    return NextResponse.json(r.body, { status: r.status, headers: r.headers })
+  }
+
   const { searchParams } = new URL(req.url)
   const eventType = searchParams.get('type')
   const hostId = searchParams.get('host_id')
@@ -35,6 +43,13 @@ export async function GET(req: NextRequest) {
 
 // 판매 이벤트/공구 공지 등록 (호스트 전용)
 export async function POST(req: NextRequest) {
+  const postIp = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
+  const postRl = await checkRateLimit(`sales-events-post:${postIp}`, 'general')
+  if (!postRl.allowed) {
+    const r = rateLimitResponse(postRl.resetAt)
+    return NextResponse.json(r.body, { status: r.status, headers: r.headers })
+  }
+
   const user = await getAuthUser(req)
   if (!user) return NextResponse.json({ error: '인증이 필요합니다' }, { status: 401 })
   if (await isSuspended(user.id)) {

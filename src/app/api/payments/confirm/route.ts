@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { calculateCommission } from '@/lib/payments'
+import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL ?? 'https://placeholder.supabase.co',
@@ -17,6 +18,13 @@ async function getAuthUser(request: NextRequest) {
 
 // 토스페이먼츠 결제 승인 콜백 처리 + 수수료 분배 정산
 export async function POST(request: NextRequest) {
+  const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
+  const rl = await checkRateLimit(`payments-confirm:${ip}`, 'payment')
+  if (!rl.allowed) {
+    const r = rateLimitResponse(rl.resetAt)
+    return NextResponse.json(r.body, { status: r.status, headers: r.headers })
+  }
+
   const user = await getAuthUser(request)
   if (!user) {
     return NextResponse.json({ error: '인증이 필요합니다' }, { status: 401 })
