@@ -102,6 +102,13 @@ export async function POST(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
+  const delIp = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
+  const delRl = await checkRateLimit(`follows-delete:${delIp}`, 'general')
+  if (!delRl.allowed) {
+    const r = rateLimitResponse(delRl.resetAt)
+    return NextResponse.json(r.body, { status: r.status, headers: r.headers })
+  }
+
   try {
     const { searchParams } = new URL(request.url)
     const followingId = searchParams.get('following_id')

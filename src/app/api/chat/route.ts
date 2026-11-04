@@ -100,7 +100,7 @@ export async function POST(req: NextRequest) {
       // FCM 정지 알림 fire-and-forget (법적 고지 의무)
       void fetch(`${getBaseUrl(req)}/api/send-notification`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'x-service-key': process.env.SUPABASE_SERVICE_ROLE_KEY ?? '' },
         body: JSON.stringify({
           userId: user.id,
           payload: {

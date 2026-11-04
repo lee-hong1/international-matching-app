@@ -1,60 +1,50 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { emailService } from '@/lib/email'
+import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
 
-// 이메일 수신 거부 API
 export async function POST(req: NextRequest) {
+  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
+  const rl = await checkRateLimit(`unsubscribe:${ip}`, 'general')
+  if (!rl.allowed) {
+    const r = rateLimitResponse(rl.resetAt)
+    return NextResponse.json(r.body, { status: r.status, headers: r.headers })
+  }
+
   try {
     const { email, type } = await req.json()
 
-    if (!email) {
-      return NextResponse.json(
-        { error: 'Email is required' },
-        { status: 400 }
-      )
+    if (!email || typeof email !== 'string') {
+      return NextResponse.json({ error: 'Email is required' }, { status: 400 })
     }
 
-    const success = await emailService.unsubscribe(email, type)
+    // 이메일 존재 여부를 외부에 노출하지 않기 위해 항상 200 반환
+    await emailService.unsubscribe(email, type).catch(() => {})
 
-    if (!success) {
-      return NextResponse.json(
-        { error: 'Failed to unsubscribe or email not found' },
-        { status: 400 }
-      )
-    }
-
-    return NextResponse.json({ 
-      message: 'Successfully unsubscribed from emails' 
-    })
-    
-  } catch (error: any) {
-    console.error('Unsubscribe error:', error)
-    return NextResponse.json(
-      { error: error.message || 'Failed to process unsubscribe request' },
-      { status: 500 }
-    )
+    return NextResponse.json({ message: 'Successfully unsubscribed from emails' })
+  } catch {
+    return NextResponse.json({ error: 'Failed to process unsubscribe request' }, { status: 500 })
   }
 }
 
-// 수신 거부 페이지 접근 (GET)
 export async function GET(req: NextRequest) {
+  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
+  const rl = await checkRateLimit(`unsubscribe:${ip}`, 'general')
+  if (!rl.allowed) {
+    return NextResponse.redirect(new URL('/unsubscribed?success=false', req.url))
+  }
+
   const { searchParams } = new URL(req.url)
   const email = searchParams.get('email')
   const type = searchParams.get('type') || 'all'
 
-  if (email) {
-    try {
-      await emailService.unsubscribe(email, type as any)
-      
-      // 성공 페이지로 리다이렉트
-      return NextResponse.redirect(new URL('/unsubscribed?success=true', req.url))
-    } catch (error) {
-      console.error('Auto unsubscribe error:', error)
-      return NextResponse.redirect(new URL('/unsubscribed?success=false', req.url))
-    }
+  if (!email) {
+    return NextResponse.json({ error: 'Email parameter is required' }, { status: 400 })
   }
 
-  return NextResponse.json(
-    { error: 'Email parameter is required' },
-    { status: 400 }
-  )
+  try {
+    await emailService.unsubscribe(email, type as Parameters<typeof emailService.unsubscribe>[1])
+    return NextResponse.redirect(new URL('/unsubscribed?success=true', req.url))
+  } catch {
+    return NextResponse.redirect(new URL('/unsubscribed?success=false', req.url))
+  }
 }

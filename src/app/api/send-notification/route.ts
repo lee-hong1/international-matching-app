@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabase } from '@/lib/supabase'
+import { isValidUuid } from '@src/lib/commerce'
 
 type NotificationData = Record<string, string>
 
@@ -35,11 +36,24 @@ async function getFirebaseMessaging() {
 }
 
 export async function POST(req: NextRequest) {
-  try {
-    const { userId, payload } = await req.json()
+  // 내부 서버→서버 전용: x-service-key 필수
+  const authHeader = req.headers.get('x-service-key')
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+  if (!serviceKey || authHeader !== serviceKey) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
 
-    if (!userId || !payload) {
-      return NextResponse.json({ error: 'Missing required parameters' }, { status: 400 })
+  try {
+    const body = await req.json()
+    // 호출 측이 userId 또는 user_id 모두 허용
+    const userId: string = body.userId ?? body.user_id ?? ''
+    const payload = body.payload ?? { title: body.title, body: body.body, data: body.data }
+
+    if (!userId || !isValidUuid(userId)) {
+      return NextResponse.json({ error: 'Valid userId required' }, { status: 400 })
+    }
+    if (!payload?.title) {
+      return NextResponse.json({ error: 'payload.title required' }, { status: 400 })
     }
 
     const { data: tokens, error } = await supabase
@@ -115,7 +129,6 @@ export async function POST(req: NextRequest) {
       nativeTokens.length > 0 ? sendBatch(nativeTokens, false) : Promise.resolve(),
     ])
 
-    // 만료 토큰 일괄 삭제
     if (staleTokens.length > 0) {
       await supabase.from('device_tokens').delete().in('token', staleTokens)
     }
@@ -126,8 +139,8 @@ export async function POST(req: NextRequest) {
       errorCount,
       staleRemoved: staleTokens.length,
     })
-  } catch (error: any) {
-    console.error('Send notification error:', error)
-    return NextResponse.json({ error: error.message ?? 'Internal server error' }, { status: 500 })
+  } catch (error: unknown) {
+    console.error('Send notification error:', (error as Error).message)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

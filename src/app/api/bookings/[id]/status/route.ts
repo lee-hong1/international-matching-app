@@ -52,7 +52,7 @@ async function sendStatusNotification(
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? `https://${req.headers.get('host')}`
     await fetch(`${baseUrl}/api/send-notification`, {
       method: 'POST',
-      headers: { 'content-type': 'application/json' },
+      headers: { 'content-type': 'application/json', 'x-service-key': process.env.SUPABASE_SERVICE_ROLE_KEY ?? '' },
       body: JSON.stringify({
         user_id: opts.recipientId,
         type: opts.newStatus,

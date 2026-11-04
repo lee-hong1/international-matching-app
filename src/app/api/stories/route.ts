@@ -57,6 +57,13 @@ export async function GET(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
+  const delIp = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
+  const delRl = await checkRateLimit(`stories-delete:${delIp}`, 'general')
+  if (!delRl.allowed) {
+    const r = rateLimitResponse(delRl.resetAt)
+    return NextResponse.json(r.body, { status: r.status, headers: r.headers })
+  }
+
   try {
     const { searchParams } = new URL(request.url)
     const storyId = searchParams.get('storyId')
