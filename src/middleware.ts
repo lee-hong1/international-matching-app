@@ -98,6 +98,45 @@ async function handleHostApiRoute(request: NextRequest): Promise<NextResponse> {
   }
 }
 
+async function handleHostPageRoute(request: NextRequest): Promise<NextResponse> {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+
+  if (!supabaseUrl || !supabaseServiceKey) {
+    return NextResponse.redirect(new URL('/onboarding/verify-age', request.url))
+  }
+
+  const accessToken = extractToken(request, supabaseUrl)
+  if (!accessToken) {
+    return NextResponse.redirect(new URL('/login', request.url))
+  }
+
+  try {
+    const supabaseAnon = createClient(supabaseUrl, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
+    const { data: { user }, error: authErr } = await supabaseAnon.auth.getUser(accessToken)
+
+    if (authErr || !user) {
+      return NextResponse.redirect(new URL('/login', request.url))
+    }
+
+    const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey)
+    const { data: profile } = await supabaseAdmin
+      .from('profiles')
+      .select('is_adult')
+      .eq('id', user.id)
+      .single()
+
+    if (!profile || profile.is_adult !== true) {
+      // 페이지 라우트: 403 대신 연령 인증 페이지로 리디렉션
+      return NextResponse.redirect(new URL('/onboarding/verify-age', request.url))
+    }
+
+    return NextResponse.next()
+  } catch {
+    return NextResponse.redirect(new URL('/onboarding/verify-age', request.url))
+  }
+}
+
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
@@ -105,18 +144,24 @@ export async function middleware(request: NextRequest) {
     return handleAdminRoute(request)
   }
 
-  // 호스트 등록/관리 API는 성인 인증 필수 (청소년보호법)
-  // /api/auth/verify-age 자체는 허용 (무한 루프 방지)
-  if (
-    pathname.startsWith('/api/host') &&
-    !pathname.startsWith('/api/auth/verify-age')
-  ) {
+  // /api/auth/** 는 항상 허용 (verify-age 포함, 무한 루프 방지)
+  if (pathname.startsWith('/api/auth/')) {
+    return NextResponse.next()
+  }
+
+  // 호스트 등록/관리 API: JWT + is_adult 검증 → 미인증 시 403
+  if (pathname.startsWith('/api/host')) {
     return handleHostApiRoute(request)
+  }
+
+  // 호스트 페이지 라우트: 미인증 시 /onboarding/verify-age 리디렉션
+  if (pathname.startsWith('/host')) {
+    return handleHostPageRoute(request)
   }
 
   return NextResponse.next()
 }
 
 export const config = {
-  matcher: ['/admin/:path*', '/api/host/:path*'],
+  matcher: ['/admin/:path*', '/api/host/:path*', '/api/auth/:path*', '/host/:path*'],
 }

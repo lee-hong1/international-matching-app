@@ -35,6 +35,19 @@ export default function RootLayout({
         <AuthProvider>
           {children}
         </AuthProvider>
+        {/* SW 등록 — 프로덕션 전용, 외부 스크립트 없이 inline */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('/sw.js', { scope: '/' })
+      .catch(function() {});
+  });
+}
+            `.trim(),
+          }}
+        />
       </body>
     </html>
   );

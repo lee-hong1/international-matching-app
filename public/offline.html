@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>오프라인 — GlobalMatch</title>
+<style>
+  :root {
+    --bg: #fff;
+    --fg: #111;
+    --accent: #9333ea;
+    --muted: #666;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #0f0f0f; --fg: #f0f0f0; --muted: #aaa; }
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100dvh;
+    padding: 24px max(16px, env(safe-area-inset-left, 0px));
+    text-align: center;
+  }
+  .icon { font-size: 64px; margin-bottom: 24px; }
+  h1 { font-size: 1.5rem; font-weight: 700; margin-bottom: 12px; }
+  .subtitle { color: var(--muted); font-size: 0.95rem; line-height: 1.6; max-width: 320px; }
+  .langs { margin-top: 32px; display: flex; flex-direction: column; gap: 8px; }
+  .lang { font-size: 0.85rem; color: var(--muted); }
+  button {
+    margin-top: 32px;
+    padding: 12px 32px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  button:active { opacity: 0.85; }
+</style>
+</head>
+<body>
+<div class="icon">📡</div>
+<h1 id="title">오프라인 상태입니다</h1>
+<p class="subtitle" id="msg">인터넷 연결을 확인한 후 다시 시도해주세요.</p>
+<button onclick="window.location.reload()">다시 시도</button>
+<div class="langs">
+  <span class="lang" id="en">You are offline. Please check your internet connection.</span>
+  <span class="lang" id="ja">オフラインです。インターネット接続を確認してください。</span>
+  <span class="lang" id="zh">您已离线。请检查您的网络连接。</span>
+</div>
+<script>
+  const lang = (navigator.language || 'ko').slice(0, 2)
+  if (lang === 'en') {
+    document.getElementById('title').textContent = 'You are offline'
+    document.getElementById('msg').textContent = 'Please check your internet connection and try again.'
+  } else if (lang === 'ja') {
+    document.getElementById('title').textContent = 'オフライン状態です'
+    document.getElementById('msg').textContent = 'インターネット接続を確認してから、もう一度お試しください。'
+  } else if (lang === 'zh') {
+    document.getElementById('title').textContent = '您已离线'
+    document.getElementById('msg').textContent = '请检查您的网络连接后重试。'
+  }
+</script>
+</body>
+</html>
