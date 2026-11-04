@@ -186,3 +186,16 @@ CREATE POLICY "Users can update own participation"
 CREATE POLICY "Hosts can view own commission ledger"
   ON commission_ledger FOR SELECT
   USING (recipient_type = 'host' AND recipient_id = auth.uid());
+
+-- 수수료 원장: INSERT/UPDATE/DELETE는 service_role만 (결제 처리 서버 전용)
+CREATE POLICY "service only write commission ledger"
+  ON commission_ledger FOR INSERT
+  WITH CHECK (false);
+
+CREATE POLICY "service only update commission ledger"
+  ON commission_ledger FOR UPDATE
+  USING (false);
+
+CREATE POLICY "service only delete commission ledger"
+  ON commission_ledger FOR DELETE
+  USING (false);

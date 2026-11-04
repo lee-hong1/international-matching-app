@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
-import { supabase } from '@/lib/supabase'
+import { supabaseService } from '@/lib/commerce'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY ?? 'sk_test_placeholder', {
   apiVersion: '2025-07-30.basil',
@@ -69,7 +69,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     }
 
     // 구독 플랜 정보 가져오기
-    const { data: plan } = await supabase
+    const { data: plan } = await supabaseService
       .from('subscription_plans')
       .select('*')
       .eq('id', planId)
@@ -85,16 +85,16 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     const endDate = new Date(startDate)
     endDate.setMonth(endDate.getMonth() + plan.duration_months)
 
-    // 사용자 구독 정보 생성 (멱등성: payment_id UNIQUE → 중복 웹훅 재시도 무시)
-    const { error: subscriptionError } = await supabase
+    // 사용자 구독 정보 생성 (멱등성: stripe_subscription_id UNIQUE → 중복 웹훅 재시도 무시)
+    const { error: subscriptionError } = await supabaseService
       .from('user_subscriptions')
       .insert({
         user_id: userId,
         plan_id: planId,
+        stripe_subscription_id: session.payment_intent as string,
         start_date: startDate.toISOString(),
         end_date: endDate.toISOString(),
         status: 'active',
-        payment_id: session.payment_intent as string
       })
 
     if (subscriptionError) {
@@ -107,7 +107,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     }
 
     // 결제 내역 저장 (멱등성: provider_payment_id UNIQUE → 중복 무시)
-    const { error: paymentError } = await supabase
+    const { error: paymentError } = await supabaseService
       .from('payments')
       .insert({
         user_id: userId,
@@ -125,77 +125,73 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     }
 
     // 프로필에 프리미엄 상태 업데이트
-    const { error: profileError } = await supabase
+    const { error: profileError } = await supabaseService
       .from('profiles')
       .update({ is_premium: true })
       .eq('id', userId)
 
     if (profileError) {
-      console.error('Error updating premium status:', profileError)
+      console.error('Error updating premium status:', profileError.code)
     }
 
-    console.log(`Subscription activated for user ${userId}`)
+    console.log(`Subscription activated for user ${userId.substring(0, 8)}`)
   } catch (error) {
     console.error('Error handling checkout completion:', error)
   }
 }
 
 async function handlePaymentSucceeded(paymentIntent: Stripe.PaymentIntent) {
-  // 결제 성공 로직
   console.log('Payment succeeded:', paymentIntent.id)
 }
 
 async function handlePaymentFailed(paymentIntent: Stripe.PaymentIntent) {
-  // 결제 실패 로직
   console.log('Payment failed:', paymentIntent.id)
-  
+
   // 결제 실패 상태 업데이트
-  const { error } = await supabase
+  const { error } = await supabaseService
     .from('payments')
     .update({ payment_status: 'failed' })
     .eq('provider_payment_id', paymentIntent.id)
 
   if (error) {
-    console.error('Error updating payment status:', error)
+    console.error('Error updating payment status:', error.code)
   }
 }
 
 async function handleSubscriptionCreated(subscription: Stripe.Subscription) {
-  // 구독 생성 로직
   console.log('Subscription created:', subscription.id)
 }
 
 async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
-  // 구독 삭제 로직
   console.log('Subscription deleted:', subscription.id)
 
   const customerId = subscription.customer as string
-  
+
   // 고객 정보에서 사용자 ID 찾기
   const customer = await stripe.customers.retrieve(customerId)
-  
+
   if (customer && !customer.deleted && customer.metadata?.userId) {
     const userId = customer.metadata.userId
 
     // 구독 상태를 취소로 업데이트
-    const { error: subscriptionError } = await supabase
+    const { error: subscriptionError } = await supabaseService
       .from('user_subscriptions')
       .update({ status: 'cancelled' })
       .eq('user_id', userId)
       .eq('status', 'active')
 
     if (subscriptionError) {
-      console.error('Error updating subscription status:', subscriptionError)
+      console.error('Error updating subscription status:', subscriptionError.code)
     }
 
     // 프리미엄 상태 제거
-    const { error: profileError } = await supabase
+    const { error: profileError } = await supabaseService
       .from('profiles')
       .update({ is_premium: false })
       .eq('id', userId)
 
     if (profileError) {
-      console.error('Error removing premium status:', profileError)
+      console.error('Error removing premium status:', profileError.code)
     }
   }
 }

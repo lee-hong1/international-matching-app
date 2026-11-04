@@ -353,12 +353,12 @@ class EmailService {
       const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString()
 
       const [sentResult, campaignsResult] = await Promise.all([
-        supabase
+        supabaseService
           .from('email_jobs')
           .select('id', { count: 'exact' })
           .eq('status', 'sent')
           .gte('sent_at', since),
-        supabase
+        supabaseService
           .from('email_campaigns')
           .select('*')
           .gte('created_at', since)
