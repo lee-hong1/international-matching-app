@@ -11,6 +11,9 @@ export async function isSuspended(userId: string): Promise<boolean> {
     .eq('id', userId)
     .single()
 
-  if (error) return false
+  if (error) {
+    console.error('[isSuspended] DB error, failing closed for user', userId.substring(0, 8) + '...')
+    return true
+  }
   return data?.is_suspended === true
 }

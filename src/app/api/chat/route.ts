@@ -5,6 +5,14 @@ import { detectExternalPlatform } from '@/lib/chat-safety'
 
 const MAX_CONTENT_LENGTH = 2000
 
+function getBaseUrl(req: Request): string {
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL
+  if (appUrl) return appUrl
+  const host = req.headers.get('host') ?? 'localhost:3000'
+  const proto = host.startsWith('localhost') ? 'http' : 'https'
+  return `${proto}://${host}`
+}
+
 /**
  * POST /api/chat/messages
  * 채팅 메시지 전송. 외부 플랫폼 유도 감지 → violation_count 증가 → 3회 시 정지.
@@ -90,8 +98,7 @@ export async function POST(req: NextRequest) {
 
     if (willSuspend) {
       // FCM 정지 알림 fire-and-forget (법적 고지 의무)
-      const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? ''
-      void fetch(`${appUrl}/api/send-notification`, {
+      void fetch(`${getBaseUrl(req)}/api/send-notification`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -102,7 +109,13 @@ export async function POST(req: NextRequest) {
             data: { type: 'suspension', reason: 'external_platform' },
           },
         }),
-      }).catch(() => {}) // 알림 실패가 응답을 막으면 안 됨
+      }).catch(() => {})
+      // 이메일 고지 (한국 전자상거래법 고지 의무)
+      void fetch(`${getBaseUrl(req)}/api/emails/suspension-notification`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-service-key': process.env.SUPABASE_SERVICE_ROLE_KEY ?? '' },
+        body: JSON.stringify({ userId: user.id }),
+      }).catch(() => {})
 
       return NextResponse.json(
         {
