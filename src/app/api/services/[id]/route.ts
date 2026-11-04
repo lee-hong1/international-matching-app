@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthUser, supabaseService, isValidUuid, hasForbiddenContent } from '@src/lib/commerce'
 import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
+import { detectExternalPlatform } from '@src/lib/chat-safety'
 
 const VALID_CATEGORIES = ['conversation', 'lesson', 'tour', 'meal', 'activity', 'other'] as const
 const VALID_CURRENCIES = ['KRW', 'JPY', 'CNY', 'USD'] as const
@@ -95,12 +96,12 @@ export async function PATCH(
     if (typeof updates.title !== 'string' || updates.title.length < 2 || updates.title.length > 100) {
       return NextResponse.json({ error: 'title must be 2-100 characters' }, { status: 400 })
     }
-    if (hasForbiddenContent(updates.title)) {
+    if (hasForbiddenContent(updates.title) || detectExternalPlatform(updates.title)) {
       return NextResponse.json({ error: 'Title contains forbidden content' }, { status: 400 })
     }
   }
   if (updates.description !== undefined && typeof updates.description === 'string') {
-    if (hasForbiddenContent(updates.description)) {
+    if (hasForbiddenContent(updates.description) || detectExternalPlatform(updates.description)) {
       return NextResponse.json({ error: 'Description contains forbidden content' }, { status: 400 })
     }
   }

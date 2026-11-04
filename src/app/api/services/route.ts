@@ -3,6 +3,7 @@ import { getAuthUser, supabaseService, isValidUuid } from '@src/lib/commerce'
 import { hasForbiddenContent } from '@src/lib/commerce'
 import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
 import { isSuspended } from '@src/lib/suspended-check'
+import { detectExternalPlatform } from '@src/lib/chat-safety'
 
 const VALID_CATEGORIES = ['conversation', 'lesson', 'tour', 'meal', 'activity', 'other'] as const
 type ServiceCategory = typeof VALID_CATEGORIES[number]
@@ -101,6 +102,9 @@ export async function POST(req: NextRequest) {
   const descStr = typeof description === 'string' ? description.trim() : ''
   if (hasForbiddenContent(titleStr) || hasForbiddenContent(descStr)) {
     return NextResponse.json({ error: 'Content contains prohibited keywords' }, { status: 400 })
+  }
+  if (detectExternalPlatform(titleStr) || detectExternalPlatform(descStr)) {
+    return NextResponse.json({ error: '외부 플랫폼 유도는 허용되지 않습니다' }, { status: 400 })
   }
 
   // ── host 프로필 확인 (is_adult) ───────────────────────────────────────────

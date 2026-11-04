@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getAuthUser, supabaseService, isValidUuid } from '@src/lib/commerce'
 import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
 import { isSuspended } from '@src/lib/suspended-check'
+import { detectExternalPlatform } from '@src/lib/chat-safety'
 
 /**
  * GET /api/reviews?host_id=xxx
@@ -100,6 +101,9 @@ export async function POST(req: NextRequest) {
   }
   if (comment && comment.length > 1000) {
     return NextResponse.json({ error: 'comment too long (max 1000)' }, { status: 400 })
+  }
+  if (comment && detectExternalPlatform(comment)) {
+    return NextResponse.json({ error: '외부 플랫폼 유도는 허용되지 않습니다' }, { status: 400 })
   }
 
   // 예약 조회 — reviewer가 user인지 host인지 확인
