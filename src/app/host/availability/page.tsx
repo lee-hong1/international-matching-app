@@ -210,16 +210,31 @@ export default function HostAvailabilityPage() {
                 justifyContent: 'space-between',
                 alignItems: 'center',
                 padding: '0.75rem 1rem',
-                background: '#f9fafb',
+                background: slot.is_active ? '#f9fafb' : '#f3f4f6',
                 borderRadius: 8,
-                border: '1px solid #e5e7eb',
+                border: `1px solid ${slot.is_active ? '#e5e7eb' : '#d1d5db'}`,
+                opacity: slot.is_active ? 1 : 0.65,
               }}
             >
-              <span style={{ fontSize: '0.9rem' }}>
-                {t(`availability.days.${slot.day_of_week}`, lang)} &nbsp;
-                {slot.start_time} – {slot.end_time} &nbsp;
-                <span style={{ color: '#6b7280', fontSize: '0.8rem' }}>({slot.timezone})</span>
-              </span>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flex: 1 }}>
+                <span style={{
+                  fontSize: '0.9rem',
+                  textDecoration: slot.is_active ? 'none' : 'line-through',
+                  color: slot.is_active ? undefined : '#9ca3af',
+                }}>
+                  {t(`availability.days.${slot.day_of_week}`, lang)}&nbsp;
+                  {slot.start_time} – {slot.end_time}&nbsp;
+                  <span style={{ color: slot.is_active ? '#6b7280' : '#d1d5db', fontSize: '0.8rem' }}>({slot.timezone})</span>
+                </span>
+                {!slot.is_active && (
+                  <span style={{
+                    fontSize: '0.7rem', background: '#fee2e2', color: '#991b1b',
+                    padding: '0.15rem 0.45rem', borderRadius: 3, fontWeight: 600, flexShrink: 0,
+                  }}>
+                    {t('availability.inactive_badge', lang)}
+                  </span>
+                )}
+              </div>
               <div style={{ display: 'flex', gap: '0.5rem' }}>
                 <button
                   onClick={() => handleToggle(slot.id, slot.is_active)}

@@ -549,6 +549,21 @@ const MESSAGES: Messages = {
   'services.reviews_title': { ko: '최근 리뷰', en: 'Recent Reviews', ja: '最近のレビュー', zh: '最近评价' },
   'availability.toggle_on': { ko: '활성화', en: 'Enable', ja: '有効化', zh: '启用' },
   'availability.toggle_off': { ko: '비활성화', en: 'Disable', ja: '無効化', zh: '停用' },
+  'availability.inactive_badge': { ko: '비활성', en: 'Inactive', ja: '無効', zh: '已停用' },
+
+  // ── discover 탭 ───────────────────────────────────────────────────────────
+  'discover.matching_tab': { ko: '매칭', en: 'Matching', ja: 'マッチング', zh: '配对' },
+  'discover.services_tab': { ko: '서비스', en: 'Services', ja: 'サービス', zh: '服务' },
+  'discover.empty_services': { ko: '서비스가 없습니다', en: 'No services found', ja: 'サービスがありません', zh: '暂无服务' },
+  'discover.match_message': { ko: '님과 매칭되었습니다! 지금 대화를 시작해 보세요.', en: 'matched with you! Start a conversation now.', ja: 'さんとマッチングしました！今すぐ会話を始めましょう。', zh: '和您配对成功！现在开始对话吧。' },
+
+  // ── 에러 페이지 ────────────────────────────────────────────────────────────
+  'error.retry': { ko: '다시 시도', en: 'Try Again', ja: '再試行', zh: '重试' },
+  'error.not_found': { ko: '페이지를 찾을 수 없습니다', en: 'Page not found', ja: 'ページが見つかりません', zh: '找不到页面' },
+  'error.go_home': { ko: '홈으로 돌아가기', en: 'Go Home', ja: 'ホームへ戻る', zh: '返回首页' },
+
+  // ── 서비스 상세 (추가) ──────────────────────────────────────────────────────
+  'services.login_to_book': { ko: '로그인 후 예약하기', en: 'Login to Book', ja: 'ログインして予約', zh: '登录后预约' },
 }
 
 /** 언어 코드를 지원 언어로 정규화 */

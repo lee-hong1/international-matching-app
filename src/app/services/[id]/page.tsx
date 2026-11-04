@@ -1,4 +1,4 @@
-import { headers } from 'next/headers'
+import { headers, cookies } from 'next/headers'
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import ReviewCard from '@/components/ReviewCard'
@@ -81,6 +81,14 @@ export default async function ServiceDetailPage(
   const headersList = await headers()
   const lang = detectLangFromHeader(headersList.get('accept-language') ?? '')
 
+  const cookieStore = await cookies()
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? ''
+  const projectRef = supabaseUrl.split('//')[1]?.split('.')[0] ?? ''
+  const hasSession = !!(
+    cookieStore.get('sb-access-token')?.value ??
+    (projectRef && cookieStore.get(`sb-${projectRef}-auth-token`)?.value)
+  )
+
   const svc = await fetchService(id)
   if (!svc) notFound()
 
@@ -139,16 +147,29 @@ export default async function ServiceDetailPage(
       {/* 예약 CTA */}
       {svc.is_active && (
         <section style={{ marginBottom: '2rem' }}>
-          <a
-            href={`/book/${svc.id}?host=${svc.host_id}`}
-            style={{
-              display: 'inline-block', background: '#e91e63', color: '#fff',
-              padding: '0.75rem 2rem', borderRadius: 8, textDecoration: 'none',
-              fontWeight: 600, fontSize: '1rem',
-            }}
-          >
-            {t('services.book_now', lang)}
-          </a>
+          {hasSession ? (
+            <a
+              href={`/book/${svc.id}?host=${svc.host_id}`}
+              style={{
+                display: 'inline-block', background: '#e91e63', color: '#fff',
+                padding: '0.75rem 2rem', borderRadius: 8, textDecoration: 'none',
+                fontWeight: 600, fontSize: '1rem',
+              }}
+            >
+              {t('services.book_now', lang)}
+            </a>
+          ) : (
+            <a
+              href={`/login?returnUrl=${encodeURIComponent(`/book/${svc.id}?host=${svc.host_id}`)}`}
+              style={{
+                display: 'inline-block', background: '#e91e63', color: '#fff',
+                padding: '0.75rem 2rem', borderRadius: 8, textDecoration: 'none',
+                fontWeight: 600, fontSize: '1rem',
+              }}
+            >
+              {t('services.login_to_book', lang)}
+            </a>
+          )}
         </section>
       )}
 
