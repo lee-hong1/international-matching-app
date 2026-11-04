@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { getAuthUser } from '@/lib/commerce'
+import { isSuspended } from '@/lib/suspended-check'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -38,6 +39,10 @@ export async function GET(req: NextRequest) {
 export async function PATCH(req: NextRequest) {
   const user = await getAuthUser(req)
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+  if (await isSuspended(user.id)) {
+    return NextResponse.json({ error: '계정이 정지되었습니다 / Account suspended' }, { status: 403 })
+  }
 
   let body: Record<string, unknown>
   try {

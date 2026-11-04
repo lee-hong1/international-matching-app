@@ -102,14 +102,37 @@ ALTER TABLE profiles ADD COLUMN IF NOT EXISTS violation_count INTEGER NOT NULL D
   CHECK (violation_count >= 0);
 ALTER TABLE profiles ADD COLUMN IF NOT EXISTS is_suspended BOOLEAN NOT NULL DEFAULT false;
 
--- 정지 상태는 service_role만 변경 가능 (사용자 셀프 복구 방지)
+-- 정지 상태는 service_role만 변경 가능 (트리거 기반 — RLS WITH CHECK에서 OLD 미지원)
+-- 기존 잘못된 policy 제거
 DROP POLICY IF EXISTS "owner cannot self-unsuspend" ON profiles;
-CREATE POLICY "owner cannot self-unsuspend" ON profiles FOR UPDATE
-  USING (auth.uid() = id)
-  WITH CHECK (
-    auth.uid() = id
-    AND is_suspended = (SELECT is_suspended FROM profiles WHERE id = auth.uid())
-  );
+
+-- BEFORE UPDATE 트리거: is_suspended/violation_count 변경은 service_role만 허용
+CREATE OR REPLACE FUNCTION prevent_self_suspension_change()
+RETURNS TRIGGER LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
+BEGIN
+  -- is_suspended 셀프 복구/셀프 정지 방지
+  IF OLD.is_suspended IS DISTINCT FROM NEW.is_suspended
+     AND current_role != 'service_role' THEN
+    RAISE EXCEPTION 'Unauthorized: cannot change suspension status directly';
+  END IF;
+  -- violation_count 셀프 조작 방지
+  IF OLD.violation_count IS DISTINCT FROM NEW.violation_count
+     AND current_role != 'service_role' THEN
+    RAISE EXCEPTION 'Unauthorized: cannot change violation count directly';
+  END IF;
+  RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS prevent_self_suspension_change_trigger ON profiles;
+CREATE TRIGGER prevent_self_suspension_change_trigger
+  BEFORE UPDATE ON profiles
+  FOR EACH ROW
+  WHEN (
+    OLD.is_suspended IS DISTINCT FROM NEW.is_suspended
+    OR OLD.violation_count IS DISTINCT FROM NEW.violation_count
+  )
+  EXECUTE FUNCTION prevent_self_suspension_change();
 
 -- profiles 인덱스
 CREATE INDEX IF NOT EXISTS idx_profiles_trust     ON profiles(trust_score DESC) WHERE trust_score > 0;

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthUser, supabaseService, isValidUuid } from '@/lib/commerce'
 import { checkRateLimit, rateLimitResponse } from '@/lib/ratelimit'
+import { isSuspended } from '@/lib/suspended-check'
 
 /**
  * GET /api/reviews?host_id=xxx
@@ -74,6 +75,10 @@ export async function POST(req: NextRequest) {
   const user = await getAuthUser(req)
   if (!user) {
     return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
+  }
+
+  if (await isSuspended(user.id)) {
+    return NextResponse.json({ error: '계정이 정지되었습니다 / Account suspended' }, { status: 403 })
   }
 
   let body: { booking_id?: string; rating?: number; comment?: string }

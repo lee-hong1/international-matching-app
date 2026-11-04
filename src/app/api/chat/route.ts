@@ -89,6 +89,21 @@ export async function POST(req: NextRequest) {
       .eq('id', user.id)
 
     if (willSuspend) {
+      // FCM 정지 알림 fire-and-forget (법적 고지 의무)
+      const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? ''
+      void fetch(`${appUrl}/api/send-notification`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: user.id,
+          payload: {
+            title: '계정 임시 정지 / Account Suspended',
+            body: '외부 플랫폼 유도로 인한 임시 정지입니다. / Account suspended for directing to external platforms.',
+            data: { type: 'suspension', reason: 'external_platform' },
+          },
+        }),
+      }).catch(() => {}) // 알림 실패가 응답을 막으면 안 됨
+
       return NextResponse.json(
         {
           error: '외부 플랫폼 유도 3회 적발. 계정이 정지되었습니다 / Account suspended after 3 violations',

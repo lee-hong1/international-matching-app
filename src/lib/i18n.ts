@@ -574,6 +574,11 @@ const MESSAGES: Messages = {
   'commission.loading': { ko: '수익 집계 중…', en: 'Loading earnings…', ja: '収益を集計中…', zh: '加载收益中…' },
   'commission.error': { ko: '수익 정보를 불러오지 못했습니다', en: 'Failed to load earnings', ja: '収益情報の読み込みに失敗しました', zh: '无法加载收益信息' },
   'commission.currency_krw': { ko: '원', en: 'KRW', ja: '韓国ウォン', zh: '韩元' },
+
+  // ── 계정 정지 알림 ────────────────────────────────────────────────────────
+  'suspension.title': { ko: '계정 임시 정지', en: 'Account Suspended', ja: 'アカウント一時停止', zh: '账号已暂停' },
+  'suspension.reason_external': { ko: '외부 플랫폼 유도로 인한 임시 정지입니다.', en: 'Your account has been suspended for directing to external platforms.', ja: '外部プラットフォームへの誘導により一時停止されました。', zh: '由于引导至外部平台，您的账号已被暂停。' },
+  'suspension.warning': { ko: '외부 플랫폼 유도 경고 ({n}회 / 3회)', en: 'External platform warning ({n} of 3)', ja: '外部プラットフォーム誘導警告 ({n}/3)', zh: '外部平台引导警告（{n}/3次）' },
 }
 
 /** 언어 코드를 지원 언어로 정규화 */
