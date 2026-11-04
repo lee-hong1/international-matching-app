@@ -36,3 +36,53 @@ export async function getAuthUser(req: NextRequest) {
   const { data: { user } } = await supabaseService.auth.getUser(token)
   return user
 }
+
+// ── i18n error messages ──────────────────────────────────────────────────────
+
+type Lang = 'ko' | 'en' | 'ja' | 'zh'
+
+const ERRORS: Record<string, Record<Lang, string>> = {
+  auth_required: {
+    ko: '인증이 필요합니다',
+    en: 'Authentication required',
+    ja: '認証が必要です',
+    zh: '需要身份验证',
+  },
+  forbidden: {
+    ko: '권한이 없습니다',
+    en: 'Forbidden',
+    ja: 'アクセス権限がありません',
+    zh: '没有权限',
+  },
+  not_found: {
+    ko: '리소스를 찾을 수 없습니다',
+    en: 'Resource not found',
+    ja: 'リソースが見つかりません',
+    zh: '找不到资源',
+  },
+  url_not_allowed: {
+    ko: '허용되지 않은 외부 URL입니다',
+    en: 'External URL not allowed',
+    ja: '許可されていない外部URLです',
+    zh: '不允许的外部URL',
+  },
+  rate_limited: {
+    ko: '요청이 너무 많습니다. 잠시 후 다시 시도해 주세요',
+    en: 'Too many requests. Please try again later',
+    ja: 'リクエストが多すぎます。しばらくしてから再試行してください',
+    zh: '请求过多，请稍后再试',
+  },
+  server_error: {
+    ko: '서버 오류가 발생했습니다',
+    en: 'Internal server error',
+    ja: 'サーバーエラーが発生しました',
+    zh: '服务器错误',
+  },
+}
+
+/** Returns a bilingual error string (ko + lang) for the given key. */
+export function errorMsg(key: keyof typeof ERRORS, lang: Lang = 'en'): string {
+  const map = ERRORS[key] ?? ERRORS.server_error
+  if (lang === 'ko') return map.ko
+  return `${map.ko} / ${map[lang] ?? map.en}`
+}
