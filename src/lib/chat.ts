@@ -37,6 +37,8 @@ async function getAuthToken(): Promise<string | null> {
 
 export const chatService = {
   async getUserChatRooms(userId: string): Promise<ChatRoom[]> {
+    // N+1 방지: chat_rooms와 messages를 단일 쿼리로 조인.
+    // 파트너 프로필은 별도 쿼리 1회로 일괄 조회.
     const { data, error } = await supabase
       .from('chat_rooms')
       .select(`
@@ -48,27 +50,38 @@ export const chatService = {
 
     if (error || !data) return []
 
-    const rooms: ChatRoom[] = []
-    for (const row of data as Array<{
+    type RawRoom = {
       id: string
       booking_id: string | null
       user_id: string
       host_id: string
       created_at: string
       messages?: Array<{ content: string; created_at: string }>
-    }>) {
-      const partnerId = row.user_id === userId ? row.host_id : row.user_id
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('id, display_name, country')
-        .eq('id', partnerId)
-        .single()
+    }
 
+    const rows = data as RawRoom[]
+
+    // 파트너 ID 목록을 한 번에 수집 → 단일 IN 쿼리
+    const partnerIds = [...new Set(rows.map((r) =>
+      r.user_id === userId ? r.host_id : r.user_id
+    ))]
+
+    const { data: profiles } = await supabase
+      .from('profiles')
+      .select('id, display_name, country')
+      .in('id', partnerIds)
+
+    const profileMap = new Map(
+      (profiles ?? []).map((p) => [p.id, p])
+    )
+
+    return rows.map((row) => {
+      const partnerId = row.user_id === userId ? row.host_id : row.user_id
+      const profile = profileMap.get(partnerId)
       const sortedMsgs = (row.messages ?? []).sort(
         (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
       )
-
-      rooms.push({
+      return {
         id: row.id,
         booking_id: row.booking_id,
         user_id: row.user_id,
@@ -77,16 +90,15 @@ export const chatService = {
         partner: profile
           ? {
               id: profile.id,
-              full_name: profile.display_name ?? 'Unknown',
+              full_name: (profile as { display_name?: string }).display_name ?? 'Unknown',
               avatar_url: null,
-              country: profile.country ?? null,
+              country: (profile as { country?: string }).country ?? null,
             }
           : undefined,
         last_message: sortedMsgs[0]?.content,
         last_message_at: sortedMsgs[0]?.created_at,
-      })
-    }
-    return rooms
+      }
+    })
   },
 
   async getRoomMessages(roomId: string): Promise<Message[]> {
