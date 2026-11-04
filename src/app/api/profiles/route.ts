@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { getAuthUser } from '@src/lib/commerce'
 import { isSuspended } from '@src/lib/suspended-check'
+import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -15,6 +16,13 @@ const ALLOWED_COUNTRIES = new Set([
 
 // GET /api/profiles/me — 본인 전체 프로필 (email 포함)
 export async function GET(req: NextRequest) {
+  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
+  const rl = await checkRateLimit(`profiles-me:${ip}`, 'general')
+  if (!rl.allowed) {
+    const r = rateLimitResponse(rl.resetAt)
+    return NextResponse.json(r.body, { status: r.status, headers: r.headers })
+  }
+
   const user = await getAuthUser(req)
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
@@ -37,6 +45,13 @@ export async function GET(req: NextRequest) {
 
 // PATCH /api/profiles/me — 프로필 수정
 export async function PATCH(req: NextRequest) {
+  const patchIp = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
+  const patchRl = await checkRateLimit(`profiles-patch:${patchIp}`, 'general')
+  if (!patchRl.allowed) {
+    const r = rateLimitResponse(patchRl.resetAt)
+    return NextResponse.json(r.body, { status: r.status, headers: r.headers })
+  }
+
   const user = await getAuthUser(req)
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
