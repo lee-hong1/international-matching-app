@@ -1,11 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { supabase } from '@/lib/supabase'
+import { supabaseService } from '@/lib/commerce'
 import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL ?? 'https://placeholder.supabase.co',
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? 'placeholder-anon-key'
-)
 
 async function getAuthUser(request: NextRequest) {
   const authHeader = request.headers.get('authorization')
@@ -126,7 +122,7 @@ export async function POST(request: NextRequest) {
       .eq('following_id', user.id)
 
     if (followers && followers.length > 0) {
-      await supabase.from('event_notifications').insert(
+      await supabaseService.from('event_notifications').insert(
         followers.map((f) => ({ event_id: event.id, recipient_id: f.follower_id }))
       )
     }

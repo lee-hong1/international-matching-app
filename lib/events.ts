@@ -1,4 +1,5 @@
 import { supabase } from './supabase'
+import { supabaseService } from './commerce'
 import { calculateCommission } from './payments'
 
 export type EventType = 'drink' | 'meal' | 'party'
@@ -122,7 +123,7 @@ export const eventsService = {
       recipient_id: f.follower_id,
     }))
 
-    await supabase.from('event_notifications').insert(notifications)
+    await supabaseService.from('event_notifications').insert(notifications)
   },
 
   // 열려있는 이벤트 목록 (탐색)

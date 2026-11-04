@@ -159,6 +159,23 @@ ALTER TABLE reports ENABLE ROW LEVEL SECURITY;
 ALTER TABLE blocks ENABLE ROW LEVEL SECURITY;
 ALTER TABLE payments ENABLE ROW LEVEL SECURITY;
 
+-- payments: 본인 결제 조회; INSERT/UPDATE/DELETE는 service_role만 (결제 서버 전용)
+DROP POLICY IF EXISTS "users read own payments" ON payments;
+CREATE POLICY "users read own payments" ON payments
+  FOR SELECT USING (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "service only write payments" ON payments;
+CREATE POLICY "service only write payments" ON payments
+  FOR INSERT WITH CHECK (false);
+
+DROP POLICY IF EXISTS "service only update payments" ON payments;
+CREATE POLICY "service only update payments" ON payments
+  FOR UPDATE USING (false);
+
+DROP POLICY IF EXISTS "service only delete payments" ON payments;
+CREATE POLICY "service only delete payments" ON payments
+  FOR DELETE USING (false);
+
 -- 기본 RLS 정책들
 CREATE POLICY "Users can view own profile" ON profiles FOR SELECT USING (auth.uid() = id);
 CREATE POLICY "Users can update own profile" ON profiles FOR UPDATE USING (auth.uid() = id);

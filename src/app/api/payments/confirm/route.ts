@@ -1,12 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
 import { calculateCommission } from '@/lib/payments'
 import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL ?? 'https://placeholder.supabase.co',
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? 'placeholder-anon-key'
-)
+import { supabase } from '@/lib/supabase'
+import { supabaseService } from '@/lib/commerce'
 
 async function getAuthUser(request: NextRequest) {
   const authHeader = request.headers.get('authorization')
@@ -36,7 +32,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: '필수 파라미터가 누락되었습니다' }, { status: 400 })
     }
 
-    const { data: paymentRecord, error: findError } = await supabase
+    // 본인 결제 레코드 조회 (user_id 필터로 IDOR 차단)
+    const { data: paymentRecord, error: findError } = await supabaseService
       .from('payments')
       .select('*, events (*, partner_venues (commission_rate))')
       .eq('provider_order_id', orderId)
@@ -70,7 +67,7 @@ export async function POST(request: NextRequest) {
 
     const tossData = await tossRes.json()
     if (!tossRes.ok) {
-      await supabase.from('payments').update({ payment_status: 'failed' }).eq('id', paymentRecord.id)
+      await supabaseService.from('payments').update({ payment_status: 'failed' }).eq('id', paymentRecord.id)
       return NextResponse.json({ error: tossData.message ?? '결제 승인에 실패했습니다' }, { status: 400 })
     }
 
@@ -80,7 +77,7 @@ export async function POST(request: NextRequest) {
     const platformFeeRate = event?.platform_fee_rate ?? 15
     const breakdown = calculateCommission(amount, platformFeeRate, venueCommissionRate)
 
-    await supabase
+    await supabaseService
       .from('payments')
       .update({
         payment_status: 'completed',
@@ -91,8 +88,8 @@ export async function POST(request: NextRequest) {
       })
       .eq('id', paymentRecord.id)
 
-    // 참가 신청 상태를 승인 대기 -> 승인으로 전환
-    await supabase
+    // 참가 신청 상태를 승인으로 전환
+    await supabaseService
       .from('event_participants')
       .update({ status: 'approved' })
       .eq('payment_id', paymentRecord.id)
@@ -110,7 +107,7 @@ export async function POST(request: NextRequest) {
         amount: breakdown.venueCommissionAmount,
       })
     }
-    await supabase.from('commission_ledger').insert(ledgerEntries)
+    await supabaseService.from('commission_ledger').insert(ledgerEntries)
 
     return NextResponse.json({ success: true, breakdown })
   } catch (err) {
