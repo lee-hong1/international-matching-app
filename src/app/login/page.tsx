@@ -29,9 +29,21 @@ export default function LoginPage() {
         else if (msg.includes('Email not confirmed')) setError(t('auth.error_email_not_confirmed', lang))
         else setError(t('auth.error_login_failed', lang))
       } else if (user) {
-        // 서버사이드 API로 admin 여부 확인 (admin 이메일 목록을 클라이언트에 노출하지 않음)
         const { data: { session } } = await supabase.auth.getSession()
         const token = session?.access_token
+
+        // 정지 계정 체크
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('is_suspended')
+          .eq('id', user.id)
+          .single()
+        if (profile?.is_suspended) {
+          router.push('/suspended')
+          return
+        }
+
+        // 서버사이드 API로 admin 여부 확인 (admin 이메일 목록을 클라이언트에 노출하지 않음)
         if (token) {
           const res = await fetch('/api/check-admin', {
             headers: { authorization: `Bearer ${token}` },

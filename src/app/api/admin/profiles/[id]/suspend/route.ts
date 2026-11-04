@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseService, isValidUuid } from '@/lib/commerce'
-import { timingSafeEqual } from 'crypto'
+import { timingSafeEqual, createHash } from 'crypto'
 
 /**
  * PATCH /api/admin/profiles/:id/suspend
@@ -73,6 +73,21 @@ export async function PATCH(
     console.error('[admin suspend] update error:', updateErr.code)
     return NextResponse.json({ error: 'Failed to update profile' }, { status: 500 })
   }
+
+  // 감사 로그 기록 (fire-and-forget — 로그 실패가 응답에 영향 없음)
+  void (async () => {
+    try {
+      const adminKeyHash = createHash('sha256').update(adminKey).digest('hex').substring(0, 16)
+      await supabaseService.from('admin_actions').insert({
+        admin_key_hash: adminKeyHash,
+        target_user_id: id,
+        action,
+        reason: body.reason ?? null,
+      })
+    } catch (e) {
+      console.error('[admin suspend] audit log error:', (e as Error).message)
+    }
+  })()
 
   return NextResponse.json({ success: true, action, userId: id })
 }

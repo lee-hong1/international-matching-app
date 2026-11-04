@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getAuthUser, supabaseService, isValidUuid } from '@/lib/commerce'
 import { checkRateLimit, rateLimitResponse } from '@/lib/ratelimit'
 import { t, type Lang } from '@/lib/i18n'
+import { isSuspended } from '@/lib/suspended-check'
 
 async function sendBookingEmail(
   req: NextRequest,
@@ -138,6 +139,15 @@ export async function PATCH(
   const isUser = booking.user_id === user.id
   if (!isHost && !isUser) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  }
+
+  // ── 정지 계정 체크 ────────────────────────────────────────────────────────
+  // 호스트 정지: completed/confirmed 처리 차단 (사용자 취소 권리는 유지)
+  // 사용자 정지: cancelled(본인 취소)는 소비자 권리로 허용
+  if (isHost && newStatus !== 'cancelled') {
+    if (await isSuspended(user.id)) {
+      return NextResponse.json({ error: 'Account suspended' }, { status: 403 })
+    }
   }
 
   // ── 상태 전이 검증 ────────────────────────────────────────────────────────
