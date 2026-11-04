@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
+import { isValidUuid, supabaseService } from '@src/lib/commerce'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL ?? 'https://placeholder.supabase.co',
@@ -33,6 +34,16 @@ export async function POST(
   }
 
   const { id: eventId } = await params
+  if (!isValidUuid(eventId)) {
+    return NextResponse.json({ error: 'Invalid event id' }, { status: 400 })
+  }
+
+  // 청소년보호법: 성인 인증 필수
+  const { data: requesterProfile } = await supabaseService
+    .from('profiles').select('is_adult').eq('id', user.id).single()
+  if (!requesterProfile?.is_adult) {
+    return NextResponse.json({ error: 'Age verification required / 성인 인증이 필요합니다', redirect: '/verify-age' }, { status: 403 })
+  }
 
   const { data: event, error: eventError } = await supabase
     .from('events')

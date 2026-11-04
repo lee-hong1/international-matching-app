@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
+import { isValidUuid } from '@src/lib/commerce'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL ?? 'https://placeholder.supabase.co',
@@ -32,6 +33,9 @@ export async function GET(
   }
 
   const { id } = await params
+  if (!isValidUuid(id)) {
+    return NextResponse.json({ error: 'Invalid event id' }, { status: 400 })
+  }
 
   const { data, error } = await supabase
     .from('events')

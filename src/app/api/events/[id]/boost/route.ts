@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
+import { isValidUuid } from '@src/lib/commerce'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL ?? 'https://placeholder.supabase.co',
@@ -34,6 +35,9 @@ export async function POST(
   if (!user) return NextResponse.json({ error: '인증이 필요합니다' }, { status: 401 })
 
   const { id: eventId } = await params
+  if (!isValidUuid(eventId)) {
+    return NextResponse.json({ error: 'Invalid event id' }, { status: 400 })
+  }
 
   const { data: event, error: eventError } = await supabase
     .from('events')
@@ -79,6 +83,10 @@ export async function PATCH(
   if (!user) return NextResponse.json({ error: '인증이 필요합니다' }, { status: 401 })
 
   const { id: eventId } = await params
+  if (!isValidUuid(eventId)) {
+    return NextResponse.json({ error: 'Invalid event id' }, { status: 400 })
+  }
+
   const { paymentKey, orderId, amount } = await request.json()
 
   if (!paymentKey || !orderId || amount === undefined) {
