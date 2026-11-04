@@ -177,6 +177,7 @@ export const matchingService = {
       .select('*')
       .neq('gender', currentUser.gender) // 반대 성별만
       .eq('verification_status', 'verified') // 인증된 사용자만
+      .eq('is_adult', true) // 청소년보호법: 미성년자 제외
       .not('id', 'in', `(${Array.from(excludeIds).join(',')})`)
       .order('last_active', { ascending: false })
       .limit(limit * 2) // 더 많이 가져와서 필터링

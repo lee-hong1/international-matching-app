@@ -243,11 +243,28 @@ export const chatService = {
     return urlData.publicUrl
   },
 
-  // 번역 기능 (Google Translate API 사용 예정)
+  // 번역 기능 — /api/translate 서버 프록시 경유 (N+43)
   async translateMessage(text: string, targetLanguage: string): Promise<string> {
-    // TODO: Google Translate API 연동
-    // 현재는 임시로 원본 텍스트 반환
-    return text
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      const token = session?.access_token
+
+      const res = await fetch('/api/translate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({ text, targetLanguage }),
+      })
+
+      if (!res.ok) return text
+
+      const json = await res.json()
+      return json.translatedText ?? text
+    } catch {
+      return text
+    }
   },
 
   // 채팅방 차단
