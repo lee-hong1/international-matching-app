@@ -86,3 +86,26 @@ export function errorMsg(key: keyof typeof ERRORS, lang: Lang = 'en'): string {
   if (lang === 'ko') return map.ko
   return `${map.ko} / ${map[lang] ?? map.en}`
 }
+
+// ── Boost pricing ────────────────────────────────────────────────────────────
+
+/** 부스트 기간(일) → 가격(원) 단일 진실 소스. 두 boost route에서 import. */
+export const BOOST_PRICES: Record<number, number> = {
+  3:  3_900,
+  7:  7_900,
+  14: 13_900,
+  30: 24_900,
+}
+
+// ── Forbidden content filter ─────────────────────────────────────────────────
+
+export const FORBIDDEN_KEYWORDS = [
+  '도박', '카지노', '슬롯', '바카라', '성인', '야동', '포르노', '불법',
+  'casino', 'gambling', 'slot', 'adult', 'porn', 'illegal', 'escort',
+]
+
+/** title/description에 금지 키워드가 포함되어 있으면 true 반환. */
+export function hasForbiddenContent(text: string): boolean {
+  const lower = text.toLowerCase()
+  return FORBIDDEN_KEYWORDS.some(kw => lower.includes(kw.toLowerCase()))
+}

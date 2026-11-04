@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseService, ALLOWED_DOMAINS, isAllowedUrl, getAuthUser } from '@/lib/commerce'
+import { supabaseService, ALLOWED_DOMAINS, isAllowedUrl, getAuthUser, hasForbiddenContent } from '@/lib/commerce'
 
 // 호스트 외부 쇼핑 링크 목록
 export async function GET(req: NextRequest) {
@@ -42,6 +42,12 @@ export async function POST(req: NextRequest) {
         { error: `허용되지 않은 외부 URL입니다. 지원 플랫폼: ${ALLOWED_DOMAINS.slice(0, 5).join(', ')} 등` },
         { status: 400 }
       )
+    }
+
+    // 금지 콘텐츠 필터 (도박/성인/불법)
+    const contentToCheck = `${title} ${description ?? ''}`
+    if (hasForbiddenContent(contentToCheck)) {
+      return NextResponse.json({ error: '허용되지 않는 콘텐츠가 포함되어 있습니다' }, { status: 400 })
     }
 
     // 호스트 1인 활성 링크 최대 20개 제한

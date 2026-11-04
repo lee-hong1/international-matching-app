@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseService, isAllowedUrl, getAuthUser } from '@/lib/commerce'
+import { supabaseService, isAllowedUrl, getAuthUser, hasForbiddenContent } from '@/lib/commerce'
 
 // 판매 이벤트/공구 공지 목록 (발견 피드)
 export async function GET(req: NextRequest) {
@@ -60,6 +60,12 @@ export async function POST(req: NextRequest) {
         { error: '허용되지 않은 외부 URL입니다' },
         { status: 400 }
       )
+    }
+
+    // 금지 콘텐츠 필터 (도박/성인/불법)
+    const contentToCheck = `${title} ${description ?? ''}`
+    if (hasForbiddenContent(contentToCheck)) {
+      return NextResponse.json({ error: '허용되지 않는 콘텐츠가 포함되어 있습니다' }, { status: 400 })
     }
 
     if (new Date(ends_at) <= new Date()) {
