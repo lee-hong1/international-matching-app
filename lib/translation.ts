@@ -11,13 +11,19 @@ export interface LanguageDetection {
   confidence: number
 }
 
-class TranslationService {
-  private apiKey: string
-
-  constructor() {
-    this.apiKey = process.env.NEXT_PUBLIC_GOOGLE_TRANSLATE_API_KEY || ''
+function getAuthToken(): string | null {
+  if (typeof window === 'undefined') return null
+  try {
+    const key = Object.keys(localStorage).find((k) => k.endsWith('-auth-token'))
+    if (!key) return null
+    const session = JSON.parse(localStorage.getItem(key) ?? 'null')
+    return session?.access_token ?? null
+  } catch {
+    return null
   }
+}
 
+class TranslationService {
   // 지원 언어 목록
   getSupportedLanguages() {
     return {
@@ -44,97 +50,46 @@ class TranslationService {
     }
   }
 
-  // 언어 감지
+  // 언어 감지 (서버 프록시 경유)
   async detectLanguage(text: string): Promise<LanguageDetection> {
-    if (!this.apiKey) {
-      throw new Error('Google Translate API key not configured')
-    }
-
     try {
-      const response = await fetch(
-        `https://translation.googleapis.com/language/translate/v2/detect?key=${this.apiKey}`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            q: text
-          })
-        }
-      )
-
-      const data = await response.json()
-      
-      if (data.error) {
-        throw new Error(data.error.message)
-      }
-
-      const detection = data.data.detections[0][0]
-      return {
-        language: detection.language,
-        confidence: detection.confidence
-      }
-    } catch (error) {
-      console.error('Language detection error:', error)
-      // 기본값으로 영어 반환
-      return {
-        language: 'en',
-        confidence: 0.5
-      }
+      const result = await this.translateText(text, 'en')
+      return { language: result.sourceLanguage, confidence: 0.9 }
+    } catch {
+      return { language: 'en', confidence: 0.5 }
     }
   }
 
-  // 텍스트 번역
+  // 텍스트 번역 — /api/translate 서버 프록시 경유 (API 키 클라이언트 노출 방지)
   async translateText(
-    text: string, 
-    targetLanguage: string, 
+    text: string,
+    targetLanguage: string,
     sourceLanguage?: string
   ): Promise<TranslationResult> {
-    if (!this.apiKey) {
-      // API 키가 없는 경우 목업 번역 반환
-      return this.getMockTranslation(text, targetLanguage, sourceLanguage)
-    }
+    const token = getAuthToken()
 
     try {
-      const params = new URLSearchParams({
-        key: this.apiKey,
-        q: text,
-        target: targetLanguage,
-        format: 'text'
+      const res = await fetch('/api/translate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({ text, targetLanguage, sourceLanguage }),
       })
 
-      if (sourceLanguage) {
-        params.append('source', sourceLanguage)
+      if (!res.ok) {
+        return this.getMockTranslation(text, targetLanguage, sourceLanguage)
       }
 
-      const response = await fetch(
-        `https://translation.googleapis.com/language/translate/v2?${params}`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-          }
-        }
-      )
-
-      const data = await response.json()
-      
-      if (data.error) {
-        throw new Error(data.error.message)
-      }
-
-      const translation = data.data.translations[0]
-      
+      const data = await res.json()
       return {
-        translatedText: translation.translatedText,
+        translatedText: data.translatedText ?? text,
         originalText: text,
-        sourceLanguage: translation.detectedSourceLanguage || sourceLanguage || 'auto',
-        targetLanguage
+        sourceLanguage: data.detectedSourceLanguage ?? sourceLanguage ?? 'auto',
+        targetLanguage,
       }
-    } catch (error) {
-      console.error('Translation error:', error)
-      // 오류 시 목업 번역 반환
+    } catch {
       return this.getMockTranslation(text, targetLanguage, sourceLanguage)
     }
   }
