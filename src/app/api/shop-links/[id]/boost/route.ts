@@ -11,6 +11,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { supabaseService, getAuthUser, isValidUuid, BOOST_PRICES } from '@/lib/commerce'
 import { checkRateLimit, rateLimitResponse } from '@/lib/ratelimit'
 import { verifyTossPayment, makeIdempotencyKey, PAYMENT_METHODS, type PaymentMethod } from '@/lib/payments'
+import { isSuspended } from '@/lib/suspended-check'
 
 export async function POST(
   req: NextRequest,
@@ -31,6 +32,11 @@ export async function POST(
       { error: '인증이 필요합니다 / Authentication required' },
       { status: 401 },
     )
+  }
+
+  // ── Suspension check ───────────────────────────────────────────────────
+  if (await isSuspended(user.id)) {
+    return NextResponse.json({ error: '계정이 정지된 상태입니다 / Account suspended' }, { status: 403 })
   }
 
   // ── Path param validation ──────────────────────────────────────────────

@@ -8,6 +8,7 @@ const MESSAGES: Record<string, Record<string, string>> = {
   ko: {
     title: '계정이 임시 정지되었습니다',
     reason: '외부 플랫폼 유도 위반으로 인해 계정이 임시 정지되었습니다.',
+    duration: '정지 기간: 7일 (관리자 검토 후 조기 해제 가능)',
     policy: '본 플랫폼은 외부 연락처 공유 및 외부 플랫폼 유도를 금지합니다.',
     appeal: '이의 신청: support@globalmatch.app',
     logout: '로그아웃',
@@ -15,6 +16,7 @@ const MESSAGES: Record<string, Record<string, string>> = {
   en: {
     title: 'Your account has been suspended',
     reason: 'Your account has been temporarily suspended for directing to external platforms.',
+    duration: 'Suspension period: 7 days (may be lifted early after admin review)',
     policy: 'This platform prohibits sharing external contact information or directing users to external platforms.',
     appeal: 'Appeal: support@globalmatch.app',
     logout: 'Log out',
@@ -22,6 +24,7 @@ const MESSAGES: Record<string, Record<string, string>> = {
   ja: {
     title: 'アカウントが一時停止されました',
     reason: '外部プラットフォームへの誘導違反により、アカウントが一時停止されました。',
+    duration: '停止期間: 7日間（管理者審査後に早期解除の場合あり）',
     policy: '当プラットフォームは、外部連絡先の共有や外部プラットフォームへの誘導を禁止しています。',
     appeal: 'お問い合わせ: support@globalmatch.app',
     logout: 'ログアウト',
@@ -29,6 +32,7 @@ const MESSAGES: Record<string, Record<string, string>> = {
   zh: {
     title: '您的账号已被暂停',
     reason: '由于引导至外部平台的违规行为，您的账号已被暂停。',
+    duration: '暂停期限：7天（管理员审核后可提前解除）',
     policy: '本平台禁止分享外部联系方式或引导用户至外部平台。',
     appeal: '申诉邮箱: support@globalmatch.app',
     logout: '退出登录',
@@ -58,6 +62,7 @@ export default function SuspendedPage() {
 
         <h1 className="text-2xl font-bold text-gray-900 mb-3">{m.title}</h1>
         <p className="text-gray-600 mb-2">{m.reason}</p>
+        <p className="text-sm font-medium text-orange-600 mb-2">{m.duration}</p>
         <p className="text-sm text-gray-500 mb-6">{m.policy}</p>
 
         <div className="bg-gray-50 rounded-2xl px-4 py-3 mb-6 text-sm text-gray-700">
