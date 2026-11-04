@@ -213,7 +213,7 @@ async function handleHostPageRoute(request: NextRequest): Promise<NextResponse> 
 }
 
 // 정지 계정이 직접 URL로 접근 차단해야 하는 페이지 경로 목록
-const PROTECTED_PAGE_PATHS = ['/feed', '/discover', '/bookings', '/book', '/host', '/profile', '/messages']
+const PROTECTED_PAGE_PATHS = ['/feed', '/discover', '/bookings', '/book', '/host', '/profile', '/messages', '/dashboard', '/analytics', '/events/create']
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
@@ -278,6 +278,9 @@ export const config = {
     '/book/:path+',
     '/profile', '/profile/:path*',
     '/messages', '/messages/:path*',
+    '/dashboard', '/dashboard/:path*',
+    '/analytics', '/analytics/:path*',
+    '/events/create',
     '/suspended',
     '/login',
     '/signup',
