@@ -1,6 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabase } from '@/lib/supabase'
 
+type NotificationData = Record<string, string>
+
+function sanitizeData(raw: Record<string, unknown>): NotificationData {
+  return Object.fromEntries(
+    Object.entries(raw).map(([k, v]) => [k, String(v)])
+  )
+}
+
 let firebaseInitialized = false
 
 async function getFirebaseMessaging() {
@@ -67,9 +75,7 @@ export async function POST(req: NextRequest) {
         const multicastMessage = {
           tokens: batch,
           notification: { title: payload.title, body: payload.body },
-          data: payload.data ? Object.fromEntries(
-            Object.entries(payload.data).map(([k, v]) => [k, String(v)])
-          ) : undefined,
+          data: payload.data ? sanitizeData(payload.data as Record<string, unknown>) : undefined,
           ...(isWeb ? {
             webpush: {
               notification: {

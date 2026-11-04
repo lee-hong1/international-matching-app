@@ -5,28 +5,62 @@ export interface FallbackCallbacks {
   onRetry: () => void
 }
 
-function getTurnServers(): RTCIceServer[] {
-  const url = process.env.NEXT_PUBLIC_TURN_SERVER_URL
-  const username = process.env.NEXT_PUBLIC_TURN_USERNAME
-  const credential = process.env.NEXT_PUBLIC_TURN_CREDENTIAL
+interface TurnCredentials {
+  urls: string
+  username: string
+  credential: string
+  ttl: number
+  fetchedAt: number
+}
+
+let cachedCredentials: TurnCredentials | null = null
+
+/** 동적 TURN 크리덴셜 fetch — TTL 1시간 전에 자동 갱신 */
+async function fetchTurnCredentials(authToken: string): Promise<RTCIceServer[]> {
+  const REFRESH_BEFORE_EXPIRY_MS = 3600 * 1000 // 1시간 전 갱신
+
+  const now = Date.now()
+  const isStale =
+    !cachedCredentials ||
+    now > cachedCredentials.fetchedAt + (cachedCredentials.ttl * 1000 - REFRESH_BEFORE_EXPIRY_MS)
+
+  if (isStale) {
+    try {
+      const res = await fetch('/api/webrtc/turn-credentials', {
+        headers: { Authorization: `Bearer ${authToken}` },
+      })
+      if (res.ok) {
+        const data = await res.json() as TurnCredentials
+        cachedCredentials = { ...data, fetchedAt: now }
+      }
+    } catch {
+      // 실패 시 기존 캐시 유지 또는 STUN만 사용
+    }
+  }
 
   const servers: RTCIceServer[] = [
     { urls: 'stun:stun.l.google.com:19302' },
     { urls: 'stun:stun1.l.google.com:19302' },
   ]
 
-  if (url && username && credential) {
-    servers.push({ urls: url, username, credential })
+  if (cachedCredentials) {
+    servers.push({
+      urls: cachedCredentials.urls,
+      username: cachedCredentials.username,
+      credential: cachedCredentials.credential,
+    })
   }
 
   return servers
 }
 
-export function createPeerConnectionWithFallback(
-  callbacks: FallbackCallbacks
-): RTCPeerConnection {
+export async function createPeerConnectionWithFallback(
+  callbacks: FallbackCallbacks,
+  authToken: string,
+): Promise<RTCPeerConnection> {
+  const iceServers = await fetchTurnCredentials(authToken)
   const pc = new RTCPeerConnection({
-    iceServers: getTurnServers(),
+    iceServers,
     iceCandidatePoolSize: 10,
   })
 
