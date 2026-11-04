@@ -1,34 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL ?? 'https://placeholder.supabase.co',
-  process.env.SUPABASE_SERVICE_ROLE_KEY ?? 'placeholder-service-role-key'
-)
-
-// 허용 외부 도메인 (allowlist — 악성 URL 등록 방지)
-const ALLOWED_DOMAINS = [
-  'smartstore.naver.com', 'brand.naver.com', 'shopping.naver.com',
-  'coupang.com', 'kakao.com', 'kakaostore.com', 'gift.kakao.com',
-  '29cm.co.kr', 'musinsa.com', 'ably.team', 'zigzag.kr',
-  'instagram.com', 'linktr.ee', 'ohou.se', 'idus.com',
-]
-
-function isAllowedUrl(url: string): boolean {
-  try {
-    const { hostname } = new URL(url)
-    return ALLOWED_DOMAINS.some(d => hostname === d || hostname.endsWith(`.${d}`))
-  } catch {
-    return false
-  }
-}
-
-async function getAuthUser(req: NextRequest) {
-  const token = req.headers.get('authorization')?.replace('Bearer ', '')
-  if (!token) return null
-  const { data: { user } } = await supabase.auth.getUser(token)
-  return user
-}
+import { supabaseService, ALLOWED_DOMAINS, isAllowedUrl, getAuthUser } from '@/lib/commerce'
 
 // 호스트 외부 쇼핑 링크 목록
 export async function GET(req: NextRequest) {
@@ -40,7 +11,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'host_id가 필요합니다' }, { status: 400 })
   }
 
-  const { data, error } = await supabase
+  const { data, error } = await supabaseService
     .from('host_shop_links')
     .select('id, title, description, external_platform, images, original_price, sale_price, click_count, is_featured, expires_at, created_at')
     .eq('host_id', hostId)
@@ -68,13 +39,13 @@ export async function POST(req: NextRequest) {
 
     if (!isAllowedUrl(external_url)) {
       return NextResponse.json(
-        { error: '허용되지 않은 외부 URL입니다. 지원 플랫폼: 네이버스마트스토어, 쿠팡, 카카오 등' },
+        { error: `허용되지 않은 외부 URL입니다. 지원 플랫폼: ${ALLOWED_DOMAINS.slice(0, 5).join(', ')} 등` },
         { status: 400 }
       )
     }
 
     // 호스트 1인 활성 링크 최대 20개 제한
-    const { count } = await supabase
+    const { count } = await supabaseService
       .from('host_shop_links')
       .select('id', { count: 'exact', head: true })
       .eq('host_id', user.id)
@@ -84,7 +55,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: '활성 링크는 최대 20개까지 등록 가능합니다' }, { status: 409 })
     }
 
-    const { data: link, error: insertErr } = await supabase
+    const { data: link, error: insertErr } = await supabaseService
       .from('host_shop_links')
       .insert({
         host_id: user.id,

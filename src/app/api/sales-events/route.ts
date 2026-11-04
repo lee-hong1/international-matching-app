@@ -1,34 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL ?? 'https://placeholder.supabase.co',
-  process.env.SUPABASE_SERVICE_ROLE_KEY ?? 'placeholder-service-role-key'
-)
-
-// 허용 외부 도메인 (shop-links와 동일)
-const ALLOWED_DOMAINS = [
-  'smartstore.naver.com', 'brand.naver.com', 'shopping.naver.com',
-  'coupang.com', 'kakao.com', 'kakaostore.com', 'gift.kakao.com',
-  '29cm.co.kr', 'musinsa.com', 'ably.team', 'zigzag.kr',
-  'instagram.com', 'linktr.ee', 'ohou.se', 'idus.com',
-]
-
-function isAllowedUrl(url: string): boolean {
-  try {
-    const { hostname } = new URL(url)
-    return ALLOWED_DOMAINS.some(d => hostname === d || hostname.endsWith(`.${d}`))
-  } catch {
-    return false
-  }
-}
-
-async function getAuthUser(req: NextRequest) {
-  const token = req.headers.get('authorization')?.replace('Bearer ', '')
-  if (!token) return null
-  const { data: { user } } = await supabase.auth.getUser(token)
-  return user
-}
+import { supabaseService, isAllowedUrl, getAuthUser } from '@/lib/commerce'
 
 // 판매 이벤트/공구 공지 목록 (발견 피드)
 export async function GET(req: NextRequest) {
@@ -38,7 +9,7 @@ export async function GET(req: NextRequest) {
   const limit = Math.min(parseInt(searchParams.get('limit') ?? '20'), 100)
   const offset = parseInt(searchParams.get('offset') ?? '0')
 
-  let query = supabase
+  let query = supabaseService
     .from('sales_events')
     .select(`
       id, event_type, title, description, external_platform,
@@ -96,9 +67,14 @@ export async function POST(req: NextRequest) {
     }
 
     const startsAt = starts_at ?? new Date().toISOString()
+
+    if (new Date(ends_at) <= new Date(startsAt)) {
+      return NextResponse.json({ error: '종료일은 시작일보다 이후여야 합니다' }, { status: 400 })
+    }
+
     const status = new Date(startsAt) <= new Date() ? 'active' : 'upcoming'
 
-    const { data: event, error: insertErr } = await supabase
+    const { data: event, error: insertErr } = await supabaseService
       .from('sales_events')
       .insert({
         host_id: user.id,

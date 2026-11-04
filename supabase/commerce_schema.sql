@@ -46,6 +46,23 @@ CREATE TABLE IF NOT EXISTS shop_link_clicks (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+ALTER TABLE shop_link_clicks ENABLE ROW LEVEL SECURITY;
+
+-- 호스트만 자기 링크의 클릭 로그 조회 가능
+CREATE POLICY "host_view_own_link_clicks"
+  ON shop_link_clicks FOR SELECT
+  USING (
+    link_id IN (
+      SELECT id FROM host_shop_links WHERE host_id = auth.uid()
+    )
+  );
+
+-- INSERT는 서비스 롤 키(bypass RLS)로만 실행되므로 별도 정책 불필요
+-- 하지만 anon/authenticated 역할에서 직접 INSERT 차단
+CREATE POLICY "deny_direct_insert_clicks"
+  ON shop_link_clicks FOR INSERT
+  WITH CHECK (false);
+
 CREATE INDEX IF NOT EXISTS idx_clicks_link_time ON shop_link_clicks(link_id, created_at);
 
 -- 클릭 수 원자적 증가
