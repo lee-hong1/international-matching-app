@@ -6,6 +6,36 @@ const VALID_CATEGORIES = ['conversation', 'lesson', 'tour', 'meal', 'activity', 
 const VALID_CURRENCIES = ['KRW', 'JPY', 'CNY', 'USD'] as const
 
 /**
+ * GET /api/services/:id
+ * 단건 서비스 조회. 비활성(is_active=false) 서비스는 404 반환 (존재 여부 노출 방지).
+ */
+export async function GET(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const rl = await checkRateLimit(req, 'general')
+  if (!rl.success) return rateLimitResponse(rl)
+
+  const { id } = await params
+  if (!isValidUuid(id)) {
+    return NextResponse.json({ error: 'Invalid service id' }, { status: 400 })
+  }
+
+  const { data, error } = await supabaseService
+    .from('services')
+    .select('id, host_id, title, description, duration_minutes, price, currency, category, max_bookings_per_day, created_at')
+    .eq('id', id)
+    .eq('is_active', true)
+    .single()
+
+  if (error || !data) {
+    return NextResponse.json({ error: 'Service not found' }, { status: 404 })
+  }
+
+  return NextResponse.json({ data })
+}
+
+/**
  * PATCH /api/services/:id
  * 서비스 수정 (부분 업데이트). JWT host_id — IDOR 방지.
  */
