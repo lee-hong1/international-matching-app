@@ -85,7 +85,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     const endDate = new Date(startDate)
     endDate.setMonth(endDate.getMonth() + plan.duration_months)
 
-    // 사용자 구독 정보 생성
+    // 사용자 구독 정보 생성 (멱등성: payment_id UNIQUE → 중복 웹훅 재시도 무시)
     const { error: subscriptionError } = await supabase
       .from('user_subscriptions')
       .insert({
@@ -98,16 +98,20 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       })
 
     if (subscriptionError) {
-      console.error('Error creating subscription:', subscriptionError)
+      if (subscriptionError.code === '23505') {
+        // 중복 키 → 이미 처리된 웹훅, 정상 종료
+        return
+      }
+      console.error('Error creating subscription:', subscriptionError.code)
       return
     }
 
-    // 결제 내역 저장
+    // 결제 내역 저장 (멱등성: provider_payment_id UNIQUE → 중복 무시)
     const { error: paymentError } = await supabase
       .from('payments')
       .insert({
         user_id: userId,
-        amount: session.amount_total! / 100, // cents를 원화로 변환
+        amount: session.amount_total! / 100,
         currency: 'KRW',
         payment_method: 'stripe',
         payment_status: 'completed',
@@ -116,8 +120,8 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
         description: `${plan.name} 구독 결제`
       })
 
-    if (paymentError) {
-      console.error('Error saving payment record:', paymentError)
+    if (paymentError && paymentError.code !== '23505') {
+      console.error('Error saving payment record:', paymentError.code)
     }
 
     // 프로필에 프리미엄 상태 업데이트
