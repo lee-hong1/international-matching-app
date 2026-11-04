@@ -9,6 +9,9 @@ import { useRouter, useParams } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { eventsService, EVENT_TYPE_LABELS, type EventItem } from '@/lib/events'
 import { TOSS_CLIENT_KEY } from '@/lib/payments'
+import { LanguageProvider, useLanguage } from '@/contexts/LanguageContext'
+import { LanguageSwitcher } from '@/components/LanguageSwitcher'
+import { EventShareCard } from '@/components/EventShareCard'
 
 declare global {
   interface Window {
@@ -30,25 +33,26 @@ function formatDateTime(value: string) {
   })
 }
 
-const STATUS_LABELS: Record<string, string> = {
-  pending_payment: '승인 대기',
-  approved: '승인됨',
-  rejected: '거절됨',
-  cancelled: '취소됨',
-}
-
-export default function EventDetailPage() {
+function EventDetailContent() {
   const { user, loading } = useAuth()
   const router = useRouter()
   const params = useParams()
   const eventId = params.id as string
 
+  const { t } = useLanguage()
   const [event, setEvent] = useState<EventItem | null>(null)
   const [loadingEvent, setLoadingEvent] = useState(true)
   const [myApplication, setMyApplication] = useState<{ id: string; status: string } | null>(null)
   const [participants, setParticipants] = useState<any[]>([])
   const [applying, setApplying] = useState(false)
   const [error, setError] = useState('')
+
+  const STATUS_LABELS: Record<string, string> = {
+    pending_payment: t('detail_pending'),
+    approved: t('detail_approved'),
+    rejected: t('detail_rejected'),
+    cancelled: t('detail_cancelled'),
+  }
 
   useEffect(() => {
     if (!loading && !user) router.push('/login')
@@ -171,7 +175,8 @@ export default function EventDetailPage() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
             </svg>
           </button>
-          <h1 className="text-lg font-bold text-gray-900 truncate">모임 상세</h1>
+          <h1 className="text-lg font-bold text-gray-900 truncate flex-1">{t('nav_events')}</h1>
+          <LanguageSwitcher />
         </div>
       </header>
 
@@ -189,12 +194,12 @@ export default function EventDetailPage() {
             </span>
             {event.venue_type === 'partner' && (
               <span className="px-2 py-0.5 bg-purple-100 text-purple-600 text-xs font-semibold rounded-full">
-                제휴 매장
+                {t('events_partner_venue')}
               </span>
             )}
             {isClosed && (
               <span className="px-2 py-0.5 bg-gray-100 text-gray-500 text-xs font-semibold rounded-full">
-                마감
+                {t('events_closed')}
               </span>
             )}
           </div>
@@ -221,19 +226,19 @@ export default function EventDetailPage() {
               <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m9-5.13a4 4 0 11-8 0 4 4 0 018 0zm6 3a4 4 0 11-8 0 4 4 0 018 0z" />
               </svg>
-              {event.participants_count} / {event.max_participants}명
+              {event.participants_count} / {event.max_participants}{t('events_persons')}
             </div>
             <div className="flex items-center gap-2 text-gray-700 font-semibold">
               <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c.74 0 1.412.196 1.94.518M12 8V6m0 12v-2" />
               </svg>
-              {event.fee_per_person > 0 ? `참가비 ${event.fee_per_person.toLocaleString()}원` : '무료'}
+              {event.fee_per_person > 0 ? `${event.fee_per_person.toLocaleString()}원` : t('events_free')}
             </div>
           </div>
 
           {event.partner_venues?.discount_price != null && event.venue_type === 'partner' && (
             <p className="mt-3 text-xs text-pink-500 bg-pink-50 rounded-lg px-3 py-2">
-              제휴 매장 할인 적용가: {event.partner_venues.discount_price.toLocaleString()}원
+              {t('detail_partner_discount')}: {event.partner_venues.discount_price.toLocaleString()}원
             </p>
           )}
         </div>
@@ -250,8 +255,8 @@ export default function EventDetailPage() {
             )}
           </div>
           <div>
-            <p className="text-sm font-semibold text-gray-900">{event.profiles?.full_name ?? '호스트'}</p>
-            <p className="text-xs text-gray-400">호스트</p>
+            <p className="text-sm font-semibold text-gray-900">{event.profiles?.full_name ?? t('detail_host')}</p>
+            <p className="text-xs text-gray-400">{t('detail_host')}</p>
           </div>
         </div>
 
@@ -264,22 +269,22 @@ export default function EventDetailPage() {
           <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
             {myApplication ? (
               <div className="text-center py-2">
-                <p className="text-sm text-gray-700 mb-1">신청 상태</p>
+                <p className="text-sm text-gray-700 mb-1">{t('detail_my_status')}</p>
                 <p className="text-base font-semibold text-gray-900">
                   {STATUS_LABELS[myApplication.status] ?? myApplication.status}
                 </p>
               </div>
             ) : isClosed ? (
-              <p className="text-center text-sm text-gray-500 py-2">신청할 수 없는 모임입니다</p>
+              <p className="text-center text-sm text-gray-500 py-2">{t('events_closed')}</p>
             ) : isFull ? (
-              <p className="text-center text-sm text-gray-500 py-2">모집 인원이 마감되었습니다</p>
+              <p className="text-center text-sm text-gray-500 py-2">{t('events_full')}</p>
             ) : (
               <button
                 onClick={handleApply}
                 disabled={applying}
                 className="w-full py-3 bg-gradient-to-r from-pink-500 to-purple-600 text-white font-semibold rounded-xl disabled:opacity-50"
               >
-                {applying ? '처리 중...' : event.fee_per_person > 0 ? `${event.fee_per_person.toLocaleString()}원 결제하고 참가 신청` : '참가 신청하기'}
+                {applying ? t('detail_applying') : event.fee_per_person > 0 ? `${event.fee_per_person.toLocaleString()}${t('detail_pay_apply')}` : t('detail_apply')}
               </button>
             )}
           </div>
@@ -288,9 +293,9 @@ export default function EventDetailPage() {
         {/* 호스트: 참가자 목록 */}
         {isHost && (
           <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
-            <h3 className="text-sm font-semibold text-gray-900 mb-3">참가 신청 ({participants.length})</h3>
+            <h3 className="text-sm font-semibold text-gray-900 mb-3">{t('detail_participants')} ({participants.length})</h3>
             {participants.length === 0 ? (
-              <p className="text-sm text-gray-400 py-2">아직 신청자가 없습니다</p>
+              <p className="text-sm text-gray-400 py-2">{t('detail_no_participants')}</p>
             ) : (
               <div className="space-y-2">
                 {participants.map((p) => (
@@ -305,7 +310,7 @@ export default function EventDetailPage() {
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-900 truncate">{p.profiles?.full_name ?? '회원'}</p>
+                      <p className="text-sm font-medium text-gray-900 truncate">{p.profiles?.full_name ?? t('detail_host')}</p>
                       <p className="text-xs text-gray-400">{STATUS_LABELS[p.status] ?? p.status}</p>
                     </div>
                     {p.status === 'pending_payment' && (
@@ -314,13 +319,13 @@ export default function EventDetailPage() {
                           onClick={() => handleParticipantStatus(p.id, 'approved')}
                           className="px-3 py-1.5 bg-pink-500 text-white text-xs font-semibold rounded-lg"
                         >
-                          승인
+                          {t('detail_approve')}
                         </button>
                         <button
                           onClick={() => handleParticipantStatus(p.id, 'rejected')}
                           className="px-3 py-1.5 bg-gray-100 text-gray-600 text-xs font-semibold rounded-lg"
                         >
-                          거절
+                          {t('detail_reject')}
                         </button>
                       </div>
                     )}
@@ -331,10 +336,31 @@ export default function EventDetailPage() {
           </div>
         )}
 
+        {isHost && event && (
+          <EventShareCard
+            eventId={event.id}
+            eventTitle={event.title}
+            eventDate={formatDateTime(event.event_datetime)}
+            eventLocation={event.venue_type === 'partner' ? (event.partner_venues?.name ?? '') : (event.custom_location ?? '')}
+            feePerPerson={event.fee_per_person}
+            maxParticipants={event.max_participants}
+            hostName={event.profiles?.full_name ?? ''}
+            eventType={event.event_type}
+          />
+        )}
+
         <Link href="/events" className="block text-center text-sm text-gray-400 hover:text-gray-600 py-2">
-          목록으로 돌아가기
+          {t('detail_back_list')}
         </Link>
       </main>
     </div>
+  )
+}
+
+export default function EventDetailPage() {
+  return (
+    <LanguageProvider>
+      <EventDetailContent />
+    </LanguageProvider>
   )
 }

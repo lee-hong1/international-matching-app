@@ -6,13 +6,8 @@ import Image from 'next/image'
 import { useAuth } from '@/contexts/AuthContext'
 import { useRouter } from 'next/navigation'
 import { eventsService, EVENT_TYPE_LABELS, type EventItem, type EventType } from '@/lib/events'
-
-const TYPE_FILTERS: { key: EventType | 'all'; label: string }[] = [
-  { key: 'all', label: '전체' },
-  { key: 'drink', label: '술 친구' },
-  { key: 'meal', label: '밥 친구' },
-  { key: 'party', label: '파티원 모집' },
-]
+import { LanguageProvider, useLanguage } from '@/contexts/LanguageContext'
+import { LanguageSwitcher } from '@/components/LanguageSwitcher'
 
 function formatDateTime(value: string) {
   const date = new Date(value)
@@ -25,12 +20,20 @@ function formatDateTime(value: string) {
   })
 }
 
-export default function EventsPage() {
+function EventsContent() {
   const { user, loading } = useAuth()
+  const { t } = useLanguage()
   const router = useRouter()
   const [events, setEvents] = useState<EventItem[]>([])
   const [loadingEvents, setLoadingEvents] = useState(true)
   const [activeType, setActiveType] = useState<EventType | 'all'>('all')
+
+  const TYPE_FILTERS: { key: EventType | 'all'; label: string }[] = [
+    { key: 'all', label: t('events_all') },
+    { key: 'drink', label: t('events_drink') },
+    { key: 'meal', label: t('events_meal') },
+    { key: 'party', label: t('events_party') },
+  ]
 
   useEffect(() => {
     if (!loading && !user) router.push('/login')
@@ -63,13 +66,16 @@ export default function EventsPage() {
       {/* 헤더 */}
       <header className="bg-white border-b border-gray-100 sticky top-0 z-40">
         <div className="max-w-lg mx-auto px-4 h-14 flex items-center justify-between">
-          <h1 className="text-lg font-bold text-gray-900">오프라인 모임</h1>
-          <Link
-            href="/events/create"
-            className="px-3 py-1.5 bg-gradient-to-r from-pink-500 to-purple-600 text-white text-sm font-semibold rounded-xl"
-          >
-            모임 만들기
-          </Link>
+          <h1 className="text-lg font-bold text-gray-900">{t('events_title')}</h1>
+          <div className="flex items-center gap-2">
+            <LanguageSwitcher />
+            <Link
+              href="/events/create"
+              className="px-3 py-1.5 bg-gradient-to-r from-pink-500 to-purple-600 text-white text-sm font-semibold rounded-xl"
+            >
+              {t('events_create')}
+            </Link>
+          </div>
         </div>
         <div className="max-w-lg mx-auto px-4 pb-3 flex gap-2 overflow-x-auto scrollbar-hide">
           {TYPE_FILTERS.map((f) => (
@@ -106,13 +112,13 @@ export default function EventsPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
             </div>
-            <h3 className="font-semibold text-gray-900 mb-2">아직 모집 중인 모임이 없습니다</h3>
-            <p className="text-sm text-gray-500 mb-4">새로운 모임을 만들어보세요!</p>
+            <h3 className="font-semibold text-gray-900 mb-2">{t('events_empty')}</h3>
+            <p className="text-sm text-gray-500 mb-4">{t('events_empty_sub')}</p>
             <Link
               href="/events/create"
               className="inline-block px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-600 text-white text-sm font-semibold rounded-xl"
             >
-              모임 만들기
+              {t('events_create')}
             </Link>
           </div>
         ) : (
@@ -135,7 +141,7 @@ export default function EventsPage() {
                     </span>
                     {event.venue_type === 'partner' && (
                       <span className="px-2 py-0.5 bg-purple-100 text-purple-600 text-xs font-semibold rounded-full">
-                        제휴 매장
+                        {t('events_partner_venue')}
                       </span>
                     )}
                   </div>
@@ -155,14 +161,14 @@ export default function EventsPage() {
                           </div>
                         )}
                       </div>
-                      <span className="text-xs text-gray-500">{event.profiles?.full_name ?? '호스트'}</span>
+                      <span className="text-xs text-gray-500">{event.profiles?.full_name ?? t('detail_host')}</span>
                     </div>
                     <div className="text-right">
                       <p className="text-sm font-semibold text-gray-900">
-                        {event.fee_per_person > 0 ? `${event.fee_per_person.toLocaleString()}원` : '무료'}
+                        {event.fee_per_person > 0 ? `${event.fee_per_person.toLocaleString()}원` : t('events_free')}
                       </p>
                       <p className="text-xs text-gray-400">
-                        {event.participants_count}/{event.max_participants}명
+                        {event.participants_count}/{event.max_participants}{t('events_persons')}
                       </p>
                     </div>
                   </div>
@@ -180,34 +186,42 @@ export default function EventsPage() {
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
             </svg>
-            <span className="text-xs">홈</span>
+            <span className="text-xs">{t('nav_home')}</span>
           </Link>
           <Link href="/explore" className="flex flex-col items-center gap-0.5 text-gray-400 hover:text-gray-600">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
-            <span className="text-xs">탐색</span>
+            <span className="text-xs">{t('nav_explore')}</span>
           </Link>
           <Link href="/events" className="flex flex-col items-center gap-0.5 text-pink-500">
             <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
               <path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
-            <span className="text-xs font-medium">모임</span>
+            <span className="text-xs font-medium">{t('nav_events')}</span>
           </Link>
           <Link href="/discover" className="flex flex-col items-center gap-0.5 text-gray-400 hover:text-gray-600">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
             </svg>
-            <span className="text-xs">매칭</span>
+            <span className="text-xs">{t('nav_match')}</span>
           </Link>
           <Link href={`/creator/${user?.id}`} className="flex flex-col items-center gap-0.5 text-gray-400 hover:text-gray-600">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
             </svg>
-            <span className="text-xs">프로필</span>
+            <span className="text-xs">{t('nav_profile')}</span>
           </Link>
         </div>
       </nav>
     </div>
+  )
+}
+
+export default function EventsPage() {
+  return (
+    <LanguageProvider>
+      <EventsContent />
+    </LanguageProvider>
   )
 }
