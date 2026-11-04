@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { reportingService } from '@/lib/reporting'
 import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
-import { supabaseService } from '@/lib/commerce'
+import { supabaseService } from '@src/lib/commerce'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL ?? 'https://placeholder.supabase.co',

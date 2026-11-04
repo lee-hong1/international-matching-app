@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabase } from '@/lib/supabase'
-import { supabaseService, isValidUuid } from '@/lib/commerce'
+import { supabaseService, isValidUuid } from '@src/lib/commerce'
 import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
 
 const BOOST_AMOUNT = 9900

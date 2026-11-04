@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { calculateCommission } from '@/lib/payments'
 import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
 import { supabase } from '@/lib/supabase'
-import { supabaseService } from '@/lib/commerce'
+import { supabaseService } from '@src/lib/commerce'
 
 async function getAuthUser(request: NextRequest) {
   const authHeader = request.headers.get('authorization')

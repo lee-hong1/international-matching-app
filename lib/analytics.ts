@@ -1,5 +1,5 @@
 import { supabase } from './supabase'
-import { supabaseService } from './commerce'
+import { supabaseService } from '@src/lib/commerce'
 
 export interface UserActivity {
   id: string

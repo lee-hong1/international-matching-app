@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabase } from '@/lib/supabase'
-import { supabaseService, isValidUuid } from '@/lib/commerce'
+import { supabaseService, isValidUuid } from '@src/lib/commerce'
 
 type NotificationData = Record<string, string>
 
