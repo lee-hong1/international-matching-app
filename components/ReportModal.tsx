@@ -55,7 +55,7 @@ export default function ReportModal({
   contentId,
   contentType = 'profile'
 }: ReportModalProps) {
-  const [selectedType, setSelectedType] = useState<ReportData['report_type']>('')
+  const [selectedType, setSelectedType] = useState<ReportData['report_type'] | ''>('')
   const [description, setDescription] = useState('')
   const [evidence, setEvidence] = useState<string[]>([])
   const [isSubmitting, setIsSubmitting] = useState(false)

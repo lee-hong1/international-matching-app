@@ -1,13 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
-import { getAuthUser } from '@src/lib/commerce'
+import { getAuthUser, supabaseService as supabase } from '@src/lib/commerce'
 import { isSuspended } from '@src/lib/suspended-check'
 import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
 
 const ALLOWED_COUNTRIES = new Set([
   'KR','JP','CN','US','GB','CA','AU','DE','FR','SG','TH','VN','PH','MY','ID',

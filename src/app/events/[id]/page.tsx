@@ -339,13 +339,11 @@ function EventDetailContent() {
         {isHost && event && (
           <EventShareCard
             eventId={event.id}
-            eventTitle={event.title}
-            eventDate={formatDateTime(event.event_datetime)}
-            eventLocation={event.venue_type === 'partner' ? (event.partner_venues?.name ?? '') : (event.custom_location ?? '')}
-            feePerPerson={event.fee_per_person}
-            maxParticipants={event.max_participants}
+            title={event.title}
+            date={formatDateTime(event.event_datetime)}
+            location={event.venue_type === 'partner' ? (event.partner_venues?.name ?? '') : (event.custom_location ?? '')}
+            fee={event.fee_per_person}
             hostName={event.profiles?.full_name ?? ''}
-            eventType={event.event_type}
           />
         )}
 

@@ -1,6 +1,7 @@
-import AgoraRTC, { 
-  IAgoraRTCClient, 
-  ICameraVideoTrack, 
+import AgoraRTC, {
+  IAgoraRTCClient,
+  ICameraVideoTrack,
+  ILocalVideoTrack,
   IMicrophoneAudioTrack,
   IRemoteVideoTrack,
   IRemoteAudioTrack,
@@ -38,7 +39,7 @@ export interface CallInvitation {
 
 class VideoCallService {
   private client: IAgoraRTCClient | null = null
-  private localVideoTrack: ICameraVideoTrack | null = null
+  private localVideoTrack: ILocalVideoTrack | null = null
   private localAudioTrack: IMicrophoneAudioTrack | null = null
   private appId: string
   private currentChannel: string | null = null
@@ -359,7 +360,7 @@ class VideoCallService {
   // 화면 공유 시작
   async startScreenShare() {
     try {
-      const screenTrack = await AgoraRTC.createScreenVideoTrack()
+      const screenTrack = await AgoraRTC.createScreenVideoTrack({}, 'disable')
       
       // 기존 비디오 트랙 교체
       if (this.localVideoTrack) {

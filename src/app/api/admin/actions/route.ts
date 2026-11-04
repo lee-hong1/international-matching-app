@@ -6,8 +6,8 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
 import { timingSafeEqual } from 'crypto'
+import { supabaseService } from '@src/lib/commerce'
 import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
 
 function isValidUuid(v: string) {
@@ -41,12 +41,6 @@ export async function GET(req: NextRequest) {
   if (!checkAdminKey(req)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
-
-  const supabaseService = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    { auth: { persistSession: false } },
-  )
 
   const { searchParams } = new URL(req.url)
   const targetUserId = searchParams.get('target_user_id')

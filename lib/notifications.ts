@@ -254,9 +254,8 @@ class NotificationService {
         icon: '/icon-192x192.png',
         badge: '/icon-192x192.png',
         tag: 'globalmatch',
-        renotify: false,
         ...options
-      })
+      } as NotificationOptions)
     }
 
     return null

@@ -63,7 +63,7 @@ export default function CreatePost({ onClose, onPostCreated }: CreatePostProps) 
       const { post, error } = await postsService.createPost({
         caption: caption.trim() || undefined,
         location: location.trim() || undefined,
-        isPublic,
+        is_public: isPublic,
         mediaFiles: selectedFiles,
       })
       if (post) {

@@ -201,7 +201,7 @@ export const adminService = {
     }
 
     return {
-      reports: reports || [],
+      reports: (reports || []) as unknown as ReportManagement[],
       total: count || 0
     }
   },

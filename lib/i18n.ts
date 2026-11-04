@@ -14,7 +14,7 @@ export const LOCALE_FLAG: Record<Locale, string> = {
   ja: '🇯🇵',
 }
 
-type TranslationKeys = {
+export type TranslationKeys = {
   loading: string; error: string; back: string; save: string; cancel: string
   confirm: string; close: string; next: string; free: string
   nav_home: string; nav_explore: string; nav_events: string; nav_match: string; nav_profile: string

@@ -444,6 +444,8 @@ class EmailService {
             promotional: false
           }
         : {
+            match_notifications: false,
+            message_notifications: false,
             newsletter: false,
             promotional: false
           }
