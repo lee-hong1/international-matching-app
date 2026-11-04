@@ -218,6 +218,21 @@ export async function PATCH(
     })()
   }
 
+  // cancelled → 커미션 환불 (이미 completed로 커미션이 생성된 경우는 없으므로
+  // confirmed→cancelled 전이 시에만 해당. booking_commissions 행 삭제)
+  if (newStatus === 'cancelled') {
+    void (async () => {
+      try {
+        await supabaseService
+          .from('booking_commissions')
+          .delete()
+          .eq('booking_id', id)
+      } catch (e) {
+        console.error('[bookings/status] commission reversal error:', (e as Error).message)
+      }
+    })()
+  }
+
   // Fire-and-forget 알림
   // confirmed → 사용자에게, cancelled → 양측에게, completed → 사용자에게
   const notifyUserId = newStatus === 'confirmed' || newStatus === 'completed'
