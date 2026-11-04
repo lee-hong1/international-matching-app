@@ -36,12 +36,12 @@ function getLang(): Lang {
 function BookingForm({ serviceId }: { serviceId: string }) {
   const searchParams = useSearchParams()
   const router = useRouter()
-  const hostId = searchParams.get('host') ?? ''
   const lang = getLang()
 
   const [step, setStep] = useState<Step>('service')
   const [service, setService] = useState<Service | null>(null)
   const [slots, setSlots] = useState<AvailabilitySlot[]>([])
+  const [resolvedHostId, setResolvedHostId] = useState(searchParams.get('host') ?? '')
   const [selectedDate, setSelectedDate] = useState('')
   const [selectedTime, setSelectedTime] = useState('')
   const [notes, setNotes] = useState('')
@@ -53,17 +53,27 @@ function BookingForm({ serviceId }: { serviceId: string }) {
     if (!serviceId) return
     fetch(`/api/services/${serviceId}`)
       .then(r => r.ok ? r.json() : null)
-      .then(data => { if (data) { setService(data); setStep('datetime') } })
+      .then((data: (Service & { host_id?: string }) | null) => {
+        if (data) {
+          setService(data)
+          setStep('datetime')
+          // fallback: extract host_id from service when not in URL
+          if (!resolvedHostId && data.host_id) {
+            setResolvedHostId(data.host_id)
+          }
+        }
+      })
       .catch(() => setError(t('error.network', lang)))
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [serviceId, lang])
 
   useEffect(() => {
-    if (!hostId) return
-    fetch(`/api/availability?host_id=${hostId}`)
+    if (!resolvedHostId) return
+    fetch(`/api/availability?host_id=${resolvedHostId}`)
       .then(r => r.ok ? r.json() : { slots: [] })
       .then(data => setSlots(data.slots ?? []))
       .catch(() => {})
-  }, [hostId])
+  }, [resolvedHostId])
 
   const DOW_NAMES: Record<Lang, string[]> = {
     ko: ['일', '월', '화', '수', '목', '금', '토'],
@@ -88,7 +98,7 @@ function BookingForm({ serviceId }: { serviceId: string }) {
           'idempotency-key': idempKey,
         },
         body: JSON.stringify({
-          host_id: hostId,
+          host_id: resolvedHostId,
           service_id: service.id,
           booked_at: bookedAt,
           timezone: tz,
@@ -121,7 +131,7 @@ function BookingForm({ serviceId }: { serviceId: string }) {
           <div style={{ fontSize: 48, marginBottom: 16 }}>✅</div>
           <h2 style={{ marginBottom: 8 }}>{t('book.success_title', lang)}</h2>
           <p style={{ color: '#666', marginBottom: 24 }}>{t('book.success_body', lang)}</p>
-          <button onClick={() => router.push(hostId ? `/host/${hostId}` : '/')} style={styles.btn}>
+          <button onClick={() => router.push(resolvedHostId ? `/host/${resolvedHostId}` : '/')} style={styles.btn}>
             {t('book.back_to_profile', lang)}
           </button>
         </div>

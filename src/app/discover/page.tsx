@@ -352,7 +352,7 @@ export default function DiscoverPage() {
                 !category ? 'bg-purple-600 text-white' : 'bg-white text-gray-600 border border-gray-200 hover:border-purple-400'
               }`}
             >
-              All
+              {t('discover.all_categories', lang)}
             </button>
             {CATEGORIES.map(cat => (
               <button

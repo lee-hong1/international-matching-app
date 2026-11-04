@@ -556,6 +556,7 @@ const MESSAGES: Messages = {
   'discover.services_tab': { ko: '서비스', en: 'Services', ja: 'サービス', zh: '服务' },
   'discover.empty_services': { ko: '서비스가 없습니다', en: 'No services found', ja: 'サービスがありません', zh: '暂无服务' },
   'discover.match_message': { ko: '님과 매칭되었습니다! 지금 대화를 시작해 보세요.', en: 'matched with you! Start a conversation now.', ja: 'さんとマッチングしました！今すぐ会話を始めましょう。', zh: '和您配对成功！现在开始对话吧。' },
+  'discover.all_categories': { ko: '전체', en: 'All', ja: 'すべて', zh: '全部' },
 
   // ── 에러 페이지 ────────────────────────────────────────────────────────────
   'error.retry': { ko: '다시 시도', en: 'Try Again', ja: '再試行', zh: '重试' },
