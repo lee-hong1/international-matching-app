@@ -282,3 +282,34 @@ CREATE TRIGGER update_post_comments_updated_at BEFORE UPDATE ON post_comments
 
 CREATE TRIGGER update_creator_profiles_updated_at BEFORE UPDATE ON creator_profiles
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+-- =====================================================
+-- Counter RPCs (likes / comments — atomic, race-safe)
+-- =====================================================
+CREATE OR REPLACE FUNCTION increment_likes_count(p_post_id UUID)
+RETURNS VOID LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
+BEGIN
+  UPDATE posts SET likes_count = likes_count + 1 WHERE id = p_post_id;
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION decrement_likes_count(p_post_id UUID)
+RETURNS VOID LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
+BEGIN
+  UPDATE posts SET likes_count = GREATEST(likes_count - 1, 0) WHERE id = p_post_id;
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION increment_comments_count(p_post_id UUID)
+RETURNS VOID LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
+BEGIN
+  UPDATE posts SET comments_count = comments_count + 1 WHERE id = p_post_id;
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION decrement_comments_count(p_post_id UUID)
+RETURNS VOID LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
+BEGIN
+  UPDATE posts SET comments_count = GREATEST(comments_count - 1, 0) WHERE id = p_post_id;
+END;
+$$;
