@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
   }
 
   // comments_count 증가
-  await supabaseService.rpc('increment_comments_count', { p_post_id: post_id }).catch(() => {})
+  await supabaseService.rpc('increment_comments_count', { p_post_id: post_id })
 
   return NextResponse.json({ comment }, { status: 201 })
 }

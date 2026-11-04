@@ -1,12 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { isValidUuid } from '@src/lib/commerce'
+import { createClient } from '@supabase/supabase-js'
+import { isValidUuid, supabaseService } from '@src/lib/commerce'
 import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
-import { supabase } from '@/lib/supabase'
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
 
 async function getAuthUser(request: NextRequest) {
   const authHeader = request.headers.get('authorization')
@@ -43,7 +38,7 @@ export async function GET(
     return NextResponse.json({ error: 'Invalid profile ID' }, { status: 400 })
   }
 
-  const { data, error } = await supabase
+  const { data, error } = await supabaseService
     .from('public_profiles')
     .select('*')
     .eq('id', id)
@@ -79,7 +74,7 @@ export async function DELETE(
   }
 
   // Supabase auth.admin.deleteUser는 연결된 profiles row를 cascade 삭제
-  const { error } = await supabase.auth.admin.deleteUser(id)
+  const { error } = await supabaseService.auth.admin.deleteUser(id)
   if (error) {
     console.error('[profiles DELETE] auth.admin.deleteUser failed:', id.substring(0, 8) + '...')
     return NextResponse.json({ error: 'Failed to delete account' }, { status: 500 })

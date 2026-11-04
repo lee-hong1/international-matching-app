@@ -46,7 +46,7 @@ export async function DELETE(
   const { error } = await supabaseService.from('post_comments').delete().eq('id', commentId)
   if (error) return NextResponse.json({ error: 'Failed to delete comment' }, { status: 500 })
 
-  await supabaseService.rpc('decrement_comments_count', { p_post_id: comment.post_id }).catch(() => {})
+  await supabaseService.rpc('decrement_comments_count', { p_post_id: comment.post_id })
 
   return NextResponse.json({ success: true })
 }

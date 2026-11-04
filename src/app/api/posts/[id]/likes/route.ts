@@ -44,7 +44,7 @@ export async function POST(
   }
 
   if (!error) {
-    await supabaseService.rpc('increment_likes_count', { p_post_id: postId }).catch(() => {})
+    await supabaseService.rpc('increment_likes_count', { p_post_id: postId })
   }
 
   return NextResponse.json({ liked: true })
@@ -80,7 +80,7 @@ export async function DELETE(
 
   if (error) return NextResponse.json({ error: 'Failed to unlike post' }, { status: 500 })
 
-  await supabaseService.rpc('decrement_likes_count', { p_post_id: postId }).catch(() => {})
+  await supabaseService.rpc('decrement_likes_count', { p_post_id: postId })
 
   return NextResponse.json({ liked: false })
 }
