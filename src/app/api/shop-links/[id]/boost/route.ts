@@ -8,15 +8,9 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseService, getAuthUser, isValidUuid } from '@/lib/commerce'
+import { supabaseService, getAuthUser, isValidUuid, BOOST_PRICES } from '@/lib/commerce'
 import { checkRateLimit, rateLimitResponse } from '@/lib/ratelimit'
-
-const BOOST_PRICE_KRW: Record<number, number> = {
-  3:  3_900,
-  7:  7_900,
-  14: 13_900,
-  30: 24_900,
-}
+import { verifyTossPayment, makeIdempotencyKey } from '@/lib/payments'
 
 export async function POST(
   req: NextRequest,
@@ -55,14 +49,14 @@ export async function POST(
       )
     }
 
-    if (!BOOST_PRICE_KRW[boost_days as number]) {
+    if (!BOOST_PRICES[boost_days as number]) {
       return NextResponse.json(
-        { error: `boost_days는 다음 중 하나: ${Object.keys(BOOST_PRICE_KRW).join(', ')}` },
+        { error: `boost_days는 다음 중 하나: ${Object.keys(BOOST_PRICES).join(', ')}` },
         { status: 400 },
       )
     }
 
-    const expectedAmount = BOOST_PRICE_KRW[boost_days as number]
+    const expectedAmount = BOOST_PRICES[boost_days as number]
 
     // ── IDOR: link must belong to this host ───────────────────────────────
     const { data: link, error: fetchErr } = await supabaseService
@@ -92,7 +86,7 @@ export async function POST(
     }
 
     // ── 멱등성 키 ─────────────────────────────────────────────────────────
-    const idempotencyKey = `boost_${user.id}_${linkId}_${order_id}`
+    const idempotencyKey = makeIdempotencyKey('boost', user.id, linkId, order_id)
 
     const { data: existing } = await supabaseService
       .from('link_boost_payments')
@@ -108,43 +102,9 @@ export async function POST(
     }
 
     // ── Toss Payments 결제 검증 ────────────────────────────────────────────
-    const tossSecretKey = process.env.TOSS_SECRET_KEY
-    if (!tossSecretKey) {
-      return NextResponse.json({ error: '결제 설정 오류' }, { status: 500 })
-    }
-
-    const tossRes = await fetch(
-      `https://api.tosspayments.com/v1/payments/${encodeURIComponent(payment_key)}`,
-      {
-        headers: {
-          Authorization: `Basic ${Buffer.from(`${tossSecretKey}:`).toString('base64')}`,
-        },
-      },
-    )
-
-    if (!tossRes.ok) {
-      return NextResponse.json({ error: '결제 검증 실패' }, { status: 402 })
-    }
-
-    const tossData = await tossRes.json() as {
-      status: string
-      orderId: string
-      totalAmount: number
-    }
-
-    if (tossData.status !== 'DONE') {
-      return NextResponse.json({ error: '결제가 완료되지 않았습니다' }, { status: 402 })
-    }
-
-    if (tossData.orderId !== order_id) {
-      return NextResponse.json({ error: '주문 ID 불일치' }, { status: 400 })
-    }
-
-    if (tossData.totalAmount !== expectedAmount) {
-      return NextResponse.json(
-        { error: `결제 금액 불일치. 예상: ${expectedAmount}원` },
-        { status: 400 },
-      )
+    const tossResult = await verifyTossPayment(payment_key, order_id, expectedAmount)
+    if (!tossResult.ok) {
+      return NextResponse.json({ error: tossResult.error }, { status: tossResult.statusCode })
     }
 
     // ── 부스트 적용 (트랜잭션 패턴) ───────────────────────────────────────
