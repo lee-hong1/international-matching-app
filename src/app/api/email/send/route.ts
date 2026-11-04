@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
+import { getAuthUser } from '@src/lib/commerce'
 
 // 이메일 전송 API (실제 구현에서는 SendGrid, AWS SES, Mailgun 등 사용)
 export async function POST(req: NextRequest) {
@@ -8,6 +9,12 @@ export async function POST(req: NextRequest) {
   if (!rl.allowed) {
     const r = rateLimitResponse(rl.resetAt)
     return NextResponse.json(r.body, { status: r.status, headers: r.headers })
+  }
+
+  // JWT 인증 필수 — 미인증 시 스팸 릴레이로 악용 가능
+  const user = await getAuthUser(req)
+  if (!user) {
+    return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
   }
 
   try {

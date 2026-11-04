@@ -313,3 +313,28 @@ BEGIN
   UPDATE posts SET comments_count = GREATEST(comments_count - 1, 0) WHERE id = p_post_id;
 END;
 $$;
+
+-- ============================================================
+-- 만료된 스토리 정리 (N+47)
+-- RLS가 만료 스토리를 숨기지만 행이 남아 용량 낭비.
+-- pg_cron 또는 Supabase Edge Function scheduled job에서 호출.
+-- ============================================================
+
+CREATE OR REPLACE FUNCTION cleanup_expired_stories()
+RETURNS INTEGER
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  deleted_count INTEGER;
+BEGIN
+  DELETE FROM stories WHERE expires_at <= NOW();
+  GET DIAGNOSTICS deleted_count = ROW_COUNT;
+  RETURN deleted_count;
+END;
+$$;
+
+-- 직접 실행 예: SELECT cleanup_expired_stories();
+-- Edge Function scheduled job (예: 매시간 실행):
+--   await supabase.rpc('cleanup_expired_stories')
