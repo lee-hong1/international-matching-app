@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL ?? 'https://placeholder.supabase.co',
@@ -7,6 +8,13 @@ const supabase = createClient(
 )
 
 export async function GET(request: NextRequest) {
+  const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
+  const rl = await checkRateLimit(`posts-get:${ip}`, 'general')
+  if (!rl.allowed) {
+    const r = rateLimitResponse(rl.resetAt)
+    return NextResponse.json(r.body, { status: r.status, headers: r.headers })
+  }
+
   const authHeader = request.headers.get('authorization')
   if (!authHeader) {
     return NextResponse.json({ error: '인증이 필요합니다' }, { status: 401 })
@@ -56,6 +64,13 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  const postIp = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
+  const postRl = await checkRateLimit(`posts-post:${postIp}`, 'general')
+  if (!postRl.allowed) {
+    const r = rateLimitResponse(postRl.resetAt)
+    return NextResponse.json(r.body, { status: r.status, headers: r.headers })
+  }
+
   try {
     const formData = await request.formData()
     const caption = formData.get('caption') as string | null
