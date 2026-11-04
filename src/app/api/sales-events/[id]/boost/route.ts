@@ -8,7 +8,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseService, getAuthUser, isValidUuid, BOOST_PRICES } from '@/lib/commerce'
 import { checkRateLimit, rateLimitResponse } from '@/lib/ratelimit'
-import { verifyTossPayment, makeIdempotencyKey } from '@/lib/payments'
+import { verifyTossPayment, makeIdempotencyKey, PAYMENT_METHODS, type PaymentMethod } from '@/lib/payments'
 
 export async function POST(
   req: NextRequest,
@@ -38,7 +38,7 @@ export async function POST(
   }
 
   try {
-    const { payment_key, order_id, boost_days } = await req.json()
+    const { payment_key, order_id, boost_days, payment_method } = await req.json()
 
     if (!payment_key || !order_id || !boost_days) {
       return NextResponse.json(
@@ -46,6 +46,11 @@ export async function POST(
         { status: 400 },
       )
     }
+
+    const resolvedMethod: PaymentMethod =
+      payment_method && Object.keys(PAYMENT_METHODS).includes(payment_method)
+        ? (payment_method as PaymentMethod)
+        : 'card'
 
     if (!BOOST_PRICES[boost_days as number]) {
       return NextResponse.json(
@@ -122,6 +127,7 @@ export async function POST(
         boost_days,
         amount: expectedAmount,
         payment_key,
+        payment_method: resolvedMethod,
         idempotency_key: idempotencyKey,
         boost_ends_at: boostEndsAt,
       })

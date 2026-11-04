@@ -3,10 +3,31 @@
  * 모든 boost route에서 공유.
  */
 
+export const PAYMENT_METHODS = {
+  card: '카드',
+  kakaopay: '카카오페이',
+  tosspay: '토스페이',
+  naverpay: '네이버페이',
+} as const
+
+export type PaymentMethod = keyof typeof PAYMENT_METHODS
+
 export interface TossPaymentResult {
   status: string
   orderId: string
   totalAmount: number
+  /** easyPay 결제 수단 정보 (카카오페이/토스페이/네이버페이 등) */
+  easyPay?: {
+    provider: string
+    amount: number
+    discountAmount: number
+  }
+  /** 일반 카드 결제 정보 */
+  card?: {
+    company: string
+    number: string
+    installmentPlanMonths: number
+  }
 }
 
 export interface TossVerifySuccess {
@@ -63,6 +84,12 @@ export async function verifyTossPayment(
 
   if (data.totalAmount !== expectedAmount) {
     return { ok: false, statusCode: 400, error: `결제 금액 불일치. 예상: ${expectedAmount}원` }
+  }
+
+  // easyPay(카카오페이/토스페이/네이버페이) 결제 금액 재검증
+  // easyPay.amount = 실제 결제 금액, discountAmount = 할인 금액 (합산 = totalAmount)
+  if (data.easyPay && data.easyPay.amount + data.easyPay.discountAmount !== expectedAmount) {
+    return { ok: false, statusCode: 400, error: 'easyPay 결제 금액 불일치' }
   }
 
   return { ok: true, data }
