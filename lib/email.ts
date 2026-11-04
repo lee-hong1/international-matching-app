@@ -1,4 +1,5 @@
 import { supabase } from './supabase'
+import { supabaseService } from './commerce'
 
 export interface EmailTemplate {
   id: string
@@ -54,7 +55,7 @@ class EmailService {
   ): Promise<boolean> {
     try {
       // 템플릿 조회
-      const { data: template, error: templateError } = await supabase
+      const { data: template, error: templateError } = await supabaseService
         .from('email_templates')
         .select('*')
         .eq('name', templateName)
@@ -67,7 +68,7 @@ class EmailService {
       }
 
       // 이메일 작업 생성
-      const { error: jobError } = await supabase
+      const { error: jobError } = await supabaseService
         .from('email_jobs')
         .insert({
           recipient_email: recipientEmail,
@@ -131,7 +132,7 @@ class EmailService {
       }
 
       // 전송 성공 시 상태 업데이트
-      await supabase
+      await supabaseService
         .from('email_jobs')
         .update({
           status: 'sent',
@@ -145,7 +146,7 @@ class EmailService {
       console.error('Email processing error:', error)
       
       // 전송 실패 시 상태 업데이트
-      await supabase
+      await supabaseService
         .from('email_jobs')
         .update({
           status: 'failed',
@@ -247,7 +248,7 @@ class EmailService {
   ): Promise<string | null> {
     try {
       // 템플릿 조회
-      const { data: template } = await supabase
+      const { data: template } = await supabaseService
         .from('email_templates')
         .select('id')
         .eq('name', templateName)
@@ -261,7 +262,7 @@ class EmailService {
       const recipientCount = await this.calculateRecipientCount(recipientFilter)
 
       // 캠페인 생성
-      const { data, error } = await supabase
+      const { data, error } = await supabaseService
         .from('email_campaigns')
         .insert({
           name,
@@ -294,7 +295,7 @@ class EmailService {
   // 수신자 수 계산
   private async calculateRecipientCount(filter: any): Promise<number> {
     try {
-      let query = supabase.from('profiles').select('id', { count: 'exact' })
+      let query = supabaseService.from('profiles').select('id', { count: 'exact' })
 
       // 필터 조건 적용
       if (filter.countries && filter.countries.length > 0) {
@@ -309,7 +310,7 @@ class EmailService {
       }
 
       if (filter.premium_only) {
-        const { data: premiumUsers } = await supabase
+        const { data: premiumUsers } = await supabaseService
           .from('subscriptions')
           .select('user_id')
           .eq('status', 'active')
@@ -321,7 +322,7 @@ class EmailService {
 
       if (filter.last_active_days) {
         const since = new Date(Date.now() - filter.last_active_days * 24 * 60 * 60 * 1000)
-        const { data: activeUsers } = await supabase
+        const { data: activeUsers } = await supabaseService
           .from('user_behavior_stats')
           .select('user_id')
           .gte('last_active_at', since.toISOString())
@@ -425,7 +426,7 @@ class EmailService {
   // 이메일 수신 거부 처리
   async unsubscribe(email: string, type: 'all' | 'marketing' = 'all'): Promise<boolean> {
     try {
-      const { data: profile } = await supabase
+      const { data: profile } = await supabaseService
         .from('profiles')
         .select('id')
         .eq('email', email)
