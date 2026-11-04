@@ -3,8 +3,42 @@
 
 ALTER TABLE profiles ADD COLUMN IF NOT EXISTS preferred_lang TEXT DEFAULT 'ko'
   CHECK (preferred_lang IN ('ko','en','ja','zh'));
-ALTER TABLE profiles ADD COLUMN IF NOT EXISTS display_name TEXT
-  GENERATED ALWAYS AS (COALESCE(full_name, split_part(email, '@', 1))) STORED;
+-- display_name: 일반 컬럼 (GENERATED 제거 — full_name/email 모두 NULL 시 오류 방지)
+-- 기존 GENERATED 컬럼이 있다면 먼저 삭제 후 재생성
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_name = 'profiles' AND column_name = 'display_name'
+      AND is_generated = 'ALWAYS'
+  ) THEN
+    ALTER TABLE profiles DROP COLUMN display_name;
+  END IF;
+END $$;
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS display_name TEXT;
+
+-- 가입/업데이트 시 display_name 자동 설정 트리거
+CREATE OR REPLACE FUNCTION set_default_display_name()
+RETURNS TRIGGER LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
+BEGIN
+  IF NEW.display_name IS NULL OR NEW.display_name = '' THEN
+    NEW.display_name := COALESCE(
+      NEW.full_name,
+      CASE WHEN NEW.email IS NOT NULL AND NEW.email <> ''
+           THEN split_part(NEW.email, '@', 1)
+           ELSE NULL
+      END,
+      'User_' || LEFT(NEW.id::text, 8)
+    );
+  END IF;
+  RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS ensure_display_name ON profiles;
+CREATE TRIGGER ensure_display_name
+  BEFORE INSERT OR UPDATE ON profiles
+  FOR EACH ROW EXECUTE FUNCTION set_default_display_name();
 
 -- trust_score / trust_badge (profiles_trust_score.sql 에서 추가되지 않은 경우 대비)
 ALTER TABLE profiles ADD COLUMN IF NOT EXISTS trust_score INTEGER DEFAULT 0

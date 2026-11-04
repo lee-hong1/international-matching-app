@@ -19,10 +19,11 @@ interface ReviewCardProps {
 }
 
 function StarRating({ rating }: { rating: number }) {
+  const safeRating = isNaN(rating) ? 1 : Math.max(1, Math.min(5, Math.round(rating)))
   return (
-    <span aria-label={`${rating} out of 5 stars`} style={{ color: '#f59e0b', letterSpacing: 1 }}>
+    <span aria-label={`${safeRating} out of 5 stars`} style={{ color: '#f59e0b', letterSpacing: 1 }}>
       {Array.from({ length: 5 }).map((_, i) => (
-        <span key={i} style={{ opacity: i < rating ? 1 : 0.25 }}>★</span>
+        <span key={i} style={{ opacity: i < safeRating ? 1 : 0.25 }}>★</span>
       ))}
     </span>
   )
