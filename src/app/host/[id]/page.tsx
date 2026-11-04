@@ -2,6 +2,7 @@ import { headers } from 'next/headers'
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import ReviewCard from '@/components/ReviewCard'
+import TrustBadge from '@/components/TrustBadge'
 import { detectLangFromHeader, t } from '@/lib/i18n'
 
 interface PublicProfile {
@@ -71,12 +72,6 @@ export async function generateMetadata(
   }
 }
 
-const BADGE_LABEL: Record<string, string> = {
-  verified: '✓',
-  premium: '★',
-  elite: '♦',
-}
-
 const CURRENCY_SYMBOL: Record<string, string> = {
   KRW: '₩',
   JPY: '¥',
@@ -98,10 +93,6 @@ export default async function HostProfilePage(
   ])
 
   if (!profile) notFound()
-
-  const badge = profile.trust_badge && profile.trust_badge !== 'none'
-    ? BADGE_LABEL[profile.trust_badge]
-    : null
 
   return (
     <main style={{ maxWidth: 760, margin: '0 auto', padding: '2rem 1rem' }}>
@@ -127,20 +118,19 @@ export default async function HostProfilePage(
         <div>
           <h1 style={{ margin: '0 0 0.25rem', fontSize: '1.5rem' }}>
             {profile.display_name ?? 'Host'}
-            {badge && (
-              <span style={{ marginLeft: '0.5rem', fontSize: '1rem', color: '#e91e63' }} title={profile.trust_badge ?? ''}>
-                {badge}
-              </span>
-            )}
           </h1>
           {profile.country && (
             <p style={{ margin: '0 0 0.5rem', color: '#666' }}>{profile.country}</p>
           )}
+          <div style={{ marginBottom: '0.5rem' }}>
+            <TrustBadge
+              trustScore={profile.trust_score}
+              trustBadge={(profile.trust_badge ?? 'none') as 'none' | 'verified' | 'premium' | 'elite'}
+              lang={lang}
+            />
+          </div>
           <div style={{ display: 'flex', gap: '1rem', fontSize: '0.85rem', color: '#888' }}>
             <span>{t('profile.host_since', lang)}</span>
-            {profile.trust_score > 0 && (
-              <span>Trust: {profile.trust_score}/100</span>
-            )}
           </div>
           {profile.bio && (
             <p style={{ marginTop: '0.75rem', color: '#444', maxWidth: 480 }}>{profile.bio}</p>

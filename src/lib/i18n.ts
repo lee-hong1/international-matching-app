@@ -535,6 +535,20 @@ const MESSAGES: Messages = {
   'host.bookings.status_error': { ko: '상태 변경 실패', en: 'Status update failed', ja: 'ステータス更新失敗', zh: '状态更新失败' },
   'host.bookings.notes': { ko: '메모', en: 'Notes', ja: 'メモ', zh: '备注' },
   'host.bookings.load_more': { ko: '더 보기', en: 'Load more', ja: 'もっと見る', zh: '加载更多' },
+
+  // ── 서비스 상세 ──────────────────────────────────────────────────────────
+  'services.not_found': { ko: '서비스를 찾을 수 없습니다', en: 'Service not found', ja: 'サービスが見つかりません', zh: '未找到服务' },
+  'services.price': { ko: '가격', en: 'Price', ja: '価格', zh: '价格' },
+  'services.duration': { ko: '소요 시간', en: 'Duration', ja: '所要時間', zh: '时长' },
+  'services.duration_min': { ko: '{n}분', en: '{n} min', ja: '{n}分', zh: '{n}分钟' },
+  'services.category': { ko: '카테고리', en: 'Category', ja: 'カテゴリ', zh: '类别' },
+  'services.host_info': { ko: '호스트 정보', en: 'Host Info', ja: 'ホスト情報', zh: '主人信息' },
+  'services.view_host': { ko: '호스트 프로필 보기', en: 'View Host Profile', ja: 'ホストプロフィールを見る', zh: '查看主人档案' },
+  'services.book_now': { ko: '예약하기', en: 'Book Now', ja: '予約する', zh: '立即预约' },
+  'services.inactive': { ko: '현재 이용 불가한 서비스입니다', en: 'This service is currently unavailable', ja: 'このサービスは現在ご利用いただけません', zh: '此服务暂不可用' },
+  'services.reviews_title': { ko: '최근 리뷰', en: 'Recent Reviews', ja: '最近のレビュー', zh: '最近评价' },
+  'availability.toggle_on': { ko: '활성화', en: 'Enable', ja: '有効化', zh: '启用' },
+  'availability.toggle_off': { ko: '비활성화', en: 'Disable', ja: '無効化', zh: '停用' },
 }
 
 /** 언어 코드를 지원 언어로 정규화 */

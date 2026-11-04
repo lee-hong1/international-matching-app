@@ -83,6 +83,20 @@ export default function HostAvailabilityPage() {
     }
   }
 
+  async function handleToggle(id: string, currentActive: boolean) {
+    try {
+      const res = await fetch(`/api/availability/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ is_active: !currentActive }),
+      })
+      if (!res.ok) throw new Error()
+      setSlots(prev => prev.map(s => s.id === id ? { ...s, is_active: !currentActive } : s))
+    } catch {
+      setMessage({ type: 'error', text: t('availability.save_error', lang) })
+    }
+  }
+
   async function handleDelete(id: string) {
     try {
       const res = await fetch(`/api/availability/${id}`, { method: 'DELETE' })
@@ -206,20 +220,36 @@ export default function HostAvailabilityPage() {
                 {slot.start_time} – {slot.end_time} &nbsp;
                 <span style={{ color: '#6b7280', fontSize: '0.8rem' }}>({slot.timezone})</span>
               </span>
-              <button
-                onClick={() => handleDelete(slot.id)}
-                style={{
-                  padding: '0.375rem 0.75rem',
-                  background: '#fee2e2',
-                  color: '#991b1b',
-                  border: 'none',
-                  borderRadius: 6,
-                  cursor: 'pointer',
-                  fontSize: '0.8rem',
-                }}
-              >
-                {t('availability.delete', lang)}
-              </button>
+              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                <button
+                  onClick={() => handleToggle(slot.id, slot.is_active)}
+                  style={{
+                    padding: '0.375rem 0.75rem',
+                    background: slot.is_active ? '#fef3c7' : '#d1fae5',
+                    color: slot.is_active ? '#92400e' : '#065f46',
+                    border: 'none',
+                    borderRadius: 6,
+                    cursor: 'pointer',
+                    fontSize: '0.8rem',
+                  }}
+                >
+                  {slot.is_active ? t('availability.toggle_off', lang) : t('availability.toggle_on', lang)}
+                </button>
+                <button
+                  onClick={() => handleDelete(slot.id)}
+                  style={{
+                    padding: '0.375rem 0.75rem',
+                    background: '#fee2e2',
+                    color: '#991b1b',
+                    border: 'none',
+                    borderRadius: 6,
+                    cursor: 'pointer',
+                    fontSize: '0.8rem',
+                  }}
+                >
+                  {t('availability.delete', lang)}
+                </button>
+              </div>
             </li>
           ))}
         </ul>
