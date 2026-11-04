@@ -358,28 +358,6 @@ const MESSAGES: Messages = {
   'auth.error_login_error': { ko: '로그인 중 오류가 발생했습니다.', en: 'An error occurred during login.', ja: 'ログイン中にエラーが発生しました。', zh: '登录时发生错误。' },
   'auth.error_social_failed': { ko: '소셜 로그인에 실패했습니다.', en: 'Social login failed.', ja: 'ソーシャルログインに失敗しました。', zh: '社交登录失败。' },
   'auth.error_social_error': { ko: '소셜 로그인 중 오류가 발생했습니다.', en: 'An error occurred during social login.', ja: 'ソーシャルログイン中にエラーが発生しました。', zh: '社交登录时发生错误。' },
-}
-
-/** 언어 코드를 지원 언어로 정규화 */
-export function normalizeLang(raw: string | null | undefined): Lang {
-  if (!raw) return 'ko'
-  const prefix = raw.split('-')[0].toLowerCase()
-  if (prefix === 'ja') return 'ja'
-  if (prefix === 'zh') return 'zh'
-  if (prefix === 'en') return 'en'
-  return 'ko'
-}
-
-/** Accept-Language 헤더에서 언어 감지 (서버사이드) */
-export function detectLangFromHeader(acceptLanguage: string | null): Lang {
-  return normalizeLang(acceptLanguage?.split(',')[0].trim())
-}
-
-/** 클라이언트에서 사용: navigator.language 기반 */
-export function detectLangFromNavigator(): Lang {
-  if (typeof navigator === 'undefined') return 'ko'
-  return normalizeLang(navigator.language)
-}
 
   // ── 회원가입 ──────────────────────────────────────────────────────────────
   'signup.title': { ko: '회원가입', en: 'Sign Up', ja: '新規登録', zh: '注册' },
@@ -528,6 +506,56 @@ export function detectLangFromNavigator(): Lang {
   'book.success_body': { ko: '예약이 접수되었습니다. 호스트 확인 후 알림을 받으실 수 있습니다.', en: 'Your booking has been submitted. You will be notified once the host confirms.', ja: '予約が送信されました。ホストの確認後に通知が届きます。', zh: '您的预约已提交，主人确认后您将收到通知。' },
   'book.back_to_profile': { ko: '프로필로 돌아가기', en: 'Back to Profile', ja: 'プロフィールに戻る', zh: '返回档案' },
   'book.cancel': { ko: '취소', en: 'Cancel', ja: 'キャンセル', zh: '取消' },
+
+  // ── 사용자 예약 목록 ──────────────────────────────────────────────────────
+  'bookings.title': { ko: '내 예약', en: 'My Bookings', ja: '予約一覧', zh: '我的预约' },
+  'bookings.tab_upcoming': { ko: '예정', en: 'Upcoming', ja: '予定', zh: '即将到来' },
+  'bookings.tab_completed': { ko: '완료', en: 'Completed', ja: '完了', zh: '已完成' },
+  'bookings.tab_cancelled': { ko: '취소', en: 'Cancelled', ja: 'キャンセル', zh: '已取消' },
+  'bookings.empty': { ko: '예약이 없습니다', en: 'No bookings', ja: '予約がありません', zh: '暂无预约' },
+  'bookings.status_pending': { ko: '대기 중', en: 'Pending', ja: '保留中', zh: '待确认' },
+  'bookings.status_confirmed': { ko: '확정됨', en: 'Confirmed', ja: '確定済み', zh: '已确认' },
+  'bookings.status_completed': { ko: '완료', en: 'Completed', ja: '完了', zh: '已完成' },
+  'bookings.status_cancelled': { ko: '취소됨', en: 'Cancelled', ja: 'キャンセル済み', zh: '已取消' },
+  'bookings.cancel_btn': { ko: '예약 취소', en: 'Cancel Booking', ja: '予約キャンセル', zh: '取消预约' },
+  'bookings.cancel_confirm': { ko: '예약을 취소하시겠습니까?', en: 'Cancel this booking?', ja: 'この予約をキャンセルしますか？', zh: '确定取消此预约？' },
+  'bookings.review_btn': { ko: '리뷰 작성', en: 'Write Review', ja: 'レビューを書く', zh: '写评价' },
+  'bookings.load_error': { ko: '예약 목록을 불러오지 못했습니다', en: 'Failed to load bookings', ja: '予約の読み込みに失敗しました', zh: '无法加载预约' },
+  'bookings.cancel_error': { ko: '취소 실패', en: 'Cancellation failed', ja: 'キャンセル失敗', zh: '取消失败' },
+  'bookings.load_more': { ko: '더 보기', en: 'Load more', ja: 'もっと見る', zh: '加载更多' },
+
+  // ── 호스트 예약 관리 ──────────────────────────────────────────────────────
+  'host.bookings.confirm_btn': { ko: '확정', en: 'Confirm', ja: '確定', zh: '确认' },
+  'host.bookings.complete_btn': { ko: '완료 처리', en: 'Mark Complete', ja: '完了にする', zh: '标记完成' },
+  'host.bookings.cancel_btn': { ko: '취소', en: 'Cancel', ja: 'キャンセル', zh: '取消' },
+  'host.bookings.empty': { ko: '들어온 예약이 없습니다', en: 'No bookings yet', ja: '予約がありません', zh: '暂无预约' },
+  'host.bookings.user_info': { ko: '예약자', en: 'Guest', ja: '予約者', zh: '预约者' },
+  'host.bookings.load_error': { ko: '예약 목록 오류', en: 'Failed to load bookings', ja: '予約読み込みエラー', zh: '无法加载预约' },
+  'host.bookings.status_updated': { ko: '상태 변경 완료', en: 'Status updated', ja: 'ステータス更新完了', zh: '状态已更新' },
+  'host.bookings.status_error': { ko: '상태 변경 실패', en: 'Status update failed', ja: 'ステータス更新失敗', zh: '状态更新失败' },
+  'host.bookings.notes': { ko: '메모', en: 'Notes', ja: 'メモ', zh: '备注' },
+  'host.bookings.load_more': { ko: '더 보기', en: 'Load more', ja: 'もっと見る', zh: '加载更多' },
+}
+
+/** 언어 코드를 지원 언어로 정규화 */
+export function normalizeLang(raw: string | null | undefined): Lang {
+  if (!raw) return 'ko'
+  const prefix = raw.split('-')[0].toLowerCase()
+  if (prefix === 'ja') return 'ja'
+  if (prefix === 'zh') return 'zh'
+  if (prefix === 'en') return 'en'
+  return 'ko'
+}
+
+/** Accept-Language 헤더에서 언어 감지 (서버사이드) */
+export function detectLangFromHeader(acceptLanguage: string | null): Lang {
+  return normalizeLang(acceptLanguage?.split(',')[0].trim())
+}
+
+/** 클라이언트에서 사용: navigator.language 기반 */
+export function detectLangFromNavigator(): Lang {
+  if (typeof navigator === 'undefined') return 'ko'
+  return normalizeLang(navigator.language)
 }
 
 /**

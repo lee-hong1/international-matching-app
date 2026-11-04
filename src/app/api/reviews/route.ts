@@ -12,20 +12,31 @@ export async function GET(req: NextRequest) {
 
   const { searchParams } = new URL(req.url)
   const hostId = searchParams.get('host_id')
+  const reviewerId = searchParams.get('reviewer_id')
   const cursor = searchParams.get('cursor')
   const limit = Math.min(Number(searchParams.get('limit') ?? '20'), 50)
 
-  if (!hostId || !isValidUuid(hostId)) {
-    return NextResponse.json({ error: 'Valid host_id required' }, { status: 400 })
+  if (!hostId && !reviewerId) {
+    return NextResponse.json({ error: 'host_id or reviewer_id required' }, { status: 400 })
+  }
+  if (hostId && !isValidUuid(hostId)) {
+    return NextResponse.json({ error: 'Invalid host_id' }, { status: 400 })
+  }
+  if (reviewerId && !isValidUuid(reviewerId)) {
+    return NextResponse.json({ error: 'Invalid reviewer_id' }, { status: 400 })
   }
 
   let query = supabaseService
     .from('reviews')
-    .select('id, rating, comment, created_at, reviewer_id, profiles!reviewer_id(display_name, country)')
-    .eq('reviewee_id', hostId)
-    .eq('is_public', true)
+    .select('id, rating, comment, created_at, reviewer_id, reviewee_id, profiles!reviewer_id(display_name, country)')
     .order('created_at', { ascending: false })
     .limit(limit + 1)
+
+  if (hostId) {
+    query = query.eq('reviewee_id', hostId).eq('is_public', true)
+  } else if (reviewerId) {
+    query = query.eq('reviewer_id', reviewerId)
+  }
 
   if (cursor) {
     try {

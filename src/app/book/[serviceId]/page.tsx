@@ -3,6 +3,7 @@
 import { useEffect, useState, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { t, type Lang } from '@/lib/i18n'
+import { useAuth } from '@/contexts/AuthContext'
 
 interface Service {
   id: string
@@ -211,9 +212,21 @@ const styles = {
 
 // Suspense 경계: useSearchParams() 필수
 export default function BookPage({ params }: { params: Promise<{ serviceId: string }> }) {
+  const { user, loading: authLoading } = useAuth()
+  const router = useRouter()
   const [serviceId, setServiceId] = useState('')
+
   useEffect(() => { params.then(p => setServiceId(p.serviceId)) }, [params])
-  if (!serviceId) return null
+
+  useEffect(() => {
+    if (!authLoading && !user && serviceId) {
+      router.push(`/login?returnUrl=/book/${serviceId}`)
+    }
+  }, [user, authLoading, serviceId, router])
+
+  if (authLoading || !serviceId) return null
+  if (!user) return null
+
   return (
     <Suspense fallback={<main style={{ padding: '2rem', textAlign: 'center' }}>Loading...</main>}>
       <BookingForm serviceId={serviceId} />
