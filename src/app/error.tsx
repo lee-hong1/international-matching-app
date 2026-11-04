@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
-import { t, detectLangFromNavigator } from '@/lib/i18n'
+import { t, detectLangFromNavigator } from '@src/lib/i18n'
 
 export default function ErrorPage({
   error,

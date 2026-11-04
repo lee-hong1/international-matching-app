@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { authService } from '@/lib/auth'
 import { supabase } from '@/lib/supabase'
-import { t, detectLangFromNavigator } from '@/lib/i18n'
+import { t, detectLangFromNavigator } from '@src/lib/i18n'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -65,7 +65,7 @@ export default function LoginPage() {
     setLoading(true)
     try {
       const { error: authError } = await authService.signInWithProvider(provider)
-      if (authError) setError(authError.message || t('auth.error_social_failed', lang))
+      if (authError) setError((authError as { message?: string }).message || t('auth.error_social_failed', lang))
     } catch {
       setError(t('auth.error_social_error', lang))
     } finally {

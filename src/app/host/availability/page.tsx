@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { t, detectLangFromNavigator, type Lang } from '@/lib/i18n'
+import { t, detectLangFromNavigator, type Lang } from '@src/lib/i18n'
 
 const TIMEZONES = [
   'Asia/Seoul',

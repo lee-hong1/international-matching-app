@@ -1,15 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getAuthUser, supabaseService, isValidUuid } from '@/lib/commerce'
-import { checkRateLimit, rateLimitResponse } from '@/lib/ratelimit'
-import { isSuspended } from '@/lib/suspended-check'
+import { getAuthUser, supabaseService, isValidUuid } from '@src/lib/commerce'
+import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
+import { isSuspended } from '@src/lib/suspended-check'
 
 /**
  * GET /api/reviews?host_id=xxx
  * 호스트의 공개 리뷰 목록 (cursor 페이지네이션).
  */
 export async function GET(req: NextRequest) {
-  const rl = await checkRateLimit(req, 'general')
-  if (!rl.success) return rateLimitResponse(rl)
+  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
+  const rl = await checkRateLimit(ip, 'general')
+  if (!rl.allowed) return rateLimitResponse(rl.resetAt)
 
   const { searchParams } = new URL(req.url)
   const hostId = searchParams.get('host_id')
@@ -69,8 +70,9 @@ export async function GET(req: NextRequest) {
  * 리뷰 작성. 완료된 예약의 당사자만 가능.
  */
 export async function POST(req: NextRequest) {
-  const rl = await checkRateLimit(req, 'general')
-  if (!rl.success) return rateLimitResponse(rl)
+  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
+  const rl = await checkRateLimit(ip, 'general')
+  if (!rl.allowed) return rateLimitResponse(rl.resetAt)
 
   const user = await getAuthUser(req)
   if (!user) {

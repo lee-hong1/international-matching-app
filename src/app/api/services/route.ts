@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getAuthUser, supabaseService, isValidUuid } from '@/lib/commerce'
-import { hasForbiddenContent } from '@/lib/commerce'
-import { checkRateLimit, rateLimitResponse } from '@/lib/ratelimit'
-import { isSuspended } from '@/lib/suspended-check'
+import { getAuthUser, supabaseService, isValidUuid } from '@src/lib/commerce'
+import { hasForbiddenContent } from '@src/lib/commerce'
+import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
+import { isSuspended } from '@src/lib/suspended-check'
 
 const VALID_CATEGORIES = ['conversation', 'lesson', 'tour', 'meal', 'activity', 'other'] as const
 type ServiceCategory = typeof VALID_CATEGORIES[number]
@@ -52,8 +52,8 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   // ── Rate limit ────────────────────────────────────────────────────────────
   const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
-  const limited = await checkRateLimit(`services_post:${ip}`, 'general')
-  if (limited) return rateLimitResponse()
+  const rl = await checkRateLimit(ip, 'general')
+  if (!rl.allowed) return rateLimitResponse(rl.resetAt)
 
   // ── 인증 ──────────────────────────────────────────────────────────────────
   const user = await getAuthUser(req)

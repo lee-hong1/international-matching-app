@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getAuthUser, supabaseService, isValidUuid } from '@/lib/commerce'
-import { formatBookingTime } from '@/lib/datetime'
-import { detectLangFromHeader, t, type Lang } from '@/lib/i18n'
-import { checkRateLimit, rateLimitResponse } from '@/lib/ratelimit'
+import { getAuthUser, supabaseService, isValidUuid } from '@src/lib/commerce'
+import { formatBookingTime } from '@src/lib/datetime'
+import { detectLangFromHeader, t, type Lang } from '@src/lib/i18n'
+import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
 
 // ── 이메일 fire-and-forget 헬퍼 ──────────────────────────────────────────────
 async function sendBookingEmail(
@@ -13,7 +13,7 @@ async function sendBookingEmail(
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? `https://${req.headers.get('host')}`
     const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY ?? ''
     // 수신자 이메일 조회
-    const { data: profile } = await (await import('@/lib/commerce')).supabaseService
+    const { data: profile } = await (await import('@src/lib/commerce')).supabaseService
       .from('profiles')
       .select('email, preferred_lang')
       .eq('id', opts.recipient_id)
@@ -234,7 +234,7 @@ export async function POST(req: NextRequest) {
   }
 
   // ── 요청 파싱 ─────────────────────────────────────────────────────────────
-  let body: { host_id: string; service_id?: string; booked_at: string; timezone?: string; notes?: string }
+  let body: { host_id: string; service_id?: string; booked_at: string; timezone?: string; notes?: string; duration_minutes?: number }
   try {
     body = await req.json()
   } catch {

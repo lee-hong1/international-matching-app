@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getAuthUser, supabaseService, isValidUuid } from '@/lib/commerce'
-import { checkRateLimit, rateLimitResponse } from '@/lib/ratelimit'
+import { getAuthUser, supabaseService, isValidUuid } from '@src/lib/commerce'
+import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
 
 const _rawRate = parseFloat(process.env.PLATFORM_COMMISSION_RATE ?? '')
 const PLATFORM_COMMISSION_RATE =
@@ -95,7 +95,7 @@ export async function GET(req: NextRequest) {
   // ── Rate limit ─────────────────────────────────────────────────────────────
   const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
   const rl = await checkRateLimit(`commissions:${ip}`, 'general')
-  if (!rl.success) return rateLimitResponse(rl)
+  if (!rl.allowed) return rateLimitResponse(rl.resetAt)
 
   // ── 인증 ──────────────────────────────────────────────────────────────────
   const user = await getAuthUser(req)

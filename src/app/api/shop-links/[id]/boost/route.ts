@@ -8,10 +8,10 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseService, getAuthUser, isValidUuid, BOOST_PRICES } from '@/lib/commerce'
-import { checkRateLimit, rateLimitResponse } from '@/lib/ratelimit'
-import { verifyTossPayment, makeIdempotencyKey, PAYMENT_METHODS, type PaymentMethod } from '@/lib/payments'
-import { isSuspended } from '@/lib/suspended-check'
+import { supabaseService, getAuthUser, isValidUuid, BOOST_PRICES } from '@src/lib/commerce'
+import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
+import { verifyTossPayment, makeIdempotencyKey, PAYMENT_METHODS, type PaymentMethod } from '@src/lib/payments'
+import { isSuspended } from '@src/lib/suspended-check'
 
 export async function POST(
   req: NextRequest,

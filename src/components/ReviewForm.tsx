@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { t, type Lang } from '@/lib/i18n'
+import { t, type Lang } from '@src/lib/i18n'
 
 interface ReviewFormProps {
   bookingId: string

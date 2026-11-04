@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseService, isAllowedUrl, getAuthUser, hasForbiddenContent } from '@/lib/commerce'
-import { isSuspended } from '@/lib/suspended-check'
+import { supabaseService, isAllowedUrl, getAuthUser, hasForbiddenContent } from '@src/lib/commerce'
+import { isSuspended } from '@src/lib/suspended-check'
 
 // 판매 이벤트/공구 공지 목록 (발견 피드)
 export async function GET(req: NextRequest) {

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseService, isValidUuid } from '@/lib/commerce'
+import { supabaseService, isValidUuid } from '@src/lib/commerce'
 
 /**
  * POST /api/emails/suspension-notification

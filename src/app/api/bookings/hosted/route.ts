@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getAuthUser, supabaseService } from '@/lib/commerce'
-import { formatBookingTime } from '@/lib/datetime'
-import { detectLangFromHeader } from '@/lib/i18n'
-import { checkRateLimit, rateLimitResponse } from '@/lib/ratelimit'
+import { getAuthUser, supabaseService } from '@src/lib/commerce'
+import { formatBookingTime } from '@src/lib/datetime'
+import { detectLangFromHeader } from '@src/lib/i18n'
+import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
 
 /**
  * GET /api/bookings/hosted

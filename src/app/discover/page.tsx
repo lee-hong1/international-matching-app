@@ -5,7 +5,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { useRouter } from 'next/navigation'
 import { matchingService, UserProfile } from '@/lib/matching'
 import Image from 'next/image'
-import { t, detectLangFromNavigator } from '@/lib/i18n'
+import { t, detectLangFromNavigator } from '@src/lib/i18n'
 
 interface ServiceItem {
   id: string

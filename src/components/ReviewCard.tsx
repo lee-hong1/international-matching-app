@@ -1,7 +1,7 @@
 'use client'
 
-import { formatRelativeTime } from '@/lib/datetime'
-import { t, type Lang } from '@/lib/i18n'
+import { formatRelativeTime } from '@src/lib/datetime'
+import { t, type Lang } from '@src/lib/i18n'
 
 interface ReviewCardProps {
   review: {

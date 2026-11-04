@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { isValidUuid } from '@/lib/commerce'
-import { t } from '@/lib/i18n'
+import { isValidUuid } from '@src/lib/commerce'
+import { t, normalizeLang, type Lang } from '@src/lib/i18n'
 
 type NotificationType = 'new_booking' | 'confirmed' | 'cancelled'
 
@@ -12,7 +12,7 @@ interface EmailPayload {
   vars?: Record<string, string>
 }
 
-function buildEmailHtml(type: NotificationType, lang: string, vars: Record<string, string>): string {
+function buildEmailHtml(type: NotificationType, lang: Lang, vars: Record<string, string>): string {
   const title = t(`notification.${type}.title`, lang)
   const body = t(`notification.${type}.body`, lang, vars)
   return `<!DOCTYPE html>
@@ -46,7 +46,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 })
   }
 
-  const { to_email, type, booking_id, lang = 'ko', vars = {} } = body
+  const { to_email, type, booking_id, lang: langRaw = 'ko', vars = {} } = body
+  const lang = normalizeLang(langRaw)
 
   if (!to_email || typeof to_email !== 'string') {
     return NextResponse.json({ error: 'to_email required' }, { status: 400 })

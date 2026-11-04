@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { headers } from "next/headers";
-import { t, detectLangFromHeader } from "@/lib/i18n";
+import { t, detectLangFromHeader } from "@src/lib/i18n";
 
 export default async function Home() {
   const headersList = await headers();

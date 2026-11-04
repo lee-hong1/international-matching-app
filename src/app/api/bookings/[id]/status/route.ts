@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getAuthUser, supabaseService, isValidUuid } from '@/lib/commerce'
-import { checkRateLimit, rateLimitResponse } from '@/lib/ratelimit'
-import { t, type Lang } from '@/lib/i18n'
-import { isSuspended } from '@/lib/suspended-check'
+import { getAuthUser, supabaseService, isValidUuid } from '@src/lib/commerce'
+import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
+import { t, type Lang } from '@src/lib/i18n'
+import { isSuspended } from '@src/lib/suspended-check'
 
 async function sendBookingEmail(
   req: NextRequest,
@@ -95,7 +95,7 @@ export async function PATCH(
   // ── Rate limit ─────────────────────────────────────────────────────────────
   const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
   const rl = await checkRateLimit(`status:${ip}`, 'general')
-  if (!rl.success) return rateLimitResponse(rl)
+  if (!rl.allowed) return rateLimitResponse(rl.resetAt)
 
   // ── 인증 ──────────────────────────────────────────────────────────────────
   const user = await getAuthUser(req)
@@ -117,11 +117,12 @@ export async function PATCH(
     return NextResponse.json({ error: 'Invalid request body' }, { status: 400 })
   }
 
-  const { status: newStatus } = body
-  const VALID_STATUSES: BookingStatus[] = ['confirmed', 'cancelled', 'completed']
-  if (!VALID_STATUSES.includes(newStatus)) {
+  const { status: newStatusRaw } = body
+  const VALID_STATUSES: NotifiableStatus[] = ['confirmed', 'cancelled', 'completed']
+  if (!VALID_STATUSES.includes(newStatusRaw as NotifiableStatus)) {
     return NextResponse.json({ error: 'Invalid status' }, { status: 400 })
   }
+  const newStatus = newStatusRaw as NotifiableStatus
 
   // ── 예약 조회 ─────────────────────────────────────────────────────────────
   const { data: booking, error: fetchErr } = await supabaseService

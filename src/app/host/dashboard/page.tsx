@@ -1,6 +1,6 @@
 import { headers } from 'next/headers'
-import { detectLangFromHeader, t } from '@/lib/i18n'
-import { supabaseService } from '@/lib/commerce'
+import { detectLangFromHeader, t } from '@src/lib/i18n'
+import { supabaseService } from '@src/lib/commerce'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 

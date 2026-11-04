@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createHash } from 'crypto'
-import { supabaseService, isAllowedUrl, isValidUuid } from '@/lib/commerce'
-import { checkRateLimit } from '@/lib/ratelimit'
+import { supabaseService, isAllowedUrl, isValidUuid } from '@src/lib/commerce'
+import { checkRateLimit } from '@src/lib/ratelimit'
 
 // 클릭 추적 리디렉션 — 외부 URL로 보내기 전에 클릭수 카운트
 // GET /api/shop-links/:id/go

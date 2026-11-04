@@ -96,7 +96,7 @@ export async function POST(req: NextRequest) {
         successCount += result.successCount
         errorCount += result.failureCount
 
-        result.responses.forEach((resp, idx) => {
+        result.responses.forEach((resp: { success: boolean; error?: { code: string } }, idx: number) => {
           if (!resp.success && resp.error) {
             const code = resp.error.code
             if (

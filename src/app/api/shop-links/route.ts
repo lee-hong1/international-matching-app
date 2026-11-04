@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseService, ALLOWED_DOMAINS, isAllowedUrl, getAuthUser, hasForbiddenContent } from '@/lib/commerce'
-import { isSuspended } from '@/lib/suspended-check'
+import { supabaseService, ALLOWED_DOMAINS, isAllowedUrl, getAuthUser, hasForbiddenContent } from '@src/lib/commerce'
+import { isSuspended } from '@src/lib/suspended-check'
 
 // 호스트 외부 쇼핑 링크 목록
 export async function GET(req: NextRequest) {

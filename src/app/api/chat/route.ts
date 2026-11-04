@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getAuthUser, supabaseService, isValidUuid } from '@/lib/commerce'
-import { checkRateLimit, rateLimitResponse } from '@/lib/ratelimit'
-import { detectExternalPlatform } from '@/lib/chat-safety'
+import { getAuthUser, supabaseService, isValidUuid } from '@src/lib/commerce'
+import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
+import { detectExternalPlatform } from '@src/lib/chat-safety'
 
 const MAX_CONTENT_LENGTH = 2000
 
@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
   // ── Rate limit ─────────────────────────────────────────────────────────────
   const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
   const rl = await checkRateLimit(`chat:${ip}`, 'general')
-  if (!rl.success) return rateLimitResponse(rl)
+  if (!rl.allowed) return rateLimitResponse(rl.resetAt)
 
   // ── 인증 ──────────────────────────────────────────────────────────────────
   const user = await getAuthUser(req)
@@ -164,7 +164,7 @@ export async function GET(req: NextRequest) {
   // ── Rate limit ─────────────────────────────────────────────────────────────
   const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
   const rl = await checkRateLimit(`chat:${ip}`, 'general')
-  if (!rl.success) return rateLimitResponse(rl)
+  if (!rl.allowed) return rateLimitResponse(rl.resetAt)
 
   // ── 인증 ──────────────────────────────────────────────────────────────────
   const user = await getAuthUser(req)

@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { authService } from '@/lib/auth'
 import { supabase } from '@/lib/supabase'
-import { t, detectLangFromNavigator } from '@/lib/i18n'
+import { t, detectLangFromNavigator } from '@src/lib/i18n'
 
 const COUNTRIES = [
   '한국', '미국', '캐나다', '영국', '독일', '프랑스', '이탈리아', '스페인',

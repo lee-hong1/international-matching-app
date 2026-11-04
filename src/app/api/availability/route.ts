@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getAuthUser, supabaseService, isValidUuid } from '@/lib/commerce'
-import { checkRateLimit, rateLimitResponse } from '@/lib/ratelimit'
-import { isSuspended } from '@/lib/suspended-check'
+import { getAuthUser, supabaseService, isValidUuid } from '@src/lib/commerce'
+import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
+import { isSuspended } from '@src/lib/suspended-check'
 
 const TIME_RE = /^([01]\d|2[0-3]):[0-5]\d$/
 
@@ -52,8 +52,9 @@ export async function GET(req: NextRequest) {
  * body: { day_of_week: 0-6, start_time: "HH:MM", end_time: "HH:MM", timezone: string }
  */
 export async function POST(req: NextRequest) {
-  const rl = await checkRateLimit(req, 'general')
-  if (!rl.success) return rateLimitResponse(rl)
+  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
+  const rl = await checkRateLimit(ip, 'general')
+  if (!rl.allowed) return rateLimitResponse(rl.resetAt)
 
   const user = await getAuthUser(req)
   if (!user) {

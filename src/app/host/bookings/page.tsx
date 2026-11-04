@@ -3,8 +3,8 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
-import { t, detectLangFromNavigator, type Lang } from '@/lib/i18n'
-import { formatBookingTime } from '@/lib/datetime'
+import { t, detectLangFromNavigator, type Lang } from '@src/lib/i18n'
+import { formatBookingTime } from '@src/lib/datetime'
 
 interface HostBooking {
   id: string

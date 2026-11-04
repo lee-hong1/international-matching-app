@@ -1,9 +1,9 @@
 import { headers, cookies } from 'next/headers'
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
-import ReviewCard from '@/components/ReviewCard'
-import TrustBadge from '@/components/TrustBadge'
-import { detectLangFromHeader, t } from '@/lib/i18n'
+import ReviewCard from '@src/components/ReviewCard'
+import TrustBadge from '@src/components/TrustBadge'
+import { detectLangFromHeader, t } from '@src/lib/i18n'
 
 interface Service {
   id: string

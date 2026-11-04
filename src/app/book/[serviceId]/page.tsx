@@ -2,7 +2,7 @@
 
 import { useEffect, useState, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
-import { t, type Lang } from '@/lib/i18n'
+import { t, type Lang } from '@src/lib/i18n'
 import { useAuth } from '@/contexts/AuthContext'
 
 interface Service {

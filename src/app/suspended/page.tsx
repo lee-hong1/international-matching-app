@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
-import { detectLangFromNavigator } from '@/lib/i18n'
+import { detectLangFromNavigator } from '@src/lib/i18n'
 
 const MESSAGES: Record<string, Record<string, string>> = {
   ko: {

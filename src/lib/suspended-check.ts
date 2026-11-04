@@ -1,4 +1,4 @@
-import { supabaseService } from '@/lib/commerce'
+import { supabaseService } from '@src/lib/commerce'
 
 /**
  * 정지 체크 2레이어 아키텍처:

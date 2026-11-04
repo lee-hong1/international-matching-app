@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getAuthUser, supabaseService, isValidUuid, hasForbiddenContent } from '@/lib/commerce'
-import { checkRateLimit, rateLimitResponse } from '@/lib/ratelimit'
+import { getAuthUser, supabaseService, isValidUuid, hasForbiddenContent } from '@src/lib/commerce'
+import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
 
 const VALID_CATEGORIES = ['conversation', 'lesson', 'tour', 'meal', 'activity', 'other'] as const
 const VALID_CURRENCIES = ['KRW', 'JPY', 'CNY', 'USD'] as const
@@ -13,8 +13,9 @@ export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const rl = await checkRateLimit(req, 'general')
-  if (!rl.success) return rateLimitResponse(rl)
+  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
+  const rl = await checkRateLimit(ip, 'general')
+  if (!rl.allowed) return rateLimitResponse(rl.resetAt)
 
   const { id } = await params
   if (!isValidUuid(id)) {
@@ -43,8 +44,9 @@ export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const rl = await checkRateLimit(req, 'general')
-  if (!rl.success) return rateLimitResponse(rl)
+  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
+  const rl = await checkRateLimit(ip, 'general')
+  if (!rl.allowed) return rateLimitResponse(rl.resetAt)
 
   const { id } = await params
   if (!isValidUuid(id)) {

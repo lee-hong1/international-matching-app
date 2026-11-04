@@ -8,7 +8,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
-import { isSuspended } from '@/lib/suspended-check'
+import { isSuspended } from '@src/lib/suspended-check'
 
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url)

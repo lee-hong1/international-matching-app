@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { getAuthUser } from '@/lib/commerce'
-import { isSuspended } from '@/lib/suspended-check'
+import { getAuthUser } from '@src/lib/commerce'
+import { isSuspended } from '@src/lib/suspended-check'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,

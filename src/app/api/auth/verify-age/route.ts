@@ -7,8 +7,8 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseService, getAuthUser } from '@/lib/commerce'
-import { checkRateLimit, rateLimitResponse } from '@/lib/ratelimit'
+import { supabaseService, getAuthUser } from '@src/lib/commerce'
+import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
 
 const MIN_AGE_YEARS = 19
 const MS_PER_YEAR = 365.25 * 24 * 60 * 60 * 1000
