@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
-import { supabase } from '@/lib/supabase'
+import { getAuthUser, supabaseService } from '@src/lib/commerce'
 
 export async function GET(request: NextRequest) {
   const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
@@ -15,11 +15,11 @@ export async function GET(request: NextRequest) {
   const type = searchParams.get('type') ?? 'followers'
 
   if (!userId) {
-    return NextResponse.json({ error: 'userId가 필요합니다' }, { status: 400 })
+    return NextResponse.json({ error: 'userId is required' }, { status: 400 })
   }
 
   try {
-    const { data: creatorProfile } = await supabase
+    const { data: creatorProfile } = await supabaseService
       .from('creator_profiles')
       .select('followers_count, following_count')
       .eq('id', userId)
@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
     const joinColumn = type === 'followers' ? 'follower_id' : 'following_id'
     const fkName = type === 'followers' ? 'follows_follower_id_fkey' : 'follows_following_id_fkey'
 
-    const { data, error } = await supabase
+    const { data, error } = await supabaseService
       .from('follows')
       .select(`
         ${joinColumn},
@@ -49,13 +49,14 @@ export async function GET(request: NextRequest) {
       .limit(20)
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 })
+      console.error('[follows GET] db error:', error.code)
+      return NextResponse.json({ error: 'Failed to fetch follows' }, { status: 500 })
     }
 
-    const users = data?.map((row: any) => row.profiles).filter(Boolean) ?? []
+    const users = data?.map((row: Record<string, unknown>) => row.profiles).filter(Boolean) ?? []
     return NextResponse.json({ users })
-  } catch (err) {
-    return NextResponse.json({ error: '서버 오류가 발생했습니다' }, { status: 500 })
+  } catch {
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
 
@@ -67,33 +68,40 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(r.body, { status: r.status, headers: r.headers })
   }
 
-  try {
-    const { following_id } = await request.json()
-    const authHeader = request.headers.get('authorization')
-
-    if (!authHeader) {
-      return NextResponse.json({ error: '인증이 필요합니다' }, { status: 401 })
-    }
-
-    const token = authHeader.replace('Bearer ', '')
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token)
-
-    if (authError || !user) {
-      return NextResponse.json({ error: '인증이 유효하지 않습니다' }, { status: 401 })
-    }
-
-    const { error } = await supabase
-      .from('follows')
-      .insert({ follower_id: user.id, following_id })
-
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 })
-    }
-
-    return NextResponse.json({ success: true }, { status: 201 })
-  } catch (err) {
-    return NextResponse.json({ error: '서버 오류가 발생했습니다' }, { status: 500 })
+  const user = await getAuthUser(request)
+  if (!user) {
+    return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
   }
+
+  let following_id: string
+  try {
+    const body = await request.json()
+    following_id = body.following_id
+  } catch {
+    return NextResponse.json({ error: 'Invalid request body' }, { status: 400 })
+  }
+
+  if (!following_id) {
+    return NextResponse.json({ error: 'following_id is required' }, { status: 400 })
+  }
+
+  if (following_id === user.id) {
+    return NextResponse.json({ error: 'Cannot follow yourself' }, { status: 400 })
+  }
+
+  const { error } = await supabaseService
+    .from('follows')
+    .insert({ follower_id: user.id, following_id })
+
+  if (error) {
+    if (error.code === '23505') {
+      return NextResponse.json({ error: 'Already following' }, { status: 409 })
+    }
+    console.error('[follows POST] db error:', error.code)
+    return NextResponse.json({ error: 'Failed to follow' }, { status: 500 })
+  }
+
+  return NextResponse.json({ success: true }, { status: 201 })
 }
 
 export async function DELETE(request: NextRequest) {
@@ -104,34 +112,28 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json(r.body, { status: r.status, headers: r.headers })
   }
 
-  try {
-    const { searchParams } = new URL(request.url)
-    const followingId = searchParams.get('following_id')
-    const authHeader = request.headers.get('authorization')
-
-    if (!authHeader || !followingId) {
-      return NextResponse.json({ error: '필수 파라미터가 없습니다' }, { status: 400 })
-    }
-
-    const token = authHeader.replace('Bearer ', '')
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token)
-
-    if (authError || !user) {
-      return NextResponse.json({ error: '인증이 유효하지 않습니다' }, { status: 401 })
-    }
-
-    const { error } = await supabase
-      .from('follows')
-      .delete()
-      .eq('follower_id', user.id)
-      .eq('following_id', followingId)
-
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 })
-    }
-
-    return NextResponse.json({ success: true })
-  } catch (err) {
-    return NextResponse.json({ error: '서버 오류가 발생했습니다' }, { status: 500 })
+  const user = await getAuthUser(request)
+  if (!user) {
+    return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
   }
+
+  const { searchParams } = new URL(request.url)
+  const followingId = searchParams.get('following_id')
+
+  if (!followingId) {
+    return NextResponse.json({ error: 'following_id is required' }, { status: 400 })
+  }
+
+  const { error } = await supabaseService
+    .from('follows')
+    .delete()
+    .eq('follower_id', user.id)
+    .eq('following_id', followingId)
+
+  if (error) {
+    console.error('[follows DELETE] db error:', error.code)
+    return NextResponse.json({ error: 'Failed to unfollow' }, { status: 500 })
+  }
+
+  return NextResponse.json({ success: true })
 }

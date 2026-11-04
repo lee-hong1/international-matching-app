@@ -254,7 +254,7 @@ export default function SignUpPage() {
           {step === 1 && (
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">이메일</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">{t('signup.label_email', lang)}</label>
                 <div className="relative">
                   <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400">
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -272,7 +272,7 @@ export default function SignUpPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">비밀번호</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">{t('signup.label_password', lang)}</label>
                 <div className="relative">
                   <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400">
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -299,13 +299,13 @@ export default function SignUpPage() {
                         <div key={i} className={`flex-1 h-1 rounded-full ${i <= passwordStrength ? strengthColor : 'bg-gray-100'}`} />
                       ))}
                     </div>
-                    <p className="text-xs text-gray-500">강도: <span className={`font-medium ${passwordStrength >= 3 ? 'text-green-600' : passwordStrength === 2 ? 'text-yellow-600' : 'text-red-600'}`}>{strengthLabel}</span></p>
+                    <p className="text-xs text-gray-500">{t('signup.password_strength', lang)} <span className={`font-medium ${passwordStrength >= 3 ? 'text-green-600' : passwordStrength === 2 ? 'text-yellow-600' : 'text-red-600'}`}>{strengthLabel}</span></p>
                   </div>
                 )}
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">비밀번호 확인</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">{t('signup.label_confirm_password', lang)}</label>
                 <div className="relative">
                   <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400">
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -334,8 +334,10 @@ export default function SignUpPage() {
                   {agreed && <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>}
                 </div>
                 <span className="text-sm text-gray-600">
-                  <Link href="/terms" className="text-pink-500 hover:underline font-medium">이용약관</Link>과{' '}
-                  <Link href="/privacy" className="text-pink-500 hover:underline font-medium">개인정보처리방침</Link>에 동의합니다
+                  <Link href="/terms" className="text-pink-500 hover:underline font-medium">{t('signup.terms_link', lang)}</Link>
+                  {' '}{t('signup.terms_and', lang)}{' '}
+                  <Link href="/privacy" className="text-pink-500 hover:underline font-medium">{t('signup.privacy_link', lang)}</Link>
+                  {t('signup.terms_agree', lang)}
                 </span>
               </label>
 
@@ -349,7 +351,7 @@ export default function SignUpPage() {
           {step === 2 && (
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">이름</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">{t('signup.label_name', lang)}</label>
                 <input
                   type="text"
                   value={form.fullName}
@@ -360,7 +362,7 @@ export default function SignUpPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">성별</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t('signup.label_gender', lang)}</label>
                 <div className="grid grid-cols-2 gap-3">
                   {(['female', 'male'] as const).map((g) => (
                     <button
@@ -369,14 +371,14 @@ export default function SignUpPage() {
                       onClick={() => update('gender', g)}
                       className={`py-3 rounded-xl text-sm font-medium border-2 transition-all ${form.gender === g ? 'border-pink-500 bg-pink-50 text-pink-600' : 'border-gray-200 text-gray-600 hover:border-gray-300'}`}
                     >
-                      {g === 'female' ? '👩 여성' : '👨 남성'}
+                      {g === 'female' ? t('signup.label_gender_female', lang) : t('signup.label_gender_male', lang)}
                     </button>
                   ))}
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">생년월일</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">{t('signup.label_birthdate', lang)}</label>
                 <input
                   type="date"
                   value={form.birthDate}
@@ -384,17 +386,17 @@ export default function SignUpPage() {
                   max={new Date(Date.now() - 18 * 365.25 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]}
                   className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-pink-400 bg-gray-50/50"
                 />
-                <p className="text-xs text-gray-400 mt-1">만 18세 이상만 가입 가능합니다</p>
+                <p className="text-xs text-gray-400 mt-1">{t('signup.label_birthdate_hint', lang)}</p>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">국가</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">{t('signup.label_country', lang)}</label>
                 <select
                   value={form.country}
                   onChange={(e) => update('country', e.target.value)}
                   className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-pink-400 bg-gray-50/50"
                 >
-                  <option value="">국가 선택</option>
+                  <option value="">{t('signup.label_country_placeholder', lang)}</option>
                   {COUNTRIES.map((c) => <option key={c} value={c}>{c}</option>)}
                 </select>
               </div>
@@ -434,14 +436,14 @@ export default function SignUpPage() {
                     </svg>
                   </div>
                 </div>
-                <p className="text-sm text-gray-500">프로필 사진 선택 <span className="text-gray-400">(선택)</span></p>
+                <p className="text-sm text-gray-500">{t('signup.label_photo', lang)} <span className="text-gray-400">{t('signup.label_photo_optional', lang)}</span></p>
                 <input ref={fileRef} type="file" accept="image/*" onChange={handleAvatarChange} className="hidden" />
               </div>
 
               {/* 소개 */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                  자기소개 <span className="text-gray-400 font-normal">(선택)</span>
+                  {t('signup.label_bio', lang)} <span className="text-gray-400 font-normal">{t('signup.label_bio_optional', lang)}</span>
                 </label>
                 <textarea
                   value={form.bio}
@@ -457,7 +459,7 @@ export default function SignUpPage() {
               {/* 관심사 */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  관심사 <span className="text-gray-400 font-normal">(최대 8개)</span>
+                  {t('signup.label_interests', lang)} <span className="text-gray-400 font-normal">{t('signup.label_interests_max', lang)}</span>
                 </label>
                 <div className="flex flex-wrap gap-2">
                   {INTERESTS.map((interest) => (
@@ -479,7 +481,7 @@ export default function SignUpPage() {
 
               <div className="flex gap-3 pt-2">
                 <button type="button" onClick={() => setStep(2)} className="flex-1 py-3 border border-gray-200 text-gray-600 font-semibold rounded-xl hover:bg-gray-50 transition-all">
-                  이전
+                  {t('signup.previous', lang)}
                 </button>
                 <button
                   type="submit"
@@ -492,7 +494,7 @@ export default function SignUpPage() {
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                       </svg>
-                      가입 중...
+                      {t('signup.submitting', lang)}
                     </span>
                   ) : t('signup.submit', lang)}
                 </button>
@@ -502,8 +504,8 @@ export default function SignUpPage() {
         </div>
 
         <p className="text-center mt-6 text-sm text-gray-600">
-          이미 계정이 있으신가요?{' '}
-          <Link href="/login" className="font-semibold text-pink-500 hover:text-pink-600">로그인</Link>
+          {t('signup.already_account', lang)}{' '}
+          <Link href="/login" className="font-semibold text-pink-500 hover:text-pink-600">{t('signup.login_link', lang)}</Link>
         </p>
       </div>
     </div>

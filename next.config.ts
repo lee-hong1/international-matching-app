@@ -32,7 +32,7 @@ const nextConfig: NextConfig = {
               "style-src 'self' 'unsafe-inline'",
               "img-src 'self' data: blob: https:",
               "media-src 'self' blob: https:",
-              "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.tosspayments.com https://event.tosspayments.com",
+              "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.tosspayments.com https://event.tosspayments.com https://fcm.googleapis.com https://firebaseinstallations.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com",
               "font-src 'self'",
               "frame-src 'self' https://js.tosspayments.com https://*.tosspayments.com",
               "frame-ancestors 'none'",

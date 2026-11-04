@@ -1,16 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
-import { isValidUuid } from '@src/lib/commerce'
-import { supabase } from '@/lib/supabase'
-import { supabaseService } from '@src/lib/commerce'
-
-async function getAuthUser(request: NextRequest) {
-  const authHeader = request.headers.get('authorization')
-  if (!authHeader) return null
-  const token = authHeader.replace('Bearer ', '')
-  const { data: { user } } = await supabase.auth.getUser(token)
-  return user
-}
+import { isValidUuid, getAuthUser, supabaseService } from '@src/lib/commerce'
 
 // POST /api/posts/:id/likes — 좋아요 (멱등성: 이미 있으면 무시)
 export async function POST(
