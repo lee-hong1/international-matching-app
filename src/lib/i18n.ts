@@ -335,6 +335,29 @@ const MESSAGES: Messages = {
     ja: '再接続',
     zh: '重新连接',
   },
+
+  // ── auth pages ────────────────────────────────────────────────────────────
+  'auth.login_title': { ko: '로그인', en: 'Sign In', ja: 'ログイン', zh: '登录' },
+  'auth.signup_title': { ko: '회원가입', en: 'Sign Up', ja: '新規登録', zh: '注册' },
+  'auth.email_label': { ko: '이메일', en: 'Email', ja: 'メールアドレス', zh: '电子邮件' },
+  'auth.password_label': { ko: '비밀번호', en: 'Password', ja: 'パスワード', zh: '密码' },
+  'auth.login_button': { ko: '로그인', en: 'Sign In', ja: 'ログイン', zh: '登录' },
+  'auth.signup_button': { ko: '회원가입', en: 'Create Account', ja: 'アカウント作成', zh: '创建账号' },
+  'auth.login_loading': { ko: '로그인 중...', en: 'Signing in...', ja: 'ログイン中...', zh: '登录中...' },
+  'auth.signup_loading': { ko: '가입 중...', en: 'Creating account...', ja: '登録中...', zh: '注册中...' },
+  'auth.or_social': { ko: '또는 소셜 계정으로 계속', en: 'Or continue with', ja: 'またはソーシャルアカウントで', zh: '或使用社交账号' },
+  'auth.no_account': { ko: '계정이 없으신가요?', en: "Don't have an account?", ja: 'アカウントがない方は', zh: '没有账号？' },
+  'auth.have_account': { ko: '이미 계정이 있으신가요?', en: 'Already have an account?', ja: 'アカウントをお持ちの方は', zh: '已有账号？' },
+  'auth.signup_link': { ko: '회원가입', en: 'Sign up', ja: '新規登録', zh: '注册' },
+  'auth.login_link': { ko: '로그인', en: 'Sign in', ja: 'ログイン', zh: '登录' },
+  'auth.forgot_password': { ko: '비밀번호를 잊으셨나요?', en: 'Forgot password?', ja: 'パスワードを忘れた方', zh: '忘记密码？' },
+  'auth.error_empty_fields': { ko: '이메일과 비밀번호를 입력하세요.', en: 'Please enter email and password.', ja: 'メールとパスワードを入力してください。', zh: '请输入邮箱和密码。' },
+  'auth.error_invalid_credentials': { ko: '이메일 또는 비밀번호가 올바르지 않습니다.', en: 'Invalid email or password.', ja: 'メールまたはパスワードが正しくありません。', zh: '邮箱或密码不正确。' },
+  'auth.error_email_not_confirmed': { ko: '이메일 인증을 완료해 주세요.', en: 'Please confirm your email address.', ja: 'メールアドレスの確認を完了してください。', zh: '请验证您的电子邮件地址。' },
+  'auth.error_login_failed': { ko: '로그인에 실패했습니다. 다시 시도해 주세요.', en: 'Login failed. Please try again.', ja: 'ログインに失敗しました。再試行してください。', zh: '登录失败，请重试。' },
+  'auth.error_login_error': { ko: '로그인 중 오류가 발생했습니다.', en: 'An error occurred during login.', ja: 'ログイン中にエラーが発生しました。', zh: '登录时发生错误。' },
+  'auth.error_social_failed': { ko: '소셜 로그인에 실패했습니다.', en: 'Social login failed.', ja: 'ソーシャルログインに失敗しました。', zh: '社交登录失败。' },
+  'auth.error_social_error': { ko: '소셜 로그인 중 오류가 발생했습니다.', en: 'An error occurred during social login.', ja: 'ソーシャルログイン中にエラーが発生しました。', zh: '社交登录时发生错误。' },
 }
 
 /** 언어 코드를 지원 언어로 정규화 */

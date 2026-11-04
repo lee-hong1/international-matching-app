@@ -4,6 +4,27 @@ import { formatBookingTime } from '@/lib/datetime'
 import { detectLangFromHeader } from '@/lib/i18n'
 import { checkRateLimit, rateLimitResponse } from '@/lib/ratelimit'
 
+// ── Fire-and-forget 알림 헬퍼 ─────────────────────────────────────────────────
+async function sendBookingNotification(
+  req: NextRequest,
+  opts: { recipientId: string; type: string; bookingId: string }
+): Promise<void> {
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? `https://${req.headers.get('host')}`
+    await fetch(`${baseUrl}/api/send-notification`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        user_id: opts.recipientId,
+        type: opts.type,
+        data: { booking_id: opts.bookingId },
+      }),
+    })
+  } catch {
+    // 알림 실패는 예약 성공에 영향 없음
+  }
+}
+
 /**
  * GET /api/bookings
  * 본인 예약 목록 조회 (JWT에서 userId 추출 — IDOR 방지).
@@ -260,6 +281,13 @@ export async function POST(req: NextRequest) {
     console.error('[bookings/POST] insert error:', error.code)
     return NextResponse.json({ error: 'Failed to create booking' }, { status: 500 })
   }
+
+  // Fire-and-forget 알림 (실패해도 예약 성공 반환)
+  void sendBookingNotification(req, {
+    recipientId: booking.host_id,
+    type: 'new_booking',
+    bookingId: booking.id,
+  })
 
   return NextResponse.json({ data: booking }, { status: 201 })
 }

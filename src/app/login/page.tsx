@@ -5,9 +5,11 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { authService } from '@/lib/auth'
 import { supabase } from '@/lib/supabase'
+import { t, detectLangFromNavigator } from '@/lib/i18n'
 
 export default function LoginPage() {
   const router = useRouter()
+  const lang = detectLangFromNavigator()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
@@ -16,16 +18,16 @@ export default function LoginPage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (!email || !password) { setError('이메일과 비밀번호를 입력하세요.'); return }
+    if (!email || !password) { setError(t('auth.error_empty_fields', lang)); return }
     setLoading(true)
     setError('')
     try {
       const { user, error: authError } = await authService.signIn({ email, password })
       if (authError) {
         const msg = authError.message ?? ''
-        if (msg.includes('Invalid login')) setError('이메일 또는 비밀번호가 올바르지 않습니다.')
-        else if (msg.includes('Email not confirmed')) setError('이메일 인증을 완료해 주세요.')
-        else setError('로그인에 실패했습니다. 다시 시도해 주세요.')
+        if (msg.includes('Invalid login')) setError(t('auth.error_invalid_credentials', lang))
+        else if (msg.includes('Email not confirmed')) setError(t('auth.error_email_not_confirmed', lang))
+        else setError(t('auth.error_login_failed', lang))
       } else if (user) {
         // 서버사이드 API로 admin 여부 확인 (admin 이메일 목록을 클라이언트에 노출하지 않음)
         const { data: { session } } = await supabase.auth.getSession()
@@ -41,7 +43,7 @@ export default function LoginPage() {
         }
       }
     } catch {
-      setError('로그인 중 오류가 발생했습니다.')
+      setError(t('auth.error_login_error', lang))
     } finally {
       setLoading(false)
     }
@@ -51,9 +53,9 @@ export default function LoginPage() {
     setLoading(true)
     try {
       const { error: authError } = await authService.signInWithProvider(provider)
-      if (authError) setError(authError.message || '소셜 로그인에 실패했습니다.')
+      if (authError) setError(authError.message || t('auth.error_social_failed', lang))
     } catch {
-      setError('소셜 로그인 중 오류가 발생했습니다.')
+      setError(t('auth.error_social_error', lang))
     } finally {
       setLoading(false)
     }
@@ -80,8 +82,8 @@ export default function LoginPage() {
 
         {/* 카드 */}
         <div className="bg-white/80 backdrop-blur-md rounded-3xl shadow-xl border border-white/60 p-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-1">로그인</h2>
-          <p className="text-sm text-gray-500 mb-6">계정에 로그인하여 계속하세요</p>
+          <h2 className="text-2xl font-bold text-gray-900 mb-1">{t('auth.login_title', lang)}</h2>
+          <p className="text-sm text-gray-500 mb-6">{t('auth.have_account', lang)}</p>
 
           {error && (
             <div className="mb-5 flex items-start gap-3 bg-red-50 border border-red-100 text-red-700 px-4 py-3 rounded-2xl text-sm">
@@ -95,7 +97,7 @@ export default function LoginPage() {
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* 이메일 */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">이메일</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">{t('auth.email_label', lang)}</label>
               <div className="relative">
                 <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -117,9 +119,9 @@ export default function LoginPage() {
             {/* 비밀번호 */}
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <label className="block text-sm font-medium text-gray-700">비밀번호</label>
+                <label className="block text-sm font-medium text-gray-700">{t('auth.password_label', lang)}</label>
                 <Link href="/forgot-password" className="text-xs text-pink-500 hover:text-pink-600 font-medium">
-                  비밀번호 찾기
+                  {t('auth.forgot_password', lang)}
                 </Link>
               </div>
               <div className="relative">
@@ -134,7 +136,7 @@ export default function LoginPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   autoComplete="current-password"
-                  placeholder="비밀번호 입력"
+                  placeholder="••••••••"
                   className="w-full pl-10 pr-12 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-transparent bg-gray-50/50 transition"
                 />
                 <button
@@ -167,9 +169,9 @@ export default function LoginPage() {
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                   </svg>
-                  로그인 중...
+                  {t('auth.login_loading', lang)}
                 </span>
-              ) : '로그인'}
+              ) : t('auth.login_button', lang)}
             </button>
           </form>
 
@@ -179,7 +181,7 @@ export default function LoginPage() {
               <div className="w-full border-t border-gray-100" />
             </div>
             <div className="relative flex justify-center">
-              <span className="px-3 bg-white text-xs text-gray-400">또는 소셜 계정으로 계속</span>
+              <span className="px-3 bg-white text-xs text-gray-400">{t('auth.or_social', lang)}</span>
             </div>
           </div>
 
@@ -213,9 +215,9 @@ export default function LoginPage() {
 
         {/* 회원가입 링크 */}
         <p className="text-center mt-6 text-sm text-gray-600">
-          계정이 없으신가요?{' '}
+          {t('auth.no_account', lang)}{' '}
           <Link href="/signup" className="font-semibold text-pink-500 hover:text-pink-600">
-            회원가입
+            {t('auth.signup_link', lang)}
           </Link>
         </p>
       </div>

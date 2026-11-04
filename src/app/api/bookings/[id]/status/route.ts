@@ -4,6 +4,26 @@ import { checkRateLimit, rateLimitResponse } from '@/lib/ratelimit'
 
 type BookingStatus = 'pending' | 'confirmed' | 'completed' | 'cancelled'
 
+async function sendStatusNotification(
+  req: NextRequest,
+  opts: { recipientId: string; newStatus: BookingStatus; bookingId: string }
+): Promise<void> {
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? `https://${req.headers.get('host')}`
+    await fetch(`${baseUrl}/api/send-notification`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        user_id: opts.recipientId,
+        type: `booking_${opts.newStatus}`,
+        data: { booking_id: opts.bookingId },
+      }),
+    })
+  } catch {
+    // 알림 실패는 상태 변경 성공에 영향 없음
+  }
+}
+
 // 허용된 상태 전이 규칙
 // key: 현재 상태, value: { 호스트 허용 전이, 사용자 허용 전이 }
 const HOST_TRANSITIONS: Record<BookingStatus, BookingStatus[]> = {
@@ -108,6 +128,24 @@ export async function PATCH(
   if (updateErr) {
     console.error('[bookings/status PATCH] update error:', updateErr.code)
     return NextResponse.json({ error: 'Failed to update booking status' }, { status: 500 })
+  }
+
+  // Fire-and-forget 알림
+  // confirmed → 사용자에게, cancelled → 양측에게, completed → 사용자에게
+  const notifyUserId = newStatus === 'confirmed' || newStatus === 'completed'
+    ? booking.user_id
+    : null
+  const notifyHostId = newStatus === 'cancelled' ? booking.host_id : null
+  const notifyGuestId = newStatus === 'cancelled' ? booking.user_id : null
+
+  if (notifyUserId) {
+    void sendStatusNotification(req, { recipientId: notifyUserId, newStatus, bookingId: id })
+  }
+  if (notifyHostId) {
+    void sendStatusNotification(req, { recipientId: notifyHostId, newStatus, bookingId: id })
+  }
+  if (notifyGuestId && notifyGuestId !== notifyHostId) {
+    void sendStatusNotification(req, { recipientId: notifyGuestId, newStatus, bookingId: id })
   }
 
   return NextResponse.json({ data: updated })
