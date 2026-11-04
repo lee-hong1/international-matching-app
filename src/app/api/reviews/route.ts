@@ -103,7 +103,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'comment too long (max 1000)' }, { status: 400 })
   }
   if (comment && detectExternalPlatform(comment)) {
-    return NextResponse.json({ error: '외부 플랫폼 유도는 허용되지 않습니다' }, { status: 400 })
+    return NextResponse.json({ error: '외부 플랫폼 유도는 허용되지 않습니다 / External platform referral not allowed' }, { status: 400 })
   }
 
   // 예약 조회 — reviewer가 user인지 host인지 확인

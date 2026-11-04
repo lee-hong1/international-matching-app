@@ -104,7 +104,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Content contains prohibited keywords' }, { status: 400 })
   }
   if (detectExternalPlatform(titleStr) || detectExternalPlatform(descStr)) {
-    return NextResponse.json({ error: '외부 플랫폼 유도는 허용되지 않습니다' }, { status: 400 })
+    return NextResponse.json({ error: '외부 플랫폼 유도는 허용되지 않습니다 / External platform referral not allowed' }, { status: 400 })
   }
 
   // ── host 프로필 확인 (is_adult) ───────────────────────────────────────────

@@ -97,12 +97,12 @@ export async function PATCH(
       return NextResponse.json({ error: 'title must be 2-100 characters' }, { status: 400 })
     }
     if (hasForbiddenContent(updates.title) || detectExternalPlatform(updates.title)) {
-      return NextResponse.json({ error: 'Title contains forbidden content' }, { status: 400 })
+      return NextResponse.json({ error: 'Title contains forbidden content / 외부 플랫폼 유도 또는 금지 키워드 포함' }, { status: 400 })
     }
   }
   if (updates.description !== undefined && typeof updates.description === 'string') {
     if (hasForbiddenContent(updates.description) || detectExternalPlatform(updates.description)) {
-      return NextResponse.json({ error: 'Description contains forbidden content' }, { status: 400 })
+      return NextResponse.json({ error: 'Description contains forbidden content / 외부 플랫폼 유도 또는 금지 키워드 포함' }, { status: 400 })
     }
   }
   if (updates.category !== undefined && !VALID_CATEGORIES.includes(updates.category as typeof VALID_CATEGORIES[number])) {
