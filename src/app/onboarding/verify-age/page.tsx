@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { Suspense, useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 
 const ALLOWED_RETURN_PATHS = ['/host/register', '/host/dashboard', '/']
@@ -71,7 +71,7 @@ function calcAge(birthDate: string): number | null {
   return age
 }
 
-export default function VerifyAgePage() {
+function VerifyAgeForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [lang, setLang] = useState<keyof typeof I18N>('ko')
@@ -161,5 +161,13 @@ export default function VerifyAgePage() {
         </button>
       </form>
     </main>
+  )
+}
+
+export default function VerifyAgePage() {
+  return (
+    <Suspense fallback={<div style={{ maxWidth: 400, margin: '80px auto', padding: '0 16px' }}>...</div>}>
+      <VerifyAgeForm />
+    </Suspense>
   )
 }
