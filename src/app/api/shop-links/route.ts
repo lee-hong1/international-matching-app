@@ -1,9 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseService, ALLOWED_DOMAINS, isAllowedUrl, getAuthUser, hasForbiddenContent } from '@src/lib/commerce'
 import { isSuspended } from '@src/lib/suspended-check'
+import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
 
 // 호스트 외부 쇼핑 링크 목록
 export async function GET(req: NextRequest) {
+  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
+  const rl = await checkRateLimit(`shop-links-get:${ip}`, 'general')
+  if (!rl.allowed) {
+    const r = rateLimitResponse(rl.resetAt)
+    return NextResponse.json(r.body, { status: r.status, headers: r.headers })
+  }
+
   const { searchParams } = new URL(req.url)
   const hostId = searchParams.get('host_id')
   const limit = Math.min(parseInt(searchParams.get('limit') ?? '20'), 50)
@@ -28,6 +36,13 @@ export async function GET(req: NextRequest) {
 
 // 쇼핑 링크 등록 (호스트 전용)
 export async function POST(req: NextRequest) {
+  const postIp = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
+  const postRl = await checkRateLimit(`shop-links-post:${postIp}`, 'general')
+  if (!postRl.allowed) {
+    const r = rateLimitResponse(postRl.resetAt)
+    return NextResponse.json(r.body, { status: r.status, headers: r.headers })
+  }
+
   const user = await getAuthUser(req)
   if (!user) return NextResponse.json({ error: '인증이 필요합니다' }, { status: 401 })
   if (await isSuspended(user.id)) {
