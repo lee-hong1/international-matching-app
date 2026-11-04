@@ -91,13 +91,13 @@ CREATE TABLE commission_ledger (
 -- =====================================================
 -- 인덱스
 -- =====================================================
-CREATE INDEX idx_events_host ON events(host_id);
-CREATE INDEX idx_events_status_datetime ON events(status, event_datetime);
-CREATE INDEX idx_event_participants_event ON event_participants(event_id);
-CREATE INDEX idx_event_participants_user ON event_participants(user_id);
-CREATE INDEX idx_event_notifications_recipient ON event_notifications(recipient_id, is_read);
-CREATE INDEX idx_commission_ledger_recipient ON commission_ledger(recipient_type, recipient_id);
-CREATE INDEX idx_payments_event ON payments(event_id);
+CREATE INDEX IF NOT EXISTS idx_events_host ON events(host_id);
+CREATE INDEX IF NOT EXISTS idx_events_status_datetime ON events(status, event_datetime);
+CREATE INDEX IF NOT EXISTS idx_event_participants_event ON event_participants(event_id);
+CREATE INDEX IF NOT EXISTS idx_event_participants_user ON event_participants(user_id);
+CREATE INDEX IF NOT EXISTS idx_event_notifications_recipient ON event_notifications(recipient_id, is_read);
+CREATE INDEX IF NOT EXISTS idx_commission_ledger_recipient ON commission_ledger(recipient_type, recipient_id);
+CREATE INDEX IF NOT EXISTS idx_payments_event ON payments(event_id);
 
 -- =====================================================
 -- 참가자 수 자동 갱신 트리거

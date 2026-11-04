@@ -22,6 +22,19 @@ CREATE INDEX IF NOT EXISTS idx_bookings_host_time
   ON bookings(host_id, booked_at)
   WHERE status NOT IN ('cancelled');
 
+-- 동일 호스트 슬롯 겹침 방지 exclusion constraint (btree_gist 필요)
+-- TOCTOU 경쟁 조건 방지: check+insert 사이의 race를 DB 레벨에서 차단
+CREATE EXTENSION IF NOT EXISTS btree_gist;
+ALTER TABLE bookings
+  DROP CONSTRAINT IF EXISTS bookings_no_overlap;
+ALTER TABLE bookings
+  ADD CONSTRAINT bookings_no_overlap
+  EXCLUDE USING GIST (
+    host_id WITH =,
+    tstzrange(booked_at, booked_at + (duration_minutes || ' minutes')::INTERVAL, '[)') WITH &&
+  )
+  WHERE (status NOT IN ('cancelled'));
+
 -- 사용자별 최신 예약 조회 인덱스
 CREATE INDEX IF NOT EXISTS idx_bookings_user_created
   ON bookings(user_id, created_at DESC);

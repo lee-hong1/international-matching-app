@@ -138,7 +138,7 @@ export const postsService = {
       ...data,
       post_media: ((data as any).post_media ?? []).sort((a: PostMedia, b: PostMedia) => a.order_index - b.order_index),
       is_liked: likedPostIds.has(postId),
-    } as Post
+    } as unknown as Post
   },
 
   async createPost(postData: CreatePostData): Promise<{ post: Post | null; error: any }> {

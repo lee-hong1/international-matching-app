@@ -181,7 +181,8 @@ export const chatService = {
         async (payload) => {
           // 업데이트된 채팅방 정보 가져오기
           const rooms = await this.getUserChatRooms(userId)
-          const updatedRoom = rooms.find(room => room.id === payload.new?.id)
+          const newData = payload.new as { id?: string } | null
+          const updatedRoom = rooms.find(room => room.id === newData?.id)
           if (updatedRoom) {
             callback(updatedRoom)
           }

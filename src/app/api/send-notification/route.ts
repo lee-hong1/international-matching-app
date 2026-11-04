@@ -106,7 +106,7 @@ export async function POST(req: NextRequest) {
           } : {}),
         }
 
-        const result = await messaging.sendEachForMulticast(multicastMessage)
+        const result = await messaging!.sendEachForMulticast(multicastMessage)
         successCount += result.successCount
         errorCount += result.failureCount
 

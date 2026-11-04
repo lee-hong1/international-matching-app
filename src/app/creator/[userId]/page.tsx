@@ -71,7 +71,7 @@ export default function CreatorProfilePage() {
         .eq('id', userId)
         .single()
 
-      if (data) setProfile(data as CreatorProfile)
+      if (data) setProfile(data as unknown as CreatorProfile)
       setLoadingProfile(false)
 
       const stats = await followsService.getFollowStats(userId)

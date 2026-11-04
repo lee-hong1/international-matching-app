@@ -351,7 +351,8 @@ export async function POST(req: NextRequest) {
     .single()
 
   if (error) {
-    if (error.code === '23505') {
+    // 23505: idempotency_key unique violation, 23P01: exclusion constraint (slot overlap)
+    if (error.code === '23505' || error.code === '23P01') {
       return NextResponse.json({ error: 'Time slot already booked' }, { status: 409 })
     }
     console.error('[bookings/POST] insert error:', error.code)

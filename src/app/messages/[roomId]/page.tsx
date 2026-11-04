@@ -2,14 +2,16 @@
 
 import React, { useState, useEffect, useRef } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
-import { useRouter } from 'next/navigation'
+import { useRouter, useParams } from 'next/navigation'
 import { chatService, Message, ChatRoom } from '@/lib/chat'
 import Image from 'next/image'
 import { RealtimeChannel } from '@supabase/supabase-js'
 
-export default function ChatPage({ params }: { params: { roomId: string } }) {
+export default function ChatPage() {
   const { user, loading } = useAuth()
   const router = useRouter()
+  const rawParams = useParams()
+  const params = { roomId: rawParams.roomId as string }
   const [messages, setMessages] = useState<Message[]>([])
   const [chatRoom, setChatRoom] = useState<ChatRoom | null>(null)
   const [newMessage, setNewMessage] = useState('')

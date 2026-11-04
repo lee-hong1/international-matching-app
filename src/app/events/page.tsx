@@ -9,9 +9,11 @@ import { eventsService, EVENT_TYPE_LABELS, type EventItem, type EventType } from
 import { LanguageProvider, useLanguage } from '@/contexts/LanguageContext'
 import { LanguageSwitcher } from '@/components/LanguageSwitcher'
 
-function formatDateTime(value: string) {
+const LOCALE_BCP47: Record<string, string> = { ko: 'ko-KR', en: 'en-US', ja: 'ja-JP', zh: 'zh-CN' }
+
+function formatDateTime(value: string, locale = 'ko') {
   const date = new Date(value)
-  return date.toLocaleString('ko-KR', {
+  return date.toLocaleString(LOCALE_BCP47[locale] ?? 'ko-KR', {
     month: 'long',
     day: 'numeric',
     weekday: 'short',
@@ -22,7 +24,7 @@ function formatDateTime(value: string) {
 
 function EventsContent() {
   const { user, loading } = useAuth()
-  const { t } = useLanguage()
+  const { t, locale } = useLanguage()
   const router = useRouter()
   const [events, setEvents] = useState<EventItem[]>([])
   const [loadingEvents, setLoadingEvents] = useState(true)
@@ -146,7 +148,7 @@ function EventsContent() {
                     )}
                   </div>
                   <h3 className="font-semibold text-gray-900 mb-1">{event.title}</h3>
-                  <p className="text-sm text-gray-500 mb-2">{formatDateTime(event.event_datetime)}</p>
+                  <p className="text-sm text-gray-500 mb-2">{formatDateTime(event.event_datetime, locale)}</p>
                   <p className="text-sm text-gray-500 mb-3">
                     {event.venue_type === 'partner' ? event.partner_venues?.name : event.custom_location}
                   </p>

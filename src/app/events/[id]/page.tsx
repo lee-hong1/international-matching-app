@@ -21,9 +21,11 @@ declare global {
   }
 }
 
-function formatDateTime(value: string) {
+const LOCALE_BCP47: Record<string, string> = { ko: 'ko-KR', en: 'en-US', ja: 'ja-JP', zh: 'zh-CN' }
+
+function formatDateTime(value: string, locale = 'ko') {
   const date = new Date(value)
-  return date.toLocaleString('ko-KR', {
+  return date.toLocaleString(LOCALE_BCP47[locale] ?? 'ko-KR', {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
@@ -39,7 +41,7 @@ function EventDetailContent() {
   const params = useParams()
   const eventId = params.id as string
 
-  const { t } = useLanguage()
+  const { t, locale } = useLanguage()
   const [event, setEvent] = useState<EventItem | null>(null)
   const [loadingEvent, setLoadingEvent] = useState(true)
   const [myApplication, setMyApplication] = useState<{ id: string; status: string } | null>(null)
@@ -213,7 +215,7 @@ function EventDetailContent() {
               <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
-              {formatDateTime(event.event_datetime)}
+              {formatDateTime(event.event_datetime, locale)}
             </div>
             <div className="flex items-center gap-2 text-gray-700">
               <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -340,7 +342,7 @@ function EventDetailContent() {
           <EventShareCard
             eventId={event.id}
             title={event.title}
-            date={formatDateTime(event.event_datetime)}
+            date={formatDateTime(event.event_datetime, locale)}
             location={event.venue_type === 'partner' ? (event.partner_venues?.name ?? '') : (event.custom_location ?? '')}
             fee={event.fee_per_person}
             hostName={event.profiles?.full_name ?? ''}
