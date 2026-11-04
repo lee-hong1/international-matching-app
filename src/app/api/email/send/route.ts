@@ -60,10 +60,9 @@ export async function POST(req: NextRequest) {
     */
 
     // 현재는 로그로만 출력 (실제 전송은 하지 않음)
+    // PII 규칙: 이메일 주소 로그 금지 — to 필드 제외
     console.log('Email would be sent:', {
-      to,
       subject,
-      recipientName,
       contentLength: html?.length || text?.length
     })
 

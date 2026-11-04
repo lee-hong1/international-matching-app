@@ -7,7 +7,10 @@
  */
 
 export type Lang = 'ko' | 'en' | 'ja' | 'zh'
+export type Locale = Lang
 export type Messages = Record<string, Record<Lang, string>>
+// LanguageContext에서 사용하는 타입 — MESSAGES의 키 집합
+export type TranslationKeys = Record<string, string>
 
 const MESSAGES: Messages = {
   // ── 호스트 프로필 카드 ──────────────────────────────────────────────────
