@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabase } from '@/lib/supabase'
-import { isValidUuid } from '@src/lib/commerce'
+import { supabaseService, isValidUuid } from '@/lib/commerce'
 
 type NotificationData = Record<string, string>
 
@@ -130,7 +130,7 @@ export async function POST(req: NextRequest) {
     ])
 
     if (staleTokens.length > 0) {
-      await supabase.from('device_tokens').delete().in('token', staleTokens)
+      await supabaseService.from('device_tokens').delete().in('token', staleTokens)
     }
 
     return NextResponse.json({

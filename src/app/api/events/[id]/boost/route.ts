@@ -1,12 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { supabase } from '@/lib/supabase'
+import { supabaseService, isValidUuid } from '@/lib/commerce'
 import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
-import { isValidUuid } from '@src/lib/commerce'
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL ?? 'https://placeholder.supabase.co',
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? 'placeholder-anon-key',
-)
 
 const BOOST_AMOUNT = 9900
 const BOOST_HOURS = 24
@@ -39,7 +34,7 @@ export async function POST(
     return NextResponse.json({ error: 'Invalid event id' }, { status: 400 })
   }
 
-  const { data: event, error: eventError } = await supabase
+  const { data: event, error: eventError } = await supabaseService
     .from('events')
     .select('id, host_id, title')
     .eq('id', eventId)
@@ -55,7 +50,7 @@ export async function POST(
 
   const tossOrderId = `boost-${eventId}-${Date.now()}`
 
-  const { error: insertError } = await supabase.from('event_boosts').insert({
+  const { error: insertError } = await supabaseService.from('event_boosts').insert({
     event_id: eventId,
     host_id: user.id,
     amount: BOOST_AMOUNT,
@@ -93,7 +88,7 @@ export async function PATCH(
     return NextResponse.json({ error: '필수 파라미터가 누락되었습니다' }, { status: 400 })
   }
 
-  const { data: boost, error: boostError } = await supabase
+  const { data: boost, error: boostError } = await supabaseService
     .from('event_boosts')
     .select('*')
     .eq('toss_order_id', orderId)
@@ -125,13 +120,13 @@ export async function PATCH(
 
   const expiresAt = new Date(Date.now() + BOOST_HOURS * 60 * 60 * 1000).toISOString()
 
-  await supabase.from('event_boosts').update({
+  await supabaseService.from('event_boosts').update({
     toss_payment_key: paymentKey,
     status: 'paid',
     expires_at: expiresAt,
   }).eq('id', boost.id)
 
-  await supabase.from('events').update({
+  await supabaseService.from('events').update({
     is_featured: true,
     boost_expires_at: expiresAt,
   }).eq('id', eventId)
