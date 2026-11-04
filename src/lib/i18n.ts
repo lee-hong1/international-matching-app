@@ -462,6 +462,36 @@ export function detectLangFromNavigator(): Lang {
     ja: 'サービスが完了しました。レビューをお願いします！',
     zh: '服务已完成，请留下评价！',
   },
+
+  // ── 호스트 가용 시간 ───────────────────────────────────────────────────
+  'availability.title': { ko: '가용 시간 설정', en: 'Set Availability', ja: '予約可能時間設定', zh: '设置可用时间' },
+  'availability.day_of_week': { ko: '요일', en: 'Day of Week', ja: '曜日', zh: '星期' },
+  'availability.start_time': { ko: '시작 시간', en: 'Start Time', ja: '開始時間', zh: '开始时间' },
+  'availability.end_time': { ko: '종료 시간', en: 'End Time', ja: '終了時間', zh: '结束时间' },
+  'availability.timezone': { ko: '시간대', en: 'Timezone', ja: 'タイムゾーン', zh: '时区' },
+  'availability.add_slot': { ko: '슬롯 추가', en: 'Add Slot', ja: 'スロット追加', zh: '添加时段' },
+  'availability.delete': { ko: '삭제', en: 'Delete', ja: '削除', zh: '删除' },
+  'availability.no_slots': { ko: '등록된 가용 시간이 없습니다', en: 'No availability slots set', ja: '予約可能時間が設定されていません', zh: '未设置可用时段' },
+  'availability.save_success': { ko: '저장되었습니다', en: 'Saved', ja: '保存しました', zh: '已保存' },
+  'availability.save_error': { ko: '저장 실패', en: 'Save failed', ja: '保存失敗', zh: '保存失败' },
+  'availability.days.0': { ko: '일요일', en: 'Sunday', ja: '日曜日', zh: '周日' },
+  'availability.days.1': { ko: '월요일', en: 'Monday', ja: '月曜日', zh: '周一' },
+  'availability.days.2': { ko: '화요일', en: 'Tuesday', ja: '火曜日', zh: '周二' },
+  'availability.days.3': { ko: '수요일', en: 'Wednesday', ja: '水曜日', zh: '周三' },
+  'availability.days.4': { ko: '목요일', en: 'Thursday', ja: '木曜日', zh: '周四' },
+  'availability.days.5': { ko: '금요일', en: 'Friday', ja: '金曜日', zh: '周五' },
+  'availability.days.6': { ko: '토요일', en: 'Saturday', ja: '土曜日', zh: '周六' },
+
+  // ── 리뷰 ──────────────────────────────────────────────────────────────
+  'review.title': { ko: '리뷰', en: 'Reviews', ja: 'レビュー', zh: '评价' },
+  'review.write': { ko: '리뷰 작성', en: 'Write a Review', ja: 'レビューを書く', zh: '写评价' },
+  'review.rating': { ko: '별점', en: 'Rating', ja: '評価', zh: '评分' },
+  'review.comment': { ko: '후기', en: 'Comment', ja: 'コメント', zh: '评论' },
+  'review.submit': { ko: '제출', en: 'Submit', ja: '送信', zh: '提交' },
+  'review.private': { ko: '비공개 리뷰', en: 'Private Review', ja: '非公開レビュー', zh: '私密评价' },
+  'review.empty': { ko: '아직 리뷰가 없습니다', en: 'No reviews yet', ja: 'まだレビューがありません', zh: '暂无评价' },
+  'review.success': { ko: '리뷰가 등록되었습니다', en: 'Review submitted', ja: 'レビューを投稿しました', zh: '评价已提交' },
+  'review.error': { ko: '리뷰 등록 실패', en: 'Failed to submit review', ja: 'レビュー投稿失敗', zh: '提交评价失败' },
 }
 
 /**
