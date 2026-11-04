@@ -492,6 +492,42 @@ export function detectLangFromNavigator(): Lang {
   'review.empty': { ko: '아직 리뷰가 없습니다', en: 'No reviews yet', ja: 'まだレビューがありません', zh: '暂无评价' },
   'review.success': { ko: '리뷰가 등록되었습니다', en: 'Review submitted', ja: 'レビューを投稿しました', zh: '评价已提交' },
   'review.error': { ko: '리뷰 등록 실패', en: 'Failed to submit review', ja: 'レビュー投稿失敗', zh: '提交评价失败' },
+
+  // ── 호스트 대시보드 / 서비스 관리 ──────────────────────────────────────
+  'host.dashboard_title': { ko: '호스트 대시보드', en: 'Host Dashboard', ja: 'ホストダッシュボード', zh: '主机仪表板' },
+  'host.services_title': { ko: '내 서비스', en: 'My Services', ja: 'サービス管理', zh: '服务管理' },
+  'host.services_add': { ko: '서비스 추가', en: 'Add Service', ja: 'サービス追加', zh: '添加服务' },
+  'host.services_edit': { ko: '수정', en: 'Edit', ja: '編集', zh: '编辑' },
+  'host.services_save': { ko: '저장', en: 'Save', ja: '保存', zh: '保存' },
+  'host.services_deactivate': { ko: '비활성화', en: 'Deactivate', ja: '無効化', zh: '停用' },
+  'host.services_deactivate_confirm': { ko: '정말 비활성화하시겠습니까?', en: 'Deactivate this service?', ja: 'サービスを無効化しますか？', zh: '确定要停用此服务吗？' },
+  'host.services_inactive': { ko: '비활성', en: 'Inactive', ja: '無効', zh: '已停用' },
+  'host.services_empty': { ko: '등록된 서비스가 없습니다', en: 'No services yet', ja: 'サービスがありません', zh: '暂无服务' },
+  'host.services_field_title': { ko: '서비스 이름', en: 'Title', ja: 'タイトル', zh: '标题' },
+  'host.services_field_desc': { ko: '설명', en: 'Description', ja: '説明', zh: '描述' },
+  'host.services_field_duration': { ko: '소요 시간(분)', en: 'Duration (min)', ja: '所要時間(分)', zh: '时长（分钟）' },
+  'host.services_field_price': { ko: '가격', en: 'Price', ja: '価格', zh: '价格' },
+  'host.services_field_currency': { ko: '통화', en: 'Currency', ja: '通貨', zh: '货币' },
+  'host.services_field_category': { ko: '카테고리', en: 'Category', ja: 'カテゴリ', zh: '类别' },
+  'host.bookings_title': { ko: '예약 관리', en: 'Manage Bookings', ja: '予約管理', zh: '预订管理' },
+  'host.bookings_desc': { ko: '들어온 예약 확인 및 처리', en: 'View and handle incoming bookings', ja: '予約の確認・対応', zh: '查看和处理预订' },
+  'host.services_desc': { ko: '서비스 등록 및 수정', en: 'Register and edit services', ja: 'サービスの登録・編集', zh: '注册和编辑服务' },
+
+  // ── 예약 플로우 ────────────────────────────────────────────────────────
+  'book.loading': { ko: '불러오는 중…', en: 'Loading…', ja: '読み込み中…', zh: '加载中…' },
+  'book.select_datetime': { ko: '날짜 및 시간 선택', en: 'Select Date & Time', ja: '日時を選択', zh: '选择日期和时间' },
+  'book.available_days': { ko: '가용 요일', en: 'Available days', ja: '対応曜日', zh: '可用日期' },
+  'book.date': { ko: '날짜', en: 'Date', ja: '日付', zh: '日期' },
+  'book.time': { ko: '시간', en: 'Time', ja: '時間', zh: '时间' },
+  'book.notes': { ko: '메모 (선택)', en: 'Notes (optional)', ja: 'メモ（任意）', zh: '备注（可选）' },
+  'book.notes_placeholder': { ko: '호스트에게 전달할 메시지를 입력하세요', en: 'Message for the host', ja: 'ホストへのメッセージ', zh: '给主人的留言' },
+  'book.confirm': { ko: '예약 확정', en: 'Confirm Booking', ja: '予約を確定する', zh: '确认预约' },
+  'book.submitting': { ko: '처리 중…', en: 'Submitting…', ja: '処理中…', zh: '提交中…' },
+  'book.slot_taken': { ko: '이미 예약된 시간입니다. 다른 시간을 선택해 주세요.', en: 'This time slot is already taken. Please choose another.', ja: 'この時間は既に予約されています。別の時間を選んでください。', zh: '该时间段已被预约，请选择其他时间。' },
+  'book.success_title': { ko: '예약 완료!', en: 'Booking Confirmed!', ja: '予約完了！', zh: '预约成功！' },
+  'book.success_body': { ko: '예약이 접수되었습니다. 호스트 확인 후 알림을 받으실 수 있습니다.', en: 'Your booking has been submitted. You will be notified once the host confirms.', ja: '予約が送信されました。ホストの確認後に通知が届きます。', zh: '您的预约已提交，主人确认后您将收到通知。' },
+  'book.back_to_profile': { ko: '프로필로 돌아가기', en: 'Back to Profile', ja: 'プロフィールに戻る', zh: '返回档案' },
+  'book.cancel': { ko: '취소', en: 'Cancel', ja: 'キャンセル', zh: '取消' },
 }
 
 /**
