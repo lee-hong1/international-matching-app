@@ -154,6 +154,8 @@ CREATE TABLE IF NOT EXISTS link_boost_payments (
   idempotency_key VARCHAR(200) UNIQUE NOT NULL,
   status          VARCHAR(20) NOT NULL DEFAULT 'paid'
     CHECK (status IN ('paid', 'refunded')),
+  payment_method  TEXT NOT NULL DEFAULT 'card'
+    CHECK (payment_method IN ('card','kakaopay','tosspay','naverpay')),
   boost_starts_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   boost_ends_at   TIMESTAMPTZ NOT NULL,
   created_at      TIMESTAMPTZ DEFAULT NOW()
