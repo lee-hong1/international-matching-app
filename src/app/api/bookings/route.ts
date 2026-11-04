@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getAuthUser } from '@/lib/commerce'
-import { supabaseService } from '@/lib/commerce'
-import { formatBookingTime, getUserTimezone } from '@/lib/datetime'
-import { detectLangFromHeader, normalizeLang } from '@/lib/i18n'
+import { getAuthUser, supabaseService, isValidUuid } from '@/lib/commerce'
+import { formatBookingTime } from '@/lib/datetime'
+import { detectLangFromHeader } from '@/lib/i18n'
+import { checkRateLimit, rateLimitResponse } from '@/lib/ratelimit'
 
 /**
  * GET /api/bookings
@@ -99,4 +99,117 @@ export async function GET(req: NextRequest) {
       count: enriched.length,
     },
   })
+}
+
+/**
+ * POST /api/bookings
+ * 예약 생성. JWT에서 guest_id 추출 (IDOR 방지).
+ * 멱등성: Idempotency-Key 헤더 지원.
+ */
+export async function POST(req: NextRequest) {
+  // ── Rate limit ────────────────────────────────────────────────────────────
+  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
+  const rl = await checkRateLimit(ip, 'payment')
+  if (!rl.allowed) {
+    const r = rateLimitResponse(rl.resetAt)
+    return NextResponse.json(r.body, { status: r.status, headers: r.headers })
+  }
+
+  // ── 인증 ──────────────────────────────────────────────────────────────────
+  const user = await getAuthUser(req)
+  if (!user) {
+    return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
+  }
+
+  // ── 멱등성 키 ─────────────────────────────────────────────────────────────
+  const idempotencyKey = req.headers.get('idempotency-key')
+  if (idempotencyKey) {
+    const { data: existing } = await supabaseService
+      .from('bookings')
+      .select('id, status')
+      .eq('idempotency_key', idempotencyKey)
+      .maybeSingle()
+    if (existing) {
+      return NextResponse.json({ data: existing, idempotent: true }, { status: 200 })
+    }
+  }
+
+  // ── 요청 파싱 ─────────────────────────────────────────────────────────────
+  let body: { host_id: string; service_id?: string; booked_at: string; timezone?: string; notes?: string }
+  try {
+    body = await req.json()
+  } catch {
+    return NextResponse.json({ error: 'Invalid request body' }, { status: 400 })
+  }
+
+  const { host_id, service_id, booked_at, timezone = 'UTC', notes } = body
+
+  if (!host_id || !booked_at) {
+    return NextResponse.json({ error: 'host_id and booked_at are required' }, { status: 400 })
+  }
+  if (!isValidUuid(host_id)) {
+    return NextResponse.json({ error: 'Invalid host_id' }, { status: 400 })
+  }
+  if (service_id && !isValidUuid(service_id)) {
+    return NextResponse.json({ error: 'Invalid service_id' }, { status: 400 })
+  }
+
+  // ── booked_at 유효성 ───────────────────────────────────────────────────────
+  const bookedDate = new Date(booked_at)
+  if (isNaN(bookedDate.getTime())) {
+    return NextResponse.json({ error: 'Invalid booked_at: not a valid ISO date' }, { status: 400 })
+  }
+  if (bookedDate <= new Date()) {
+    return NextResponse.json({ error: 'booked_at must be in the future' }, { status: 400 })
+  }
+
+  // ── timezone 화이트리스트 ──────────────────────────────────────────────────
+  let validatedTz = 'UTC'
+  try {
+    Intl.DateTimeFormat(undefined, { timeZone: timezone })
+    validatedTz = timezone
+  } catch {
+    return NextResponse.json({ error: 'Invalid timezone' }, { status: 400 })
+  }
+
+  const bookedAtIso = bookedDate.toISOString()
+
+  // ── 슬롯 충돌 체크 ────────────────────────────────────────────────────────
+  const { count } = await supabaseService
+    .from('bookings')
+    .select('id', { count: 'exact', head: true })
+    .eq('host_id', host_id)
+    .eq('booked_at', bookedAtIso)
+    .neq('status', 'cancelled')
+
+  if ((count ?? 0) > 0) {
+    return NextResponse.json({ error: 'Time slot already booked' }, { status: 409 })
+  }
+
+  // ── 예약 생성 ─────────────────────────────────────────────────────────────
+  const finalKey = idempotencyKey ?? `booking_${user.id}_${host_id}_${bookedAtIso}`
+  const { data: booking, error } = await supabaseService
+    .from('bookings')
+    .insert({
+      guest_id: user.id,
+      host_id,
+      service_id: service_id ?? null,
+      booked_at: bookedAtIso,
+      timezone: validatedTz,
+      notes: notes ?? null,
+      status: 'pending',
+      idempotency_key: finalKey,
+    })
+    .select('id, status, booked_at, host_id, guest_id, created_at')
+    .single()
+
+  if (error) {
+    if (error.code === '23505') {
+      return NextResponse.json({ error: 'Time slot already booked' }, { status: 409 })
+    }
+    console.error('[bookings/POST] insert error:', error.code)
+    return NextResponse.json({ error: 'Failed to create booking' }, { status: 500 })
+  }
+
+  return NextResponse.json({ data: booking }, { status: 201 })
 }

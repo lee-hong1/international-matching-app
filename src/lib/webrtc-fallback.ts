@@ -54,6 +54,16 @@ async function fetchTurnCredentials(authToken: string): Promise<RTCIceServer[]> 
   return servers
 }
 
+/**
+ * Usage in a React component (useEffect):
+ *   useEffect(() => {
+ *     let pc: RTCPeerConnection | undefined
+ *     ;(async () => {
+ *       pc = await createPeerConnectionWithFallback(callbacks, token)
+ *     })()
+ *     return () => pc?.close()
+ *   }, [])
+ */
 export async function createPeerConnectionWithFallback(
   callbacks: FallbackCallbacks,
   authToken: string,
