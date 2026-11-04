@@ -1,154 +1,149 @@
 -- ============================================================
--- 커머스 스키마: 호스트 미니샵 / 공구 / 선물 패키지 / 디지털 굿즈
+-- 커머스 스키마 v2: 외부 링크 연계 모델
+-- 플랫폼은 링크·홍보 제공, 실제 거래는 외부 플랫폼에서 처리
+-- 플랫폼 수익 = 링크 부스팅 비용 + 이벤트 등록 수수료
 -- ============================================================
 
--- 호스트 상품 테이블
-CREATE TABLE IF NOT EXISTS host_products (
+-- 호스트 외부 쇼핑 링크
+CREATE TABLE IF NOT EXISTS host_shop_links (
   id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   host_id           UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
-  product_type      VARCHAR(20) NOT NULL
-    CHECK (product_type IN ('physical', 'digital', 'groupbuy', 'gift_package')),
   title             TEXT NOT NULL CHECK (char_length(title) <= 100),
-  description       TEXT CHECK (char_length(description) <= 2000),
-  price             INT NOT NULL CHECK (price >= 1000),
-  stock             INT CHECK (stock IS NULL OR stock >= 0),
+  description       TEXT CHECK (char_length(description) <= 500),
+  external_url      TEXT NOT NULL,              -- 네이버스마트스토어, 쿠팡 등 외부 URL
+  external_platform VARCHAR(50) DEFAULT 'other',
   images            TEXT[] DEFAULT ARRAY[]::TEXT[],
-  platform_fee_rate DECIMAL(5,2) NOT NULL DEFAULT 15.00,
+  original_price    INT CHECK (original_price > 0),
+  sale_price        INT CHECK (sale_price > 0),
+  click_count       INT NOT NULL DEFAULT 0,
+  is_featured       BOOLEAN NOT NULL DEFAULT FALSE,
+  boost_expires_at  TIMESTAMPTZ,               -- 부스팅 만료 시각
   status            VARCHAR(20) NOT NULL DEFAULT 'active'
-    CHECK (status IN ('active', 'paused', 'sold_out', 'deleted')),
-  sold_count        INT NOT NULL DEFAULT 0,
-  created_at        TIMESTAMPTZ DEFAULT NOW(),
-  updated_at        TIMESTAMPTZ DEFAULT NOW()
+    CHECK (status IN ('active', 'paused', 'expired', 'deleted')),
+  expires_at        TIMESTAMPTZ,
+  created_at        TIMESTAMPTZ DEFAULT NOW()
 );
 
-ALTER TABLE host_products ENABLE ROW LEVEL SECURITY;
+ALTER TABLE host_shop_links ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "host_full_access_own_products"
-  ON host_products FOR ALL
+CREATE POLICY "host_manage_own_links"
+  ON host_shop_links FOR ALL
   USING (host_id = auth.uid());
 
-CREATE POLICY "public_view_active_products"
-  ON host_products FOR SELECT
+CREATE POLICY "public_view_active_links"
+  ON host_shop_links FOR SELECT
   USING (status = 'active');
 
-CREATE INDEX IF NOT EXISTS idx_host_products_host ON host_products(host_id, status);
+CREATE INDEX IF NOT EXISTS idx_shop_links_host ON host_shop_links(host_id, status);
+CREATE INDEX IF NOT EXISTS idx_shop_links_featured ON host_shop_links(is_featured, boost_expires_at)
+  WHERE is_featured = TRUE;
 
--- 공구(공동구매) 캠페인
-CREATE TABLE IF NOT EXISTS groupbuy_campaigns (
-  id                 UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  host_id            UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
-  product_id         UUID NOT NULL REFERENCES host_products(id) ON DELETE CASCADE,
-  title              TEXT NOT NULL,
-  unit_price         INT NOT NULL CHECK (unit_price >= 1000),
-  original_price     INT NOT NULL CHECK (original_price >= unit_price),
-  min_quantity       INT NOT NULL DEFAULT 10 CHECK (min_quantity > 0),
-  max_quantity       INT CHECK (max_quantity IS NULL OR max_quantity >= min_quantity),
-  current_quantity   INT NOT NULL DEFAULT 0 CHECK (current_quantity >= 0),
-  deadline           TIMESTAMPTZ NOT NULL,
-  status             VARCHAR(20) NOT NULL DEFAULT 'open'
-    CHECK (status IN ('open', 'succeeded', 'failed', 'shipping', 'completed')),
-  supplier_note      TEXT,
-  shipping_fee       INT NOT NULL DEFAULT 0 CHECK (shipping_fee >= 0),
-  expected_ship_date DATE,
-  created_at         TIMESTAMPTZ DEFAULT NOW()
+-- 클릭 추적 로그 (익명화)
+CREATE TABLE IF NOT EXISTS shop_link_clicks (
+  id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  link_id    UUID NOT NULL REFERENCES host_shop_links(id) ON DELETE CASCADE,
+  ip_hash    VARCHAR(16) NOT NULL,              -- SHA-256 앞 16자리 (개인정보 미포함)
+  created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-ALTER TABLE groupbuy_campaigns ENABLE ROW LEVEL SECURITY;
+CREATE INDEX IF NOT EXISTS idx_clicks_link_time ON shop_link_clicks(link_id, created_at);
 
-CREATE POLICY "host_manage_own_campaigns"
-  ON groupbuy_campaigns FOR ALL
-  USING (host_id = auth.uid());
-
-CREATE POLICY "public_view_open_campaigns"
-  ON groupbuy_campaigns FOR SELECT
-  USING (status IN ('open', 'succeeded', 'shipping'));
-
--- 공구 주문
-CREATE TABLE IF NOT EXISTS groupbuy_orders (
-  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  campaign_id     UUID NOT NULL REFERENCES groupbuy_campaigns(id) ON DELETE RESTRICT,
-  buyer_id        UUID NOT NULL REFERENCES profiles(id) ON DELETE RESTRICT,
-  quantity        INT NOT NULL DEFAULT 1 CHECK (quantity > 0),
-  unit_price      INT NOT NULL,
-  total_price     INT NOT NULL,
-  shipping_addr   JSONB NOT NULL,              -- AES-256 암호화 후 저장 권장
-  payment_key     VARCHAR(200) UNIQUE,
-  payment_status  VARCHAR(20) NOT NULL DEFAULT 'held'
-    CHECK (payment_status IN ('held', 'charged', 'refunded', 'failed')),
-  idempotency_key VARCHAR(200) UNIQUE NOT NULL,
-  created_at      TIMESTAMPTZ DEFAULT NOW(),
-  UNIQUE(campaign_id, buyer_id)                -- 1인 1참여
-);
-
-ALTER TABLE groupbuy_orders ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "buyer_own_orders"
-  ON groupbuy_orders FOR ALL
-  USING (buyer_id = auth.uid());
-
-CREATE POLICY "host_view_campaign_orders"
-  ON groupbuy_orders FOR SELECT
-  USING (
-    campaign_id IN (
-      SELECT id FROM groupbuy_campaigns WHERE host_id = auth.uid()
-    )
-  );
-
--- 공구 수량 원자적 증가 함수 (경쟁 조건 방지)
-CREATE OR REPLACE FUNCTION increment_groupbuy_quantity(
-  p_campaign_id UUID,
-  p_quantity INT
-) RETURNS VOID LANGUAGE plpgsql AS $$
+-- 클릭 수 원자적 증가
+CREATE OR REPLACE FUNCTION increment_link_clicks(p_link_id UUID)
+RETURNS void LANGUAGE plpgsql AS $$
 BEGIN
-  UPDATE groupbuy_campaigns
-  SET current_quantity = current_quantity + p_quantity
-  WHERE id = p_campaign_id AND status = 'open';
+  UPDATE host_shop_links SET click_count = click_count + 1 WHERE id = p_link_id;
 END;
 $$;
 
--- 실물 선물 패키지
-CREATE TABLE IF NOT EXISTS gift_packages (
-  id               UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  sender_id        UUID NOT NULL REFERENCES profiles(id) ON DELETE RESTRICT,
-  receiver_id      UUID NOT NULL REFERENCES profiles(id) ON DELETE RESTRICT,
-  package_type     VARCHAR(50) NOT NULL
-    CHECK (package_type IN ('flowers', 'chocolate', 'wine', 'custom_box')),
-  price            INT NOT NULL,
-  platform_cut     INT NOT NULL,
-  delivery_partner VARCHAR(100),
-  tracking_number  TEXT,
-  message          TEXT CHECK (char_length(message) <= 300),
-  status           VARCHAR(20) NOT NULL DEFAULT 'ordered'
-    CHECK (status IN ('ordered', 'processing', 'shipped', 'delivered', 'failed')),
-  payment_key      VARCHAR(200) UNIQUE,
-  idempotency_key  VARCHAR(200) UNIQUE NOT NULL,
-  sent_at          TIMESTAMPTZ,
-  received_at      TIMESTAMPTZ,
-  created_at       TIMESTAMPTZ DEFAULT NOW()
-);
-
-ALTER TABLE gift_packages ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "sender_or_receiver_view"
-  ON gift_packages FOR SELECT
-  USING (sender_id = auth.uid() OR receiver_id = auth.uid());
-
-CREATE POLICY "sender_insert"
-  ON gift_packages FOR INSERT
-  WITH CHECK (sender_id = auth.uid());
-
--- 배송 완료 후 30일 주소 자동 삭제 (개인정보 보호)
-CREATE OR REPLACE FUNCTION cleanup_delivered_shipping_addr()
+-- 부스팅 만료 자동 처리 (cron 또는 edge function에서 호출)
+CREATE OR REPLACE FUNCTION expire_shop_link_boosts()
 RETURNS void LANGUAGE plpgsql SECURITY DEFINER AS $$
 BEGIN
-  UPDATE groupbuy_orders
-  SET shipping_addr = '{"redacted": true}'::JSONB
-  WHERE payment_status = 'charged'
-    AND created_at < NOW() - INTERVAL '30 days';
-
-  UPDATE gift_packages
-  SET status = status  -- trigger placeholder; real addr stored encrypted
-  WHERE status = 'delivered'
-    AND received_at < NOW() - INTERVAL '30 days';
+  UPDATE host_shop_links
+  SET is_featured = FALSE, boost_expires_at = NULL
+  WHERE is_featured = TRUE AND boost_expires_at < NOW();
 END;
 $$;
+
+-- 판매 이벤트 / 공구 공지 (외부 링크 연계)
+CREATE TABLE IF NOT EXISTS sales_events (
+  id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  host_id           UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  event_type        VARCHAR(20) NOT NULL
+    CHECK (event_type IN ('groupbuy', 'flash_sale', 'limited', 'presale', 'collaboration')),
+  title             TEXT NOT NULL CHECK (char_length(title) <= 100),
+  description       TEXT CHECK (char_length(description) <= 1000),
+  external_url      TEXT NOT NULL,              -- 실제 구매는 이 외부 URL에서 처리
+  external_platform VARCHAR(50) DEFAULT 'other',
+  images            TEXT[] DEFAULT ARRAY[]::TEXT[],
+  original_price    INT CHECK (original_price > 0),
+  event_price       INT CHECK (event_price > 0),
+  starts_at         TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  ends_at           TIMESTAMPTZ NOT NULL,
+  min_participants  INT CHECK (min_participants > 0),  -- 공지용, 플랫폼이 집계 안 함
+  status            VARCHAR(20) NOT NULL DEFAULT 'upcoming'
+    CHECK (status IN ('upcoming', 'active', 'ended', 'cancelled')),
+  click_count       INT NOT NULL DEFAULT 0,
+  is_featured       BOOLEAN NOT NULL DEFAULT FALSE,
+  boost_expires_at  TIMESTAMPTZ,
+  created_at        TIMESTAMPTZ DEFAULT NOW(),
+  CHECK (ends_at > starts_at)
+);
+
+ALTER TABLE sales_events ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "host_manage_own_events"
+  ON sales_events FOR ALL
+  USING (host_id = auth.uid());
+
+CREATE POLICY "public_view_active_events"
+  ON sales_events FOR SELECT
+  USING (status IN ('upcoming', 'active'));
+
+CREATE INDEX IF NOT EXISTS idx_sales_events_status ON sales_events(status, ends_at);
+CREATE INDEX IF NOT EXISTS idx_sales_events_host ON sales_events(host_id, status);
+
+-- 판매 이벤트 클릭 수 원자적 증가
+CREATE OR REPLACE FUNCTION increment_event_clicks(p_event_id UUID)
+RETURNS void LANGUAGE plpgsql AS $$
+BEGIN
+  UPDATE sales_events SET click_count = click_count + 1 WHERE id = p_event_id;
+END;
+$$;
+
+-- 이벤트 상태 자동 업데이트 (cron 또는 edge function에서 호출)
+CREATE OR REPLACE FUNCTION sync_sales_event_status()
+RETURNS void LANGUAGE plpgsql SECURITY DEFINER AS $$
+BEGIN
+  UPDATE sales_events SET status = 'active'
+  WHERE status = 'upcoming' AND starts_at <= NOW();
+
+  UPDATE sales_events SET status = 'ended'
+  WHERE status IN ('upcoming', 'active') AND ends_at < NOW();
+END;
+$$;
+
+-- 링크 부스팅 결제 내역 (부스팅은 플랫폼 직접 수익)
+CREATE TABLE IF NOT EXISTS link_boost_payments (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  host_id         UUID NOT NULL REFERENCES profiles(id),
+  target_type     VARCHAR(20) NOT NULL
+    CHECK (target_type IN ('shop_link', 'sales_event')),
+  target_id       UUID NOT NULL,               -- host_shop_links.id 또는 sales_events.id
+  boost_days      INT NOT NULL DEFAULT 7,
+  amount          INT NOT NULL,                -- KRW
+  payment_key     VARCHAR(200) UNIQUE,
+  idempotency_key VARCHAR(200) UNIQUE NOT NULL,
+  status          VARCHAR(20) NOT NULL DEFAULT 'paid'
+    CHECK (status IN ('paid', 'refunded')),
+  boost_starts_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  boost_ends_at   TIMESTAMPTZ NOT NULL,
+  created_at      TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE link_boost_payments ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "host_view_own_boost_payments"
+  ON link_boost_payments FOR SELECT
+  USING (host_id = auth.uid());
