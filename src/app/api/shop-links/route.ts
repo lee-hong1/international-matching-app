@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseService, ALLOWED_DOMAINS, isAllowedUrl, getAuthUser, hasForbiddenContent } from '@/lib/commerce'
+import { isSuspended } from '@/lib/suspended-check'
 
 // 호스트 외부 쇼핑 링크 목록
 export async function GET(req: NextRequest) {
@@ -29,6 +30,9 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   const user = await getAuthUser(req)
   if (!user) return NextResponse.json({ error: '인증이 필요합니다' }, { status: 401 })
+  if (await isSuspended(user.id)) {
+    return NextResponse.json({ error: 'Account suspended' }, { status: 403 })
+  }
 
   try {
     const { title, description, external_url, external_platform, images, original_price, sale_price, expires_at } = await req.json()
