@@ -10,13 +10,20 @@ function extractToken(request: NextRequest, supabaseUrl: string): string | undef
   )
 }
 
+// base64url → string 디코딩 (Edge Runtime 호환 — Buffer 없이 atob 사용)
+function base64urlDecode(str: string): string {
+  const base64 = str.replace(/-/g, '+').replace(/_/g, '/')
+  const padded = base64.padEnd(base64.length + (4 - (base64.length % 4)) % 4, '=')
+  return atob(padded)
+}
+
 // JWT payload에서 app_metadata 추출 (서명 검증 없음 — Supabase 발급 토큰 신뢰)
 // 미들웨어 성능 우선: DB 조회 없이 JWT 클레임만 사용
 function getAppMetadataFromJwt(token: string): Record<string, unknown> {
   try {
     const parts = token.split('.')
     if (parts.length !== 3) return {}
-    const payload = JSON.parse(Buffer.from(parts[1], 'base64url').toString('utf-8'))
+    const payload = JSON.parse(base64urlDecode(parts[1]))
     return (payload?.app_metadata as Record<string, unknown>) ?? {}
   } catch {
     return {}
@@ -264,11 +271,12 @@ export const config = {
     '/api/bookings',
     '/api/host/:path*',
     '/host/:path*',
-    '/feed/:path*',
-    '/discover/:path*',
-    '/bookings/:path*',
-    '/book/:path*',
-    '/profile/:path*',
+    // 단독 경로 + 하위 경로 모두 매칭 필요 (/:path*는 하위만 매칭)
+    '/feed', '/feed/:path*',
+    '/discover', '/discover/:path*',
+    '/bookings', '/bookings/:path*',
+    '/book/:path+',
+    '/profile', '/profile/:path*',
     '/suspended',
     '/login',
     '/signup',
