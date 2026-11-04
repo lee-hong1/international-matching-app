@@ -5,6 +5,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { useRouter } from 'next/navigation'
 import { matchingService, UserProfile } from '@/lib/matching'
 import Image from 'next/image'
+import { t, detectLangFromNavigator } from '@/lib/i18n'
 
 export default function DiscoverPage() {
   const { user, loading } = useAuth()
@@ -15,6 +16,7 @@ export default function DiscoverPage() {
   const [showMatchModal, setShowMatchModal] = useState(false)
   const [isDragging, setIsDragging] = useState(false)
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
+  const lang = detectLangFromNavigator()
 
   useEffect(() => {
     if (!loading && !user) {
@@ -139,13 +141,13 @@ export default function DiscoverPage() {
       <div className="min-h-screen bg-gradient-to-br from-pink-50 to-blue-50 flex items-center justify-center">
         <div className="text-center">
           <div className="text-6xl mb-4">💕</div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">모든 프로필을 확인했습니다!</h2>
-          <p className="text-gray-600 mb-6">새로운 추천을 받으려면 잠시 후 다시 확인해주세요.</p>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">{t('discover.all_seen', lang)}</h2>
+          <p className="text-gray-600 mb-6">{t('discover.check_later', lang)}</p>
           <button
             onClick={loadProfiles}
             className="bg-purple-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-purple-700"
           >
-            다시 로드하기
+            {t('discover.reload', lang)}
           </button>
         </div>
       </div>
@@ -304,7 +306,7 @@ export default function DiscoverPage() {
 
         {/* 사용법 안내 */}
         <div className="text-center mt-6 text-gray-600 text-sm">
-          카드를 좌우로 스와이프하거나 버튼을 눌러 선택하세요
+          {t('discover.swipe_hint', lang)}
         </div>
       </main>
 
@@ -313,22 +315,22 @@ export default function DiscoverPage() {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-2xl p-8 max-w-sm mx-4 text-center">
             <div className="text-6xl mb-4">🎉</div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">매칭 성공!</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">{t('discover.match_success', lang)}</h2>
             <p className="text-gray-600 mb-6">
-              {currentProfile.full_name}님과 매칭되었습니다!
+              {currentProfile.full_name} {t('discover.match_message', lang)}
             </p>
             <div className="flex space-x-3">
               <button
                 onClick={() => setShowMatchModal(false)}
                 className="flex-1 bg-gray-200 text-gray-700 py-2 px-4 rounded-lg font-semibold hover:bg-gray-300"
               >
-                계속 탐색
+                {t('discover.keep_exploring', lang)}
               </button>
               <button
                 onClick={() => router.push('/messages')}
                 className="flex-1 bg-purple-600 text-white py-2 px-4 rounded-lg font-semibold hover:bg-purple-700"
               >
-                메시지 보내기
+                {t('profile.send_message', lang)}
               </button>
             </div>
           </div>

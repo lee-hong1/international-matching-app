@@ -104,6 +104,43 @@ const MESSAGES: Messages = {
     ja: '終了',
     zh: '已结束',
   },
+  // ── 발견 (Discover) 페이지 ────────────────────────────────────────────────
+  'discover.all_seen': {
+    ko: '모든 프로필을 확인했습니다!',
+    en: "You've seen all profiles!",
+    ja: 'すべてのプロフィールを確認しました！',
+    zh: '您已查看所有档案！',
+  },
+  'discover.check_later': {
+    ko: '새로운 추천을 받으려면 잠시 후 다시 확인해주세요.',
+    en: 'Check back later for new recommendations.',
+    ja: '新しいおすすめは後でご確認ください。',
+    zh: '稍后再来查看新推荐。',
+  },
+  'discover.reload': {
+    ko: '다시 로드하기',
+    en: 'Reload',
+    ja: '再読み込み',
+    zh: '重新加载',
+  },
+  'discover.swipe_hint': {
+    ko: '카드를 좌우로 스와이프하거나 버튼을 눌러 선택하세요',
+    en: 'Swipe cards left or right, or use the buttons',
+    ja: 'カードを左右にスワイプするかボタンで選択してください',
+    zh: '左右滑动卡片或点击按钮进行选择',
+  },
+  'discover.match_success': {
+    ko: '매칭 성공!',
+    en: "It's a Match!",
+    ja: 'マッチング成功！',
+    zh: '配对成功！',
+  },
+  'discover.keep_exploring': {
+    ko: '계속 탐색',
+    en: 'Keep Exploring',
+    ja: '探索を続ける',
+    zh: '继续探索',
+  },
   // ── WebRTC ─────────────────────────────────────────────────────────────
   'webrtc.connection_unstable': {
     ko: '연결이 불안정합니다.',
