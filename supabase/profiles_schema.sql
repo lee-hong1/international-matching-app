@@ -97,6 +97,21 @@ CREATE OR REPLACE VIEW public_profiles AS
 -- 공개 뷰 접근 권한
 GRANT SELECT ON public_profiles TO authenticated, anon;
 
+-- 외부 플랫폼 유도 위반 추적 (CLAUDE.md: 외부 플랫폼 유도 시 계정 정지)
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS violation_count INTEGER NOT NULL DEFAULT 0
+  CHECK (violation_count >= 0);
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS is_suspended BOOLEAN NOT NULL DEFAULT false;
+
+-- 정지 상태는 service_role만 변경 가능 (사용자 셀프 복구 방지)
+DROP POLICY IF EXISTS "owner cannot self-unsuspend" ON profiles;
+CREATE POLICY "owner cannot self-unsuspend" ON profiles FOR UPDATE
+  USING (auth.uid() = id)
+  WITH CHECK (
+    auth.uid() = id
+    AND is_suspended = (SELECT is_suspended FROM profiles WHERE id = auth.uid())
+  );
+
 -- profiles 인덱스
-CREATE INDEX IF NOT EXISTS idx_profiles_trust ON profiles(trust_score DESC) WHERE trust_score > 0;
-CREATE INDEX IF NOT EXISTS idx_profiles_lang ON profiles(preferred_lang);
+CREATE INDEX IF NOT EXISTS idx_profiles_trust     ON profiles(trust_score DESC) WHERE trust_score > 0;
+CREATE INDEX IF NOT EXISTS idx_profiles_lang      ON profiles(preferred_lang);
+CREATE INDEX IF NOT EXISTS idx_profiles_suspended ON profiles(is_suspended) WHERE is_suspended = true;

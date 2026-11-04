@@ -2,9 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getAuthUser, supabaseService, isValidUuid } from '@/lib/commerce'
 import { checkRateLimit, rateLimitResponse } from '@/lib/ratelimit'
 
-const PLATFORM_COMMISSION_RATE = parseFloat(
-  process.env.PLATFORM_COMMISSION_RATE ?? '0.15'
-)
+const _rawRate = parseFloat(process.env.PLATFORM_COMMISSION_RATE ?? '')
+const PLATFORM_COMMISSION_RATE =
+  isNaN(_rawRate) || _rawRate < 0 || _rawRate > 1 ? 0.15 : _rawRate
 
 /**
  * POST /api/commissions

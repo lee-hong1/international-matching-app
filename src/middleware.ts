@@ -46,6 +46,47 @@ async function handleAdminRoute(request: NextRequest): Promise<NextResponse> {
   }
 }
 
+async function handleSuspendedCheck(request: NextRequest): Promise<NextResponse> {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+
+  if (!supabaseUrl || !supabaseServiceKey) {
+    return NextResponse.json({ error: '서버 설정 오류' }, { status: 500 })
+  }
+
+  const accessToken = extractToken(request, supabaseUrl)
+  if (!accessToken) {
+    return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
+  }
+
+  try {
+    const supabaseAnon = createClient(supabaseUrl, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
+    const { data: { user }, error: authErr } = await supabaseAnon.auth.getUser(accessToken)
+
+    if (authErr || !user) {
+      return NextResponse.json({ error: 'Invalid auth token' }, { status: 401 })
+    }
+
+    const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey)
+    const { data: profile } = await supabaseAdmin
+      .from('profiles')
+      .select('is_suspended')
+      .eq('id', user.id)
+      .single()
+
+    if (profile?.is_suspended) {
+      return NextResponse.json(
+        { error: '계정이 정지되었습니다 / Account suspended' },
+        { status: 403 }
+      )
+    }
+
+    return NextResponse.next()
+  } catch {
+    return NextResponse.json({ error: '서버 오류가 발생했습니다' }, { status: 500 })
+  }
+}
+
 async function handleHostApiRoute(request: NextRequest): Promise<NextResponse> {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
   const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
@@ -138,7 +179,7 @@ async function handleHostPageRoute(request: NextRequest): Promise<NextResponse> 
 }
 
 export async function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl
+  const { pathname, search } = request.nextUrl
 
   if (pathname.startsWith('/admin')) {
     return handleAdminRoute(request)
@@ -147,6 +188,16 @@ export async function middleware(request: NextRequest) {
   // /api/auth/** 는 항상 허용 (verify-age 포함, 무한 루프 방지)
   if (pathname.startsWith('/api/auth/')) {
     return NextResponse.next()
+  }
+
+  // 채팅 API: 정지 계정 차단 (외부 플랫폼 유도 3회 적발 시)
+  if (pathname.startsWith('/api/chat/')) {
+    return handleSuspendedCheck(request)
+  }
+
+  // 예약 생성(POST): 정지 계정 차단
+  if (pathname === '/api/bookings' && request.method === 'POST') {
+    return handleSuspendedCheck(request)
   }
 
   // 호스트 등록/관리 API: JWT + is_adult 검증 → 미인증 시 403
@@ -163,5 +214,12 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/admin/:path*', '/api/host/:path*', '/api/auth/:path*', '/host/:path*'],
+  matcher: [
+    '/admin/:path*',
+    '/api/auth/:path*',
+    '/api/chat/:path*',
+    '/api/bookings',
+    '/api/host/:path*',
+    '/host/:path*',
+  ],
 }
