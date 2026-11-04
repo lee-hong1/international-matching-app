@@ -340,7 +340,7 @@ export default function SignUpPage() {
               </label>
 
               <button onClick={goNext} className="w-full py-3 bg-gradient-to-r from-pink-500 to-purple-600 text-white font-semibold rounded-xl hover:from-pink-600 hover:to-purple-700 transition-all shadow-md mt-2">
-                다음 단계
+                {t('signup.next_step', lang)}
               </button>
             </div>
           )}
@@ -401,10 +401,10 @@ export default function SignUpPage() {
 
               <div className="flex gap-3 pt-2">
                 <button type="button" onClick={() => setStep(1)} className="flex-1 py-3 border border-gray-200 text-gray-600 font-semibold rounded-xl hover:bg-gray-50 transition-all">
-                  이전
+                  {t('signup.previous', lang)}
                 </button>
                 <button type="button" onClick={goNext} className="flex-1 py-3 bg-gradient-to-r from-pink-500 to-purple-600 text-white font-semibold rounded-xl hover:from-pink-600 hover:to-purple-700 transition-all shadow-md">
-                  다음
+                  {t('signup.next', lang)}
                 </button>
               </div>
             </div>

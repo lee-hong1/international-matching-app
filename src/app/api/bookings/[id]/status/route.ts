@@ -3,6 +3,34 @@ import { getAuthUser, supabaseService, isValidUuid } from '@/lib/commerce'
 import { checkRateLimit, rateLimitResponse } from '@/lib/ratelimit'
 import { t, type Lang } from '@/lib/i18n'
 
+async function sendBookingEmail(
+  req: NextRequest,
+  opts: { booking_id: string; type: 'confirmed' | 'cancelled'; recipient_id: string }
+): Promise<void> {
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? `https://${req.headers.get('host')}`
+    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY ?? ''
+    const { data: profile } = await supabaseService
+      .from('profiles')
+      .select('email, preferred_lang')
+      .eq('id', opts.recipient_id)
+      .single()
+    if (!profile?.email) return
+    await fetch(`${baseUrl}/api/emails/booking-notification`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', 'x-service-key': serviceKey },
+      body: JSON.stringify({
+        to_email: profile.email,
+        type: opts.type,
+        booking_id: opts.booking_id,
+        lang: profile.preferred_lang ?? 'ko',
+      }),
+    })
+  } catch {
+    // 이메일 실패는 상태 변경 성공에 영향 없음
+  }
+}
+
 type BookingStatus = 'pending' | 'confirmed' | 'completed' | 'cancelled'
 type NotifiableStatus = 'confirmed' | 'cancelled' | 'completed'
 
@@ -159,6 +187,14 @@ export async function PATCH(
   }
   if (notifyGuestId && notifyGuestId !== notifyHostId) {
     void sendStatusNotification(req, { recipientId: notifyGuestId, newStatus, bookingId: id })
+  }
+
+  // 이메일 알림 (confirmed/cancelled만)
+  if (newStatus === 'confirmed' && booking.user_id) {
+    void sendBookingEmail(req, { booking_id: id, type: 'confirmed', recipient_id: booking.user_id })
+  } else if (newStatus === 'cancelled') {
+    if (booking.user_id) void sendBookingEmail(req, { booking_id: id, type: 'cancelled', recipient_id: booking.user_id })
+    if (booking.host_id) void sendBookingEmail(req, { booking_id: id, type: 'cancelled', recipient_id: booking.host_id })
   }
 
   return NextResponse.json({ data: updated })

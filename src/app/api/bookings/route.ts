@@ -4,6 +4,36 @@ import { formatBookingTime } from '@/lib/datetime'
 import { detectLangFromHeader, t, type Lang } from '@/lib/i18n'
 import { checkRateLimit, rateLimitResponse } from '@/lib/ratelimit'
 
+// ── 이메일 fire-and-forget 헬퍼 ──────────────────────────────────────────────
+async function sendBookingEmail(
+  req: NextRequest,
+  opts: { booking_id: string; type: 'new_booking' | 'confirmed' | 'cancelled'; recipient_id: string }
+): Promise<void> {
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? `https://${req.headers.get('host')}`
+    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY ?? ''
+    // 수신자 이메일 조회
+    const { data: profile } = await (await import('@/lib/commerce')).supabaseService
+      .from('profiles')
+      .select('email, preferred_lang')
+      .eq('id', opts.recipient_id)
+      .single()
+    if (!profile?.email) return
+    await fetch(`${baseUrl}/api/emails/booking-notification`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', 'x-service-key': serviceKey },
+      body: JSON.stringify({
+        to_email: profile.email,
+        type: opts.type,
+        booking_id: opts.booking_id,
+        lang: profile.preferred_lang ?? 'ko',
+      }),
+    })
+  } catch {
+    // 이메일 실패는 예약 성공에 영향 없음
+  }
+}
+
 // ── Fire-and-forget 알림 헬퍼 ─────────────────────────────────────────────────
 async function sendBookingNotification(
   req: NextRequest,
@@ -315,12 +345,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Failed to create booking' }, { status: 500 })
   }
 
-  // Fire-and-forget 알림 (실패해도 예약 성공 반환)
+  // Fire-and-forget: FCM push + 이메일 (병렬, 실패해도 예약 성공 반환)
   void sendBookingNotification(req, {
     recipientId: booking.host_id,
     type: 'new_booking',
     bookingId: booking.id,
   })
+  void sendBookingEmail(req, { booking_id: booking.id, type: 'new_booking', recipient_id: booking.host_id })
 
   return NextResponse.json({ data: booking }, { status: 201 })
 }

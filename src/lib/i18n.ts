@@ -409,6 +409,9 @@ export function detectLangFromNavigator(): Lang {
   'signup.strength_fair': { ko: '보통', en: 'Fair', ja: '普通', zh: '一般' },
   'signup.strength_strong': { ko: '강함', en: 'Strong', ja: '強い', zh: '强' },
   'signup.strength_very_strong': { ko: '매우 강함', en: 'Very Strong', ja: 'とても強い', zh: '非常强' },
+  'signup.next_step': { ko: '다음 단계', en: 'Next Step', ja: '次のステップ', zh: '下一步' },
+  'signup.next': { ko: '다음', en: 'Next', ja: '次へ', zh: '下一步' },
+  'signup.previous': { ko: '이전', en: 'Back', ja: '戻る', zh: '上一步' },
 
   // ── 알림 메시지 (FCM push 본문) ──────────────────────────────────────────
   'notification.new_booking.title': {
