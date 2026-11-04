@@ -114,6 +114,10 @@ CREATE INDEX idx_post_likes_user_id ON post_likes(user_id);
 CREATE INDEX idx_post_comments_post_id ON post_comments(post_id);
 CREATE INDEX idx_stories_user_id ON stories(user_id);
 CREATE INDEX idx_stories_expires_at ON stories(expires_at);
+CREATE INDEX idx_comment_likes_comment_id ON comment_likes(comment_id);
+CREATE INDEX idx_comment_likes_user_id ON comment_likes(user_id);
+CREATE INDEX idx_story_views_story_id ON story_views(story_id);
+CREATE INDEX idx_story_views_viewer_id ON story_views(viewer_id);
 
 -- =====================================================
 -- RLS 정책
