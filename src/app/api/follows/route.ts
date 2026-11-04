@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL ?? 'https://placeholder.supabase.co',
@@ -7,6 +8,13 @@ const supabase = createClient(
 )
 
 export async function GET(request: NextRequest) {
+  const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
+  const rl = await checkRateLimit(`follows-get:${ip}`, 'general')
+  if (!rl.allowed) {
+    const r = rateLimitResponse(rl.resetAt)
+    return NextResponse.json(r.body, { status: r.status, headers: r.headers })
+  }
+
   const { searchParams } = new URL(request.url)
   const userId = searchParams.get('userId')
   const type = searchParams.get('type') ?? 'followers'
@@ -57,6 +65,13 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  const postIp = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
+  const postRl = await checkRateLimit(`follows-post:${postIp}`, 'general')
+  if (!postRl.allowed) {
+    const r = rateLimitResponse(postRl.resetAt)
+    return NextResponse.json(r.body, { status: r.status, headers: r.headers })
+  }
+
   try {
     const { following_id } = await request.json()
     const authHeader = request.headers.get('authorization')
