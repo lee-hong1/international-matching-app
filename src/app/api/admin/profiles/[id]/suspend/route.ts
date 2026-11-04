@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseService, isValidUuid } from '@src/lib/commerce'
+import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
 import { timingSafeEqual, createHash } from 'crypto'
 
 /**
@@ -10,6 +11,14 @@ export async function PATCH(
   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  // ── Rate limit — admin key brute-force 방지 ────────────────────────────
+  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
+  const rl = await checkRateLimit(ip, 'general')
+  if (!rl.allowed) {
+    const r = rateLimitResponse(rl.resetAt)
+    return NextResponse.json(r.body, { status: r.status, headers: r.headers })
+  }
+
   // ── Admin key 인증 (타이밍 어택 방지) ───────────────────────────────────
   const adminKey = process.env.ADMIN_API_KEY
   if (!adminKey) {

@@ -8,6 +8,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { timingSafeEqual } from 'crypto'
+import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
 
 function isValidUuid(v: string) {
   return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(v)
@@ -29,6 +30,14 @@ function checkAdminKey(req: NextRequest): boolean {
 }
 
 export async function GET(req: NextRequest) {
+  // ── Rate limit — admin key brute-force 방지 ────────────────────────────
+  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
+  const rl = await checkRateLimit(ip, 'general')
+  if (!rl.allowed) {
+    const r = rateLimitResponse(rl.resetAt)
+    return NextResponse.json(r.body, { status: r.status, headers: r.headers })
+  }
+
   if (!checkAdminKey(req)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
