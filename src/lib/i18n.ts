@@ -565,6 +565,15 @@ const MESSAGES: Messages = {
 
   // ── 서비스 상세 (추가) ──────────────────────────────────────────────────────
   'services.login_to_book': { ko: '로그인 후 예약하기', en: 'Login to Book', ja: 'ログインして予約', zh: '登录后预约' },
+
+  // ── 커미션 / 수익 대시보드 ───────────────────────────────────────────────
+  'commission.earnings_title': { ko: '이번 달 수익', en: 'This Month\'s Earnings', ja: '今月の収益', zh: '本月收益' },
+  'commission.net_revenue': { ko: '순수익', en: 'Net Revenue', ja: '純収益', zh: '净收入' },
+  'commission.total_completed': { ko: '완료된 예약', en: 'Completed Bookings', ja: '完了した予約', zh: '已完成预约' },
+  'commission.platform_fee': { ko: '플랫폼 수수료 15%', en: 'Platform fee 15%', ja: 'プラットフォーム手数料15%', zh: '平台手续费15%' },
+  'commission.loading': { ko: '수익 집계 중…', en: 'Loading earnings…', ja: '収益を集計中…', zh: '加载收益中…' },
+  'commission.error': { ko: '수익 정보를 불러오지 못했습니다', en: 'Failed to load earnings', ja: '収益情報の読み込みに失敗しました', zh: '无法加载收益信息' },
+  'commission.currency_krw': { ko: '원', en: 'KRW', ja: '韓国ウォン', zh: '韩元' },
 }
 
 /** 언어 코드를 지원 언어로 정규화 */

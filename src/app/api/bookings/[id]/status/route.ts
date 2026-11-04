@@ -171,6 +171,42 @@ export async function PATCH(
     return NextResponse.json({ error: 'Failed to update booking status' }, { status: 500 })
   }
 
+  // completed → 커미션 자동 생성 (fire-and-forget)
+  if (newStatus === 'completed') {
+    void (async () => {
+      try {
+        const { data: service } = await supabaseService
+          .from('bookings')
+          .select('service_id')
+          .eq('id', id)
+          .single()
+        if (service?.service_id) {
+          const { data: svc } = await supabaseService
+            .from('services')
+            .select('price, currency')
+            .eq('id', service.service_id)
+            .single()
+          if (svc?.price) {
+            const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? `https://${req.headers.get('host')}`
+            const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY ?? ''
+            await fetch(`${baseUrl}/api/commissions`, {
+              method: 'POST',
+              headers: { 'content-type': 'application/json', 'x-service-key': serviceKey },
+              body: JSON.stringify({
+                booking_id: id,
+                gross_amount: Number(svc.price),
+                currency: svc.currency ?? 'KRW',
+              }),
+            })
+          }
+        }
+      } catch (e) {
+        // 커미션 실패는 상태 변경 성공에 영향 없음 (에러 코드만 로그)
+        console.error('[bookings/status] commission trigger error:', (e as Error).message)
+      }
+    })()
+  }
+
   // Fire-and-forget 알림
   // confirmed → 사용자에게, cancelled → 양측에게, completed → 사용자에게
   const notifyUserId = newStatus === 'confirmed' || newStatus === 'completed'
