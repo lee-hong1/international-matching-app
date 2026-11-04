@@ -20,7 +20,8 @@ export async function GET(req: NextRequest) {
   const url = new URL(req.url)
   const status = url.searchParams.get('status') // 'pending'|'confirmed'|'cancelled'|'completed'
   const limit = Math.min(parseInt(url.searchParams.get('limit') ?? '20', 10), 100)
-  const offset = parseInt(url.searchParams.get('offset') ?? '0', 10)
+  // cursor 기반 페이지네이션: cursor = `${created_at}__${id}` (base64 인코딩)
+  const cursorParam = url.searchParams.get('cursor')
   const rawTimezone = url.searchParams.get('timezone') ?? 'UTC'
 
   // 타임존 화이트리스트 (악의적 입력 방지 — Intl 오류 catch로 처리)
@@ -34,7 +35,30 @@ export async function GET(req: NextRequest) {
 
   const lang = detectLangFromHeader(req.headers.get('accept-language'))
 
+  // ── cursor 디코드 ─────────────────────────────────────────────────────────
+  let cursorCreatedAt: string | null = null
+  let cursorId: string | null = null
+  if (cursorParam) {
+    try {
+      const decoded = Buffer.from(cursorParam, 'base64').toString('utf-8')
+      const [ca, cid] = decoded.split('__')
+      if (ca && cid && isValidUuid(cid)) {
+        cursorCreatedAt = ca
+        cursorId = cid
+      }
+    } catch {
+      return NextResponse.json({ error: 'Invalid cursor' }, { status: 400 })
+    }
+  }
+
   // ── DB 조회 ───────────────────────────────────────────────────────────────
+  if (status) {
+    const VALID_STATUSES = ['pending', 'confirmed', 'cancelled', 'completed']
+    if (!VALID_STATUSES.includes(status)) {
+      return NextResponse.json({ error: 'Invalid status value' }, { status: 400 })
+    }
+  }
+
   let query = supabaseService
     .from('bookings')
     .select(`
@@ -57,15 +81,17 @@ export async function GET(req: NextRequest) {
       )
     `)
     .eq('guest_id', user.id)
-    .order('booked_at', { ascending: false })
-    .range(offset, offset + limit - 1)
+    .order('created_at', { ascending: false })
+    .order('id', { ascending: false })
+    .limit(limit + 1) // +1로 다음 페이지 여부 판단
 
-  if (status) {
-    const VALID_STATUSES = ['pending', 'confirmed', 'cancelled', 'completed']
-    if (!VALID_STATUSES.includes(status)) {
-      return NextResponse.json({ error: 'Invalid status value' }, { status: 400 })
-    }
-    query = query.eq('status', status)
+  if (status) query = query.eq('status', status)
+
+  // cursor 조건: created_at < cursorCreatedAt OR (created_at = cursorCreatedAt AND id < cursorId)
+  if (cursorCreatedAt && cursorId) {
+    query = query.or(
+      `created_at.lt.${cursorCreatedAt},and(created_at.eq.${cursorCreatedAt},id.lt.${cursorId})`
+    )
   }
 
   const { data: bookings, error } = await query
@@ -81,7 +107,11 @@ export async function GET(req: NextRequest) {
     : lang === 'zh' ? 'zh-CN'
     : 'en-US'
 
-  const enriched = (bookings ?? []).map((b) => ({
+  const rows = bookings ?? []
+  const hasMore = rows.length > limit
+  const page = hasMore ? rows.slice(0, limit) : rows
+
+  const enriched = page.map((b) => ({
     ...b,
     timezone: 'UTC',
     formatted_time: b.booked_at
@@ -89,14 +119,21 @@ export async function GET(req: NextRequest) {
       : null,
   }))
 
+  // 다음 cursor 생성
+  const lastItem = page[page.length - 1]
+  const nextCursor = hasMore && lastItem
+    ? Buffer.from(`${lastItem.created_at}__${lastItem.id}`).toString('base64')
+    : null
+
   return NextResponse.json({
     data: enriched,
     meta: {
       timezone: tz,
       locale,
       limit,
-      offset,
       count: enriched.length,
+      has_more: hasMore,
+      next_cursor: nextCursor,
     },
   })
 }
@@ -174,15 +211,28 @@ export async function POST(req: NextRequest) {
 
   const bookedAtIso = bookedDate.toISOString()
 
-  // ── 슬롯 충돌 체크 ────────────────────────────────────────────────────────
-  const { count } = await supabaseService
-    .from('bookings')
-    .select('id', { count: 'exact', head: true })
-    .eq('host_id', host_id)
-    .eq('booked_at', bookedAtIso)
-    .neq('status', 'cancelled')
-
-  if ((count ?? 0) > 0) {
+  // ── 슬롯 겹침 체크 (범위 기반) ───────────────────────────────────────────
+  const duration = typeof body.duration_minutes === 'number' && body.duration_minutes > 0
+    ? Math.min(body.duration_minutes, 480)
+    : 60
+  const { data: overlapResult, error: overlapErr } = await supabaseService
+    .rpc('check_slot_overlap', {
+      p_host_id: host_id,
+      p_start: bookedAtIso,
+      p_duration: duration,
+    })
+  if (overlapErr) {
+    // DB 함수 없으면 단순 exact-match fallback
+    const { count } = await supabaseService
+      .from('bookings')
+      .select('id', { count: 'exact', head: true })
+      .eq('host_id', host_id)
+      .eq('booked_at', bookedAtIso)
+      .neq('status', 'cancelled')
+    if ((count ?? 0) > 0) {
+      return NextResponse.json({ error: 'Time slot already booked' }, { status: 409 })
+    }
+  } else if (overlapResult === true) {
     return NextResponse.json({ error: 'Time slot already booked' }, { status: 409 })
   }
 
