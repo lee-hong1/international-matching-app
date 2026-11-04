@@ -220,6 +220,19 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
   }
 
+  // ── 성인 인증 필수 (청소년보호법) ────────────────────────────────────────
+  const { data: requesterProfile } = await supabaseService
+    .from('profiles')
+    .select('is_adult')
+    .eq('id', user.id)
+    .single()
+  if (!requesterProfile?.is_adult) {
+    return NextResponse.json(
+      { error: 'Age verification required / 성인 인증이 필요합니다', redirect: '/verify-age' },
+      { status: 403 }
+    )
+  }
+
   // ── 멱등성 키 ─────────────────────────────────────────────────────────────
   const idempotencyKey = req.headers.get('idempotency-key')
   if (idempotencyKey) {
