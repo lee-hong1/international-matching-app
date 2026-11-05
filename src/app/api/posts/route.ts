@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
 import { getAuthUser, supabaseService } from '@src/lib/commerce'
+import { detectExternalPlatform } from '@src/lib/chat-safety'
 
 export async function GET(request: NextRequest) {
   const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
@@ -81,6 +82,11 @@ export async function POST(request: NextRequest) {
     isPublic = formData.get('is_public') !== 'false'
   } catch {
     return NextResponse.json({ error: 'Invalid request body' }, { status: 400 })
+  }
+
+  // 수익 누수 방지: 포스트 캡션에 외부 플랫폼 유도 금지
+  if (caption && detectExternalPlatform(caption)) {
+    return NextResponse.json({ error: 'External platform references are not allowed' }, { status: 400 })
   }
 
   const { data: post, error: postError } = await supabaseService
