@@ -108,7 +108,7 @@ function EventDetailContent() {
       const data = await res.json()
 
       if (!res.ok) {
-        setError(data.error ?? '신청에 실패했습니다')
+        setError(data.error ?? 'Application failed')
         return
       }
 

@@ -154,10 +154,28 @@ ALTER TABLE matching_preferences ENABLE ROW LEVEL SECURITY;
 ALTER TABLE matches ENABLE ROW LEVEL SECURITY;
 ALTER TABLE chat_rooms ENABLE ROW LEVEL SECURITY;
 ALTER TABLE messages ENABLE ROW LEVEL SECURITY;
+ALTER TABLE subscription_plans ENABLE ROW LEVEL SECURITY;
 ALTER TABLE user_subscriptions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE reports ENABLE ROW LEVEL SECURITY;
 ALTER TABLE blocks ENABLE ROW LEVEL SECURITY;
 ALTER TABLE payments ENABLE ROW LEVEL SECURITY;
+
+-- subscription_plans: 인증 사용자는 읽기 가능; 쓰기는 service_role 전용
+DROP POLICY IF EXISTS "anyone read subscription plans" ON subscription_plans;
+CREATE POLICY "anyone read subscription plans" ON subscription_plans
+  FOR SELECT USING (auth.role() = 'authenticated');
+
+DROP POLICY IF EXISTS "service only write subscription plans" ON subscription_plans;
+CREATE POLICY "service only write subscription plans" ON subscription_plans
+  FOR INSERT WITH CHECK (false);
+
+DROP POLICY IF EXISTS "service only update subscription plans" ON subscription_plans;
+CREATE POLICY "service only update subscription plans" ON subscription_plans
+  FOR UPDATE USING (false);
+
+DROP POLICY IF EXISTS "service only delete subscription plans" ON subscription_plans;
+CREATE POLICY "service only delete subscription plans" ON subscription_plans
+  FOR DELETE USING (false);
 
 -- payments: 본인 결제 조회; INSERT/UPDATE/DELETE는 service_role만 (결제 서버 전용)
 DROP POLICY IF EXISTS "users read own payments" ON payments;

@@ -55,19 +55,19 @@ export default function CreateEventPage() {
     setError('')
 
     if (!title.trim()) {
-      setError('제목을 입력해주세요')
+      setError('Title is required')
       return
     }
     if (!eventDatetime) {
-      setError('일정을 선택해주세요')
+      setError('Please select a date and time')
       return
     }
     if (venueType === 'partner' && !venueId) {
-      setError('제휴 매장을 선택해주세요')
+      setError('Please select a partner venue')
       return
     }
     if (venueType === 'custom' && !customLocation.trim()) {
-      setError('장소를 입력해주세요')
+      setError('Please enter a location')
       return
     }
 
@@ -86,7 +86,7 @@ export default function CreateEventPage() {
       })
 
       if (createError || !event) {
-        setError(createError?.message ?? '모임 생성에 실패했습니다')
+        setError(createError?.message ?? 'Failed to create event')
         return
       }
 
