@@ -488,7 +488,24 @@ const MESSAGES: Messages = {
   'availability.days.5': { ko: '금요일', en: 'Friday', ja: '金曜日', zh: '周五' },
   'availability.days.6': { ko: '토요일', en: 'Saturday', ja: '土曜日', zh: '周六' },
 
-  // ── 리뷰 ──────────────────────────────────────────────────────────────
+  // ── 이벤트 상세 ───────────────────────────────────────────────────────
+  'detail_pending': { ko: '승인 대기', en: 'Pending', ja: '承認待ち', zh: '待审批' },
+  'detail_approved': { ko: '승인됨', en: 'Approved', ja: '承認済み', zh: '已批准' },
+  'detail_rejected': { ko: '거절됨', en: 'Rejected', ja: '拒否されました', zh: '已拒绝' },
+  'detail_cancelled': { ko: '취소됨', en: 'Cancelled', ja: 'キャンセル済み', zh: '已取消' },
+  'detail_partner_discount': { ko: '파트너 할인가', en: 'Partner discount', ja: 'パートナー割引', zh: '合作伙伴折扣' },
+  'detail_host': { ko: '호스트', en: 'Host', ja: 'ホスト', zh: '主持人' },
+  'detail_my_status': { ko: '내 신청 상태', en: 'My application status', ja: '申込状況', zh: '我的申请状态' },
+  'detail_applying': { ko: '처리 중...', en: 'Processing...', ja: '処理中...', zh: '处理中...' },
+  'detail_pay_apply': { ko: '원 결제 후 신청', en: ' — Pay & Apply', ja: '円支払い後申込', zh: '元付款申请' },
+  'detail_apply': { ko: '무료 신청', en: 'Apply (Free)', ja: '無料申込', zh: '免费申请' },
+  'detail_participants': { ko: '참가자', en: 'Participants', ja: '参加者', zh: '参与者' },
+  'detail_no_participants': { ko: '아직 참가자가 없습니다', en: 'No participants yet', ja: 'まだ参加者がいません', zh: '暂无参与者' },
+  'detail_approve': { ko: '승인', en: 'Approve', ja: '承認', zh: '批准' },
+  'detail_reject': { ko: '거절', en: 'Reject', ja: '拒否', zh: '拒绝' },
+  'detail_back_list': { ko: '목록으로 돌아가기', en: 'Back to list', ja: '一覧に戻る', zh: '返回列表' },
+
+// ── 리뷰 ──────────────────────────────────────────────────────────────
   'review.title': { ko: '리뷰', en: 'Reviews', ja: 'レビュー', zh: '评价' },
   'review.write': { ko: '리뷰 작성', en: 'Write a Review', ja: 'レビューを書く', zh: '写评价' },
   'review.rating': { ko: '별점', en: 'Rating', ja: '評価', zh: '评分' },

@@ -81,7 +81,17 @@ export async function POST(
       .select()
       .single()
 
-    if (error) return NextResponse.json({ error: 'Failed to register participant' }, { status: 500 })
+    if (error) {
+      // DB 트리거 EVENT_FULL 예외 (동시 신청 race condition 대응)
+      if (error.message?.includes('EVENT_FULL') || error.code === 'P0001') {
+        return NextResponse.json({ error: 'Event is fully booked' }, { status: 409 })
+      }
+      // 중복 신청 unique violation
+      if (error.code === '23505') {
+        return NextResponse.json({ error: 'Already applied to this event' }, { status: 409 })
+      }
+      return NextResponse.json({ error: 'Failed to register participant' }, { status: 500 })
+    }
     return NextResponse.json({ participant, requiresPayment: false }, { status: 201 })
   }
 
@@ -114,6 +124,12 @@ export async function POST(
     .single()
 
   if (participantError) {
+    if (participantError.message?.includes('EVENT_FULL') || participantError.code === 'P0001') {
+      return NextResponse.json({ error: 'Event is fully booked' }, { status: 409 })
+    }
+    if (participantError.code === '23505') {
+      return NextResponse.json({ error: 'Already applied to this event' }, { status: 409 })
+    }
     return NextResponse.json({ error: 'Failed to register participant' }, { status: 500 })
   }
 
