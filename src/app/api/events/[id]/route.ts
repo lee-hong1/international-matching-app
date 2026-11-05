@@ -15,7 +15,7 @@ export async function GET(
 
   const user = await getAuthUser(request)
   if (!user) {
-    return NextResponse.json({ error: '인증이 필요합니다' }, { status: 401 })
+    return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
   }
 
   const { id } = await params
@@ -34,7 +34,7 @@ export async function GET(
     .single()
 
   if (error || !data) {
-    return NextResponse.json({ error: '이벤트를 찾을 수 없습니다' }, { status: 404 })
+    return NextResponse.json({ error: 'Event not found' }, { status: 404 })
   }
 
   return NextResponse.json({ event: data })

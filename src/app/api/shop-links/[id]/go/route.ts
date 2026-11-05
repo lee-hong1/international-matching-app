@@ -14,14 +14,14 @@ export async function GET(
   try {
     const rl = await checkRateLimit(ip, 'general')
     if (!rl.allowed) {
-      return NextResponse.json({ error: '요청이 너무 많습니다. 잠시 후 다시 시도해 주세요' }, { status: 429 })
+      return NextResponse.json({ error: 'Too many requests. Please try again later' }, { status: 429 })
     }
   } catch {
     // Rate limit 서버 장애 시 redirect는 계속 허용
   }
 
   if (!isValidUuid(params.id)) {
-    return NextResponse.json({ error: '유효하지 않은 링크 ID입니다' }, { status: 400 })
+    return NextResponse.json({ error: 'Invalid link ID' }, { status: 400 })
   }
 
   const { data: link } = await supabaseService
@@ -36,12 +36,12 @@ export async function GET(
 
   if (link.expires_at && new Date(link.expires_at) < new Date()) {
     await supabaseService.from('host_shop_links').update({ status: 'expired' }).eq('id', params.id)
-    return NextResponse.json({ error: '만료된 링크입니다' }, { status: 410 })
+    return NextResponse.json({ error: 'Link has expired' }, { status: 410 })
   }
 
   // DB에 저장된 URL을 리디렉션 직전 재검증 (등록 후 DB 조작 방어)
   if (!isAllowedUrl(link.external_url)) {
-    return NextResponse.json({ error: '유효하지 않은 외부 URL입니다' }, { status: 400 })
+    return NextResponse.json({ error: 'Invalid external URL' }, { status: 400 })
   }
 
   // 익명화된 클릭 로그

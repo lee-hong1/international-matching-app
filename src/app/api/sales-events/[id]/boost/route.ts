@@ -27,20 +27,20 @@ export async function POST(
   const user = await getAuthUser(req)
   if (!user) {
     return NextResponse.json(
-      { error: '인증이 필요합니다 / Authentication required' },
+      { error: 'Authentication required' },
       { status: 401 },
     )
   }
 
   // ── Suspension check ───────────────────────────────────────────────────
   if (await isSuspended(user.id)) {
-    return NextResponse.json({ error: '계정이 정지된 상태입니다 / Account suspended' }, { status: 403 })
+    return NextResponse.json({ error: 'Account suspended' }, { status: 403 })
   }
 
   // ── Path param validation ──────────────────────────────────────────────
   const eventId = params.id
   if (!isValidUuid(eventId)) {
-    return NextResponse.json({ error: '유효하지 않은 이벤트 ID입니다' }, { status: 400 })
+    return NextResponse.json({ error: 'Invalid event ID' }, { status: 400 })
   }
 
   try {
@@ -48,7 +48,7 @@ export async function POST(
 
     if (!payment_key || !order_id || !boost_days) {
       return NextResponse.json(
-        { error: '필수 항목 누락: payment_key, order_id, boost_days' },
+        { error: 'Required fields missing: payment_key, order_id, boost_days' },
         { status: 400 },
       )
     }
@@ -60,7 +60,7 @@ export async function POST(
 
     if (!BOOST_PRICES[boost_days as number]) {
       return NextResponse.json(
-        { error: `boost_days는 다음 중 하나: ${Object.keys(BOOST_PRICES).join(', ')}` },
+        { error: `boost_days must be one of: ${Object.keys(BOOST_PRICES).join(', ')}` },
         { status: 400 },
       )
     }
@@ -75,26 +75,26 @@ export async function POST(
       .single()
 
     if (fetchErr || !event) {
-      return NextResponse.json({ error: '이벤트를 찾을 수 없습니다' }, { status: 404 })
+      return NextResponse.json({ error: 'Event not found' }, { status: 404 })
     }
 
     if (event.host_id !== user.id) {
-      return NextResponse.json({ error: '권한이 없습니다' }, { status: 403 })
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
     if (!['upcoming', 'active'].includes(event.status)) {
-      return NextResponse.json({ error: '진행 중이지 않은 이벤트는 부스팅할 수 없습니다' }, { status: 409 })
+      return NextResponse.json({ error: 'Cannot boost an event that is not active' }, { status: 409 })
     }
 
     // 이벤트 종료 후 부스팅 금지
     if (new Date(event.ends_at) <= new Date()) {
-      return NextResponse.json({ error: '이미 종료된 이벤트입니다' }, { status: 409 })
+      return NextResponse.json({ error: 'Event has already ended' }, { status: 409 })
     }
 
     // ── 이미 활성 부스트 ──────────────────────────────────────────────────
     if (event.is_featured && event.boost_expires_at && new Date(event.boost_expires_at) > new Date()) {
       return NextResponse.json(
-        { error: '이미 활성 부스트가 있습니다', boost_expires_at: event.boost_expires_at },
+        { error: 'Active boost already exists', boost_expires_at: event.boost_expires_at },
         { status: 409 },
       )
     }
@@ -151,7 +151,7 @@ export async function POST(
       .eq('id', eventId)
 
     if (updateErr) {
-      return NextResponse.json({ error: '부스트 적용 오류: ' + updateErr.message }, { status: 500 })
+      return NextResponse.json({ error: 'Boost apply error: ' + updateErr.message }, { status: 500 })
     }
 
     return NextResponse.json(
@@ -164,6 +164,6 @@ export async function POST(
       { status: 201 },
     )
   } catch {
-    return NextResponse.json({ error: '서버 오류가 발생했습니다' }, { status: 500 })
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

@@ -122,7 +122,7 @@ export async function PATCH(req: NextRequest) {
   if (!user) return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
 
   if (await isSuspended(user.id)) {
-    return NextResponse.json({ error: '계정이 정지되었습니다' }, { status: 403 })
+    return NextResponse.json({ error: 'Account suspended' }, { status: 403 })
   }
 
   const { searchParams } = new URL(req.url)

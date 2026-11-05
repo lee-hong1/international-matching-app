@@ -16,7 +16,7 @@ export async function DELETE(
 
   const user = await getAuthUser(request)
   if (!user) {
-    return NextResponse.json({ error: '인증이 필요합니다' }, { status: 401 })
+    return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
   }
 
   const { commentId } = await params

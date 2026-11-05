@@ -51,7 +51,7 @@ export async function POST(req: NextRequest) {
   }
 
   const user = await getAuthUser(req)
-  if (!user) return NextResponse.json({ error: '인증이 필요합니다' }, { status: 401 })
+  if (!user) return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
   if (await isSuspended(user.id)) {
     return NextResponse.json({ error: 'Account suspended' }, { status: 403 })
   }
@@ -64,19 +64,19 @@ export async function POST(req: NextRequest) {
 
     if (!event_type || !title || !external_url || !ends_at) {
       return NextResponse.json(
-        { error: '필수 항목 누락: event_type, title, external_url, ends_at' },
+        { error: 'Required fields missing: event_type, title, external_url, ends_at' },
         { status: 400 }
       )
     }
 
     const validTypes = ['groupbuy', 'flash_sale', 'limited', 'presale', 'collaboration']
     if (!validTypes.includes(event_type)) {
-      return NextResponse.json({ error: `event_type은 다음 중 하나: ${validTypes.join(', ')}` }, { status: 400 })
+      return NextResponse.json({ error: `event_type must be one of: ${validTypes.join(', ')}` }, { status: 400 })
     }
 
     if (!isAllowedUrl(external_url)) {
       return NextResponse.json(
-        { error: '허용되지 않은 외부 URL입니다' },
+        { error: 'External URL not allowed' },
         { status: 400 }
       )
     }
@@ -84,17 +84,17 @@ export async function POST(req: NextRequest) {
     // 금지 콘텐츠 필터 (도박/성인/불법)
     const contentToCheck = `${title} ${description ?? ''}`
     if (hasForbiddenContent(contentToCheck)) {
-      return NextResponse.json({ error: '허용되지 않는 콘텐츠가 포함되어 있습니다' }, { status: 400 })
+      return NextResponse.json({ error: 'Content violates platform rules' }, { status: 400 })
     }
 
     if (new Date(ends_at) <= new Date()) {
-      return NextResponse.json({ error: '종료일은 미래여야 합니다' }, { status: 400 })
+      return NextResponse.json({ error: 'ends_at must be a future date' }, { status: 400 })
     }
 
     const startsAt = starts_at ?? new Date().toISOString()
 
     if (new Date(ends_at) <= new Date(startsAt)) {
-      return NextResponse.json({ error: '종료일은 시작일보다 이후여야 합니다' }, { status: 400 })
+      return NextResponse.json({ error: 'ends_at must be after starts_at' }, { status: 400 })
     }
 
     const status = new Date(startsAt) <= new Date() ? 'active' : 'upcoming'
@@ -125,6 +125,6 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ event }, { status: 201 })
   } catch {
-    return NextResponse.json({ error: '서버 오류가 발생했습니다' }, { status: 500 })
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

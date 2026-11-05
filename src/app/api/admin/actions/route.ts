@@ -76,6 +76,6 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({ actions: data ?? [], count: (data ?? []).length })
   } catch {
-    return NextResponse.json({ error: '서버 오류가 발생했습니다' }, { status: 500 })
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

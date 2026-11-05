@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
 
   const user = await getAuthUser(req)
   if (!user) {
-    return NextResponse.json({ error: '인증이 필요합니다' }, { status: 401 })
+    return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
   }
 
   try {
@@ -86,12 +86,12 @@ export async function POST(req: NextRequest) {
 export async function GET(req: NextRequest) {
   const user = await getAuthUser(req)
   if (!user) {
-    return NextResponse.json({ error: '인증이 필요합니다' }, { status: 401 })
+    return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
   }
 
   const admin = await isAdmin(user.id)
   if (!admin) {
-    return NextResponse.json({ error: '관리자 권한이 필요합니다' }, { status: 403 })
+    return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
   }
 
   try {

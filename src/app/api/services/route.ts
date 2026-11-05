@@ -104,7 +104,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Content contains prohibited keywords' }, { status: 400 })
   }
   if (detectExternalPlatform(titleStr) || detectExternalPlatform(descStr)) {
-    return NextResponse.json({ error: '외부 플랫폼 유도는 허용되지 않습니다 / External platform referral not allowed' }, { status: 400 })
+    return NextResponse.json({ error: 'External platform referral not allowed' }, { status: 400 })
   }
 
   // ── host 프로필 확인 (is_adult) ───────────────────────────────────────────
@@ -127,6 +127,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Maximum 50 active services per host' }, { status: 400 })
   }
 
+  // ── 약관 동의 확인 (결혼중개업법 §13 계약서 교부 의무) ─────────────────────
+  const termsAgreed = body.terms_agreed === true
+  if (!termsAgreed) {
+    return NextResponse.json({ error: 'Host terms agreement required (terms_agreed: true)' }, { status: 400 })
+  }
+
   // ── INSERT ────────────────────────────────────────────────────────────────
   const { data: service, error } = await supabaseService
     .from('services')
@@ -146,6 +152,13 @@ export async function POST(req: NextRequest) {
   if (error) {
     return NextResponse.json({ error: 'Failed to create service' }, { status: 500 })
   }
+
+  // ── 약관 동의 타임스탬프 기록 (최초 동의 시에만 업데이트) ─────────────────
+  void supabaseService
+    .from('profiles')
+    .update({ host_terms_agreed_at: new Date().toISOString() })
+    .eq('id', user.id)
+    .is('host_terms_agreed_at', null)
 
   return NextResponse.json({ data: service }, { status: 201 })
 }

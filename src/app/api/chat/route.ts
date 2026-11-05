@@ -65,7 +65,7 @@ export async function POST(req: NextRequest) {
   }
   if (profile?.is_suspended) {
     return NextResponse.json(
-      { error: '계정이 정지되었습니다 / Account suspended' },
+      { error: 'Account suspended' },
       { status: 403 }
     )
   }
@@ -119,7 +119,7 @@ export async function POST(req: NextRequest) {
 
       return NextResponse.json(
         {
-          error: '외부 플랫폼 유도 3회 적발. 계정이 정지되었습니다 / Account suspended after 3 violations',
+          error: 'Account suspended after 3 violations',
           suspended: true,
         },
         { status: 403 }
@@ -128,7 +128,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(
       {
-        error: '외부 플랫폼 유도 메시지는 허용되지 않습니다 / External platform links are not allowed',
+        error: 'External platform links are not allowed',
         warning: true,
         violation_count: currentCount,
         remaining_warnings: 3 - currentCount,

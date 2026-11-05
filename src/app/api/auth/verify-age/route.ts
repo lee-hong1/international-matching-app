@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
 
   const user = await getAuthUser(req)
   if (!user) {
-    return NextResponse.json({ error: '인증이 필요합니다 / Authentication required' }, { status: 401 })
+    return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
   }
 
   let birth_date: string
@@ -39,16 +39,16 @@ export async function POST(req: NextRequest) {
     const body = await req.json()
     birth_date = body.birth_date
   } catch {
-    return NextResponse.json({ error: 'JSON 파싱 오류' }, { status: 400 })
+    return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 })
   }
 
   if (!birth_date || !/^\d{4}-\d{2}-\d{2}$/.test(birth_date)) {
-    return NextResponse.json({ error: 'birth_date 형식: YYYY-MM-DD' }, { status: 400 })
+    return NextResponse.json({ error: 'birth_date format: YYYY-MM-DD' }, { status: 400 })
   }
 
   // 미래 날짜 차단
   if (new Date(birth_date) >= new Date()) {
-    return NextResponse.json({ error: '유효하지 않은 생년월일입니다' }, { status: 400 })
+    return NextResponse.json({ error: 'Invalid birth date' }, { status: 400 })
   }
 
   if (!isAdult(birth_date)) {
@@ -58,7 +58,7 @@ export async function POST(req: NextRequest) {
       .insert({ result: 'blocked', user_id: user.id })
 
     return NextResponse.json(
-      { error: '만 19세 미만은 서비스를 이용할 수 없습니다 / Users under 19 are not permitted' },
+      { error: 'Users under 19 are not permitted' },
       { status: 403 }
     )
   }
@@ -70,7 +70,7 @@ export async function POST(req: NextRequest) {
     .eq('id', user.id)
 
   if (updateErr) {
-    return NextResponse.json({ error: '연령 인증 처리 오류' }, { status: 500 })
+    return NextResponse.json({ error: 'Age verification failed' }, { status: 500 })
   }
 
   // 통과 로그 (생년월일 비저장)

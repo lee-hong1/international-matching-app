@@ -24,7 +24,7 @@ export async function POST(
 
   const user = await getAuthUser(request)
   if (!user) {
-    return NextResponse.json({ error: '인증이 필요합니다' }, { status: 401 })
+    return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
   }
 
   const { id: eventId } = await params
@@ -36,7 +36,7 @@ export async function POST(
   const { data: requesterProfile } = await supabaseService
     .from('profiles').select('is_adult').eq('id', user.id).single()
   if (!requesterProfile?.is_adult) {
-    return NextResponse.json({ error: 'Age verification required / 성인 인증이 필요합니다', redirect: '/verify-age' }, { status: 403 })
+    return NextResponse.json({ error: 'Age verification required', redirect: '/verify-age' }, { status: 403 })
   }
 
   const { data: event, error: eventError } = await supabaseService
@@ -46,19 +46,19 @@ export async function POST(
     .single()
 
   if (eventError || !event) {
-    return NextResponse.json({ error: '이벤트를 찾을 수 없습니다' }, { status: 404 })
+    return NextResponse.json({ error: 'Event not found' }, { status: 404 })
   }
 
   if (event.status !== 'open') {
-    return NextResponse.json({ error: '신청할 수 없는 이벤트입니다' }, { status: 400 })
+    return NextResponse.json({ error: 'Event is not accepting applications' }, { status: 400 })
   }
 
   if (event.participants_count >= event.max_participants) {
-    return NextResponse.json({ error: '모집 인원이 마감되었습니다' }, { status: 400 })
+    return NextResponse.json({ error: 'Event is fully booked' }, { status: 400 })
   }
 
   if (event.host_id === user.id) {
-    return NextResponse.json({ error: '본인이 만든 이벤트에는 신청할 수 없습니다' }, { status: 400 })
+    return NextResponse.json({ error: 'Cannot apply to your own event' }, { status: 400 })
   }
 
   // 이미 신청했는지 확인
@@ -70,7 +70,7 @@ export async function POST(
     .maybeSingle()
 
   if (existing) {
-    return NextResponse.json({ error: '이미 신청한 이벤트입니다', participant: existing }, { status: 409 })
+    return NextResponse.json({ error: 'Already applied to this event', participant: existing }, { status: 409 })
   }
 
   // 무료 이벤트: 결제 없이 바로 신청 등록 (승인 대기)
@@ -104,7 +104,7 @@ export async function POST(
     .single()
 
   if (paymentError || !payment) {
-    return NextResponse.json({ error: paymentError?.message ?? '결제 생성에 실패했습니다' }, { status: 500 })
+    return NextResponse.json({ error: paymentError?.message ?? 'Failed to create payment' }, { status: 500 })
   }
 
   const { data: participant, error: participantError } = await supabaseService

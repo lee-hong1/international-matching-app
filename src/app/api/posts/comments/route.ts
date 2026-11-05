@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
 
   const user = await getAuthUser(request)
   if (!user) {
-    return NextResponse.json({ error: '인증이 필요합니다' }, { status: 401 })
+    return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
   }
 
   const body = await request.json().catch(() => null)

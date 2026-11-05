@@ -25,8 +25,8 @@ const CONTENT = {
         body: '온라인 서비스(영상통화 등)는 플랫폼 내 채널을 통해서만 제공되어야 합니다. 외부 플랫폼(Zoom, KakaoTalk 등)으로의 유도는 계정 정지 사유입니다. 녹화는 양측의 명시적 동의 후에만 허용됩니다.',
       },
       {
-        heading: '제5조 (결제 및 환불)',
-        body: '결제는 등록된 결제 수단을 통해 처리됩니다. 서비스 이용 전 취소 시 전액 환불, 서비스 시작 후 취소 시 호스트와의 환불 정책에 따릅니다. 플랫폼은 에스크로 방식으로 결제금을 보호합니다.',
+        heading: '제5조 (결제, 청약철회 및 환불)',
+        body: '결제는 등록된 결제 수단을 통해 처리됩니다. 전자상거래법 제17조에 따라 디지털 콘텐츠·예약 서비스 이용 전 7일 이내 청약철회(취소)가 가능하며 전액 환불합니다. 서비스 시작 후 취소 시 호스트 환불 정책에 따릅니다. 플랫폼은 에스크로 방식으로 결제금을 보호합니다.',
       },
       {
         heading: '제6조 (금지 행위)',
@@ -63,8 +63,8 @@ const CONTENT = {
         body: 'Online services (video calls, etc.) must be provided only through the platform\'s built-in channels. Directing users to external platforms (Zoom, KakaoTalk, etc.) is grounds for account suspension. Recording is only permitted with explicit consent from both parties.',
       },
       {
-        heading: 'Article 5 (Payment and Refunds)',
-        body: 'Payments are processed through registered payment methods. Full refund applies before service starts; after service commencement, the host\'s refund policy applies. The platform protects payments via escrow.',
+        heading: 'Article 5 (Payment, Withdrawal and Refunds)',
+        body: 'Payments are processed through registered payment methods. Under the Korean E-Commerce Act §17 (전자상거래법), users may withdraw (cancel) within 7 days before service commencement for a full refund. After service starts, the host\'s refund policy applies. The platform protects payments via escrow.',
       },
       {
         heading: 'Article 6 (Prohibited Conduct)',
@@ -88,7 +88,7 @@ const CONTENT = {
       { heading: '第2条（利用資格）', body: 'サービスは19歳以上の成人のみご利用いただけます。登録時に年齢確認が必要です。虚偽情報の提供はアカウントの即時停止につながります。' },
       { heading: '第3条（プラットフォームの役割）', body: 'GlobalMatchは通信販売仲介業者として、ホスト（サービス提供者）と利用者間の契約締結を仲介します。分争仲裁及び返金保証の責任を負います。' },
       { heading: '第4条（サービス利用）', body: 'オンラインサービスはプラットフォーム内チャンネルのみで提供されます。外部プラットフォームへの誘導はアカウント停止事由です。録画は両者の明示的同意後のみ許可されます。' },
-      { heading: '第5条（支払いと返金）', body: 'サービス開始前のキャンセルは全額返金。開始後はホストの返金ポリシーに従います。プラットフォームはエスクロー方式で支払いを保護します。' },
+      { heading: '第5条（支払い・クーリングオフ・返金）', body: '電子商取引法§17に基づき、サービス開始前7日以内はキャンセル（クーリングオフ）が可能で全額返金します。開始後はホストの返金ポリシーに従います。プラットフォームはエスクロー方式で支払いを保護します。' },
       { heading: '第6条（禁止行為）', body: '未成年者のアクセス試み、売春・違法行為への誘導、個人情報の無断収集、虚偽情報の提供、プラットフォーム外取引への誘導は厳禁です。' },
       { heading: '第7条（個人情報）', body: 'GDPRを含む適用法に基づき個人情報を処理します。いつでも個人情報削除を要求できます（GDPR第17条）。お問い合わせ: support@globalmatch.app' },
       { heading: '第8条（紛争解決）', body: 'プラットフォームは7営業日以内に紛争に対応します。' },
@@ -102,7 +102,7 @@ const CONTENT = {
       { heading: '第二条（使用资格）', body: '服务仅限19周岁及以上成年人使用。注册时需进行年龄验证。提供虚假信息将导致账户立即暂停。' },
       { heading: '第三条（平台角色）', body: 'GlobalMatch作为网络交易中介，促进主机（服务提供者）与用户之间的合同签订。平台对纠纷调解和退款保障负责。' },
       { heading: '第四条（服务使用）', body: '在线服务必须仅通过平台内置频道提供。引导用户至外部平台是账户暂停的理由。仅在双方明确同意后方可录制。' },
-      { heading: '第五条（付款和退款）', body: '服务开始前取消全额退款；开始后按主机退款政策处理。平台以托管方式保护付款。' },
+      { heading: '第五条（付款、撤回权与退款）', body: '依据韩国电子商务法§17，服务开始前7日内可撤回订单并全额退款。服务开始后按主机退款政策处理。平台以托管方式保护付款。' },
       { heading: '第六条（禁止行为）', body: '严禁：未成年人访问尝试、卖淫或非法活动引导、未授权收集个人信息、提供虚假信息、平台外交易引导。' },
       { heading: '第七条（隐私）', body: '根据包括GDPR在内的适用法律处理个人数据。用户可随时请求删除个人数据（GDPR第17条）。联系: support@globalmatch.app' },
       { heading: '第八条（纠纷解决）', body: '平台将在7个工作日内回应纠纷。' },

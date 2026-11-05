@@ -81,7 +81,7 @@ export async function POST(req: NextRequest) {
   }
 
   if (await isSuspended(user.id)) {
-    return NextResponse.json({ error: '계정이 정지되었습니다 / Account suspended' }, { status: 403 })
+    return NextResponse.json({ error: 'Account suspended' }, { status: 403 })
   }
 
   let body: { booking_id?: string; rating?: number; comment?: string }
@@ -103,7 +103,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'comment too long (max 1000)' }, { status: 400 })
   }
   if (comment && detectExternalPlatform(comment)) {
-    return NextResponse.json({ error: '외부 플랫폼 유도는 허용되지 않습니다 / External platform referral not allowed' }, { status: 400 })
+    return NextResponse.json({ error: 'External platform referral not allowed' }, { status: 400 })
   }
 
   // 예약 조회 — reviewer가 user인지 host인지 확인

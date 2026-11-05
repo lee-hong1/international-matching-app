@@ -228,7 +228,7 @@ export async function POST(req: NextRequest) {
     .single()
   if (!requesterProfile?.is_adult) {
     return NextResponse.json(
-      { error: 'Age verification required / 성인 인증이 필요합니다', redirect: '/verify-age' },
+      { error: 'Age verification required', redirect: '/verify-age' },
       { status: 403 }
     )
   }

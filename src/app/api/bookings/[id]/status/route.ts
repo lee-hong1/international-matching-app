@@ -90,7 +90,7 @@ const USER_TRANSITIONS: Record<BookingStatus, BookingStatus[]> = {
  */
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   // ── Rate limit ─────────────────────────────────────────────────────────────
   const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
@@ -104,7 +104,7 @@ export async function PATCH(
   }
 
   // ── UUID 검증 ──────────────────────────────────────────────────────────────
-  const { id } = params
+  const { id } = await params
   if (!isValidUuid(id)) {
     return NextResponse.json({ error: 'Invalid booking id' }, { status: 400 })
   }

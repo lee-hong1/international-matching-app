@@ -17,7 +17,7 @@ export async function GET(req: NextRequest) {
   const limit = Math.min(parseInt(searchParams.get('limit') ?? '20'), 50)
 
   if (!hostId) {
-    return NextResponse.json({ error: 'host_id가 필요합니다' }, { status: 400 })
+    return NextResponse.json({ error: 'host_id is required' }, { status: 400 })
   }
 
   const { data, error } = await supabaseService
@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
   }
 
   const user = await getAuthUser(req)
-  if (!user) return NextResponse.json({ error: '인증이 필요합니다' }, { status: 401 })
+  if (!user) return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
   if (await isSuspended(user.id)) {
     return NextResponse.json({ error: 'Account suspended' }, { status: 403 })
   }
@@ -53,12 +53,12 @@ export async function POST(req: NextRequest) {
     const { title, description, external_url, external_platform, images, original_price, sale_price, expires_at } = await req.json()
 
     if (!title || !external_url) {
-      return NextResponse.json({ error: '필수 항목 누락: title, external_url' }, { status: 400 })
+      return NextResponse.json({ error: 'Required fields missing: title, external_url' }, { status: 400 })
     }
 
     if (!isAllowedUrl(external_url)) {
       return NextResponse.json(
-        { error: `허용되지 않은 외부 URL입니다. 지원 플랫폼: ${ALLOWED_DOMAINS.slice(0, 5).join(', ')} 등` },
+        { error: `External URL not allowed. Supported platforms: ${ALLOWED_DOMAINS.slice(0, 5).join(', ')} ` },
         { status: 400 }
       )
     }
@@ -66,7 +66,7 @@ export async function POST(req: NextRequest) {
     // 금지 콘텐츠 필터 (도박/성인/불법)
     const contentToCheck = `${title} ${description ?? ''}`
     if (hasForbiddenContent(contentToCheck)) {
-      return NextResponse.json({ error: '허용되지 않는 콘텐츠가 포함되어 있습니다' }, { status: 400 })
+      return NextResponse.json({ error: 'Content violates platform rules' }, { status: 400 })
     }
 
     // 호스트 1인 활성 링크 최대 20개 제한
@@ -77,7 +77,7 @@ export async function POST(req: NextRequest) {
       .eq('status', 'active')
 
     if ((count ?? 0) >= 20) {
-      return NextResponse.json({ error: '활성 링크는 최대 20개까지 등록 가능합니다' }, { status: 409 })
+      return NextResponse.json({ error: 'Maximum 20 active links allowed' }, { status: 409 })
     }
 
     const { data: link, error: insertErr } = await supabaseService
@@ -103,6 +103,6 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ link }, { status: 201 })
   } catch {
-    return NextResponse.json({ error: '서버 오류가 발생했습니다' }, { status: 500 })
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

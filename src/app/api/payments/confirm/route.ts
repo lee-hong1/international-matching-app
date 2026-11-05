@@ -23,13 +23,13 @@ export async function POST(request: NextRequest) {
 
   const user = await getAuthUser(request)
   if (!user) {
-    return NextResponse.json({ error: '인증이 필요합니다' }, { status: 401 })
+    return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
   }
 
   try {
     const { paymentKey, orderId, amount } = await request.json()
     if (!paymentKey || !orderId || amount === undefined) {
-      return NextResponse.json({ error: '필수 파라미터가 누락되었습니다' }, { status: 400 })
+      return NextResponse.json({ error: 'Required parameters missing' }, { status: 400 })
     }
 
     // 본인 결제 레코드 조회 (user_id 필터로 IDOR 차단)
@@ -41,11 +41,11 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (findError || !paymentRecord) {
-      return NextResponse.json({ error: '결제 정보를 찾을 수 없습니다' }, { status: 404 })
+      return NextResponse.json({ error: 'Payment not found' }, { status: 404 })
     }
 
     if (paymentRecord.amount !== amount) {
-      return NextResponse.json({ error: '결제 금액이 일치하지 않습니다' }, { status: 400 })
+      return NextResponse.json({ error: 'Payment amount mismatch' }, { status: 400 })
     }
 
     if (paymentRecord.payment_status === 'completed') {
@@ -68,7 +68,7 @@ export async function POST(request: NextRequest) {
     const tossData = await tossRes.json()
     if (!tossRes.ok) {
       await supabaseService.from('payments').update({ payment_status: 'failed' }).eq('id', paymentRecord.id)
-      return NextResponse.json({ error: tossData.message ?? '결제 승인에 실패했습니다' }, { status: 400 })
+      return NextResponse.json({ error: tossData.message ?? 'Payment confirmation failed' }, { status: 400 })
     }
 
     // 수수료 분배 계산
@@ -111,6 +111,6 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true, breakdown })
   } catch (err) {
-    return NextResponse.json({ error: '서버 오류가 발생했습니다' }, { status: 500 })
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

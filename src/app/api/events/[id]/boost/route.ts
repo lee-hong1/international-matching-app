@@ -27,7 +27,7 @@ export async function POST(
   }
 
   const user = await getAuthUser(request)
-  if (!user) return NextResponse.json({ error: '인증이 필요합니다' }, { status: 401 })
+  if (!user) return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
 
   const { id: eventId } = await params
   if (!isValidUuid(eventId)) {
@@ -41,11 +41,11 @@ export async function POST(
     .single()
 
   if (eventError || !event) {
-    return NextResponse.json({ error: '모임을 찾을 수 없습니다' }, { status: 404 })
+    return NextResponse.json({ error: 'Event not found' }, { status: 404 })
   }
 
   if (event.host_id !== user.id) {
-    return NextResponse.json({ error: '호스트만 부스트를 신청할 수 있습니다' }, { status: 403 })
+    return NextResponse.json({ error: 'Only the host can boost this event' }, { status: 403 })
   }
 
   const tossOrderId = `boost-${eventId}-${Date.now()}`
@@ -59,7 +59,7 @@ export async function POST(
   })
 
   if (insertError) {
-    return NextResponse.json({ error: '부스트 생성에 실패했습니다' }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to create boost' }, { status: 500 })
   }
 
   return NextResponse.json({
@@ -75,7 +75,7 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> },
 ) {
   const user = await getAuthUser(request)
-  if (!user) return NextResponse.json({ error: '인증이 필요합니다' }, { status: 401 })
+  if (!user) return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
 
   const { id: eventId } = await params
   if (!isValidUuid(eventId)) {
@@ -85,7 +85,7 @@ export async function PATCH(
   const { paymentKey, orderId, amount } = await request.json()
 
   if (!paymentKey || !orderId || amount === undefined) {
-    return NextResponse.json({ error: '필수 파라미터가 누락되었습니다' }, { status: 400 })
+    return NextResponse.json({ error: 'Required parameters missing' }, { status: 400 })
   }
 
   const { data: boost, error: boostError } = await supabaseService
@@ -96,11 +96,11 @@ export async function PATCH(
     .single()
 
   if (boostError || !boost) {
-    return NextResponse.json({ error: '부스트 정보를 찾을 수 없습니다' }, { status: 404 })
+    return NextResponse.json({ error: 'Boost not found' }, { status: 404 })
   }
 
   if (boost.amount !== amount) {
-    return NextResponse.json({ error: '결제 금액이 일치하지 않습니다' }, { status: 400 })
+    return NextResponse.json({ error: 'Payment amount mismatch' }, { status: 400 })
   }
 
   // Confirm with Toss Payments
@@ -115,7 +115,7 @@ export async function PATCH(
 
   if (!tossRes.ok) {
     const tossData = await tossRes.json()
-    return NextResponse.json({ error: tossData.message ?? '결제 승인에 실패했습니다' }, { status: 400 })
+    return NextResponse.json({ error: tossData.message ?? 'Payment confirmation failed' }, { status: 400 })
   }
 
   const expiresAt = new Date(Date.now() + BOOST_HOURS * 60 * 60 * 1000).toISOString()

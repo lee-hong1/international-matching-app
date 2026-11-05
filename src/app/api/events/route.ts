@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
 
   const user = await getAuthUser(request)
   if (!user) {
-    return NextResponse.json({ error: '인증이 필요합니다' }, { status: 401 })
+    return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
   }
 
   const { searchParams } = new URL(request.url)
@@ -40,7 +40,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ events: data ?? [] })
   } catch {
-    return NextResponse.json({ error: '서버 오류가 발생했습니다' }, { status: 500 })
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
 
@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
 
   const user = await getAuthUser(request)
   if (!user) {
-    return NextResponse.json({ error: '인증이 필요합니다' }, { status: 401 })
+    return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
   }
 
   try {
@@ -65,13 +65,13 @@ export async function POST(request: NextRequest) {
     } = body
 
     if (!eventType || !title || !venueType || !eventDatetime || !maxParticipants) {
-      return NextResponse.json({ error: '필수 항목이 누락되었습니다' }, { status: 400 })
+      return NextResponse.json({ error: 'Required fields missing' }, { status: 400 })
     }
     if (venueType === 'partner' && !venueId) {
-      return NextResponse.json({ error: '제휴 매장을 선택해주세요' }, { status: 400 })
+      return NextResponse.json({ error: 'Please select a partner venue' }, { status: 400 })
     }
     if (venueType === 'custom' && !customLocation) {
-      return NextResponse.json({ error: '장소를 입력해주세요' }, { status: 400 })
+      return NextResponse.json({ error: 'Please enter a location' }, { status: 400 })
     }
 
     // 프리미엄 회원 검증
@@ -82,7 +82,7 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (!profile?.is_premium) {
-      return NextResponse.json({ error: '유료 회원만 이벤트를 만들 수 있습니다' }, { status: 403 })
+      return NextResponse.json({ error: 'Only premium members can create events' }, { status: 403 })
     }
 
     const { data: event, error } = await supabaseService
@@ -103,7 +103,7 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (error || !event) {
-      return NextResponse.json({ error: error?.message ?? '이벤트 생성에 실패했습니다' }, { status: 500 })
+      return NextResponse.json({ error: error?.message ?? 'Failed to create event' }, { status: 500 })
     }
 
     // 팔로워에게 알림 발송
@@ -120,6 +120,6 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ event }, { status: 201 })
   } catch {
-    return NextResponse.json({ error: '서버 오류가 발생했습니다' }, { status: 500 })
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

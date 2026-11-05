@@ -138,3 +138,8 @@ CREATE TRIGGER prevent_self_suspension_change_trigger
 CREATE INDEX IF NOT EXISTS idx_profiles_trust     ON profiles(trust_score DESC) WHERE trust_score > 0;
 CREATE INDEX IF NOT EXISTS idx_profiles_lang      ON profiles(preferred_lang);
 CREATE INDEX IF NOT EXISTS idx_profiles_suspended ON profiles(is_suspended) WHERE is_suspended = true;
+
+-- ⑨ 운영: 호스트 약관 동의 타임스탬프 (결혼중개업법 §13 계약서 교부 의무)
+-- 첫 서비스 등록 시 자동 기록. NULL = 아직 약관 미동의.
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS host_terms_agreed_at TIMESTAMPTZ DEFAULT NULL;
+CREATE INDEX IF NOT EXISTS idx_profiles_host_terms ON profiles(host_terms_agreed_at) WHERE host_terms_agreed_at IS NOT NULL;
