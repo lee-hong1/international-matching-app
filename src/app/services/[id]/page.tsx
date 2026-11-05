@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import ReviewCard from '@src/components/ReviewCard'
 import TrustBadge from '@src/components/TrustBadge'
+import { CURRENCY_SYMBOL } from '@src/lib/currency'
 import { detectLangFromHeader, t } from '@src/lib/i18n'
 
 interface Service {
@@ -34,10 +35,6 @@ interface Review {
   is_public: boolean
   created_at: string
   reviewer?: { display_name?: string | null; country?: string | null } | null
-}
-
-const CURRENCY_SYMBOL: Record<string, string> = {
-  KRW: '₩', JPY: '¥', CNY: '¥', USD: '$', EUR: '€',
 }
 
 async function fetchService(id: string): Promise<Service | null> {

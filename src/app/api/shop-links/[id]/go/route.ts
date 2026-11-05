@@ -7,8 +7,9 @@ import { checkRateLimit } from '@src/lib/ratelimit'
 // GET /api/shop-links/:id/go
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params
   // Rate limit — bot click farming 방지 (graceful: 실패해도 redirect 허용)
   const ip = req.headers.get('x-forwarded-for')?.split(',')[0] ?? 'unknown'
   try {
@@ -20,14 +21,14 @@ export async function GET(
     // Rate limit 서버 장애 시 redirect는 계속 허용
   }
 
-  if (!isValidUuid(params.id)) {
+  if (!isValidUuid(id)) {
     return NextResponse.json({ error: 'Invalid link ID' }, { status: 400 })
   }
 
   const { data: link } = await supabaseService
     .from('host_shop_links')
     .select('id, external_url, status, expires_at')
-    .eq('id', params.id)
+    .eq('id', id)
     .single()
 
   if (!link || link.status !== 'active') {
@@ -35,7 +36,7 @@ export async function GET(
   }
 
   if (link.expires_at && new Date(link.expires_at) < new Date()) {
-    await supabaseService.from('host_shop_links').update({ status: 'expired' }).eq('id', params.id)
+    await supabaseService.from('host_shop_links').update({ status: 'expired' }).eq('id', id)
     return NextResponse.json({ error: 'Link has expired' }, { status: 410 })
   }
 
@@ -53,15 +54,15 @@ export async function GET(
   const { data: recentClick } = await supabaseService
     .from('shop_link_clicks')
     .select('id')
-    .eq('link_id', params.id)
+    .eq('link_id', id)
     .eq('ip_hash', ipHash)
     .gte('created_at', tenMinAgo)
     .single()
 
   if (!recentClick) {
     await Promise.all([
-      supabaseService.from('shop_link_clicks').insert({ link_id: params.id, ip_hash: ipHash }),
-      supabaseService.rpc('increment_link_clicks', { p_link_id: params.id }),
+      supabaseService.from('shop_link_clicks').insert({ link_id: id, ip_hash: ipHash }),
+      supabaseService.rpc('increment_link_clicks', { p_link_id: id }),
     ])
   }
 

@@ -17,6 +17,7 @@ export const LOCALE_FLAG: Record<Locale, string> = {
 export type TranslationKeys = {
   loading: string; error: string; back: string; save: string; cancel: string
   confirm: string; close: string; next: string; free: string
+  error_not_found: string; error_generic: string; error_go_home: string
   nav_home: string; nav_explore: string; nav_events: string; nav_match: string; nav_profile: string
   events_title: string; events_all: string; events_drink: string; events_meal: string; events_party: string
   events_create: string; events_empty: string; events_empty_sub: string; events_full: string
@@ -42,6 +43,7 @@ export type TranslationKeys = {
 const ko: TranslationKeys = {
   loading: '로딩 중...', error: '오류가 발생했습니다', back: '뒤로', save: '저장', cancel: '취소',
   confirm: '확인', close: '닫기', next: '다음', free: '무료',
+  error_not_found: '페이지를 찾을 수 없습니다', error_generic: '요청하신 페이지가 존재하지 않거나 이동되었습니다.', error_go_home: '홈으로 돌아가기',
   nav_home: '홈', nav_explore: '탐색', nav_events: '모임', nav_match: '매칭', nav_profile: '프로필',
   events_title: '오프라인 모임', events_all: '전체', events_drink: '술 친구', events_meal: '밥 친구',
   events_party: '파티원 모집', events_create: '모임 만들기', events_empty: '아직 모집 중인 모임이 없습니다',
@@ -78,6 +80,7 @@ const ko: TranslationKeys = {
 const en: TranslationKeys = {
   loading: 'Loading...', error: 'An error occurred', back: 'Back', save: 'Save', cancel: 'Cancel',
   confirm: 'Confirm', close: 'Close', next: 'Next', free: 'Free',
+  error_not_found: 'Page Not Found', error_generic: 'The page you requested does not exist or has been moved.', error_go_home: 'Go Home',
   nav_home: 'Home', nav_explore: 'Explore', nav_events: 'Events', nav_match: 'Match', nav_profile: 'Profile',
   events_title: 'Offline Events', events_all: 'All', events_drink: 'Drinks', events_meal: 'Meals',
   events_party: 'Party', events_create: 'Create Event', events_empty: 'No events available yet',
@@ -115,6 +118,7 @@ const en: TranslationKeys = {
 const zh: TranslationKeys = {
   loading: '加载中...', error: '发生错误', back: '返回', save: '保存', cancel: '取消',
   confirm: '确认', close: '关闭', next: '下一步', free: '免费',
+  error_not_found: '找不到页面', error_generic: '您请求的页面不存在或已被移动。', error_go_home: '返回首页',
   nav_home: '首页', nav_explore: '探索', nav_events: '活动', nav_match: '匹配', nav_profile: '个人',
   events_title: '线下活动', events_all: '全部', events_drink: '喝酒伙伴', events_meal: '吃饭伙伴',
   events_party: '派对招募', events_create: '创建活动', events_empty: '暂无招募中的活动',
@@ -152,6 +156,7 @@ const zh: TranslationKeys = {
 const ja: TranslationKeys = {
   loading: '読み込み中...', error: 'エラーが発生しました', back: '戻る', save: '保存', cancel: 'キャンセル',
   confirm: '確認', close: '閉じる', next: '次へ', free: '無料',
+  error_not_found: 'ページが見つかりません', error_generic: 'リクエストされたページは存在しないか、移動されました。', error_go_home: 'ホームへ戻る',
   nav_home: 'ホーム', nav_explore: '探索', nav_events: 'イベント', nav_match: 'マッチング', nav_profile: 'プロフィール',
   events_title: 'オフラインイベント', events_all: 'すべて', events_drink: '飲み友達', events_meal: 'ご飯友達',
   events_party: 'パーティー募集', events_create: 'イベント作成', events_empty: '現在募集中のイベントはありません',

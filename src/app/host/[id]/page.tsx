@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import ReviewCard from '@src/components/ReviewCard'
 import TrustBadge from '@src/components/TrustBadge'
+import { CURRENCY_SYMBOL } from '@src/lib/currency'
 import { detectLangFromHeader, t } from '@src/lib/i18n'
 
 interface PublicProfile {
@@ -70,13 +71,6 @@ export async function generateMetadata(
     title: `${name}${country} — GlobalMatch`,
     description: profile.bio ?? `Meet ${name} on GlobalMatch`,
   }
-}
-
-const CURRENCY_SYMBOL: Record<string, string> = {
-  KRW: '₩',
-  JPY: '¥',
-  CNY: '¥',
-  USD: '$',
 }
 
 export default async function HostProfilePage(

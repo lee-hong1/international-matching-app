@@ -8,7 +8,9 @@ export interface AdminStats {
   totalMatches: number
   totalMessages: number
   dailyActiveUsers: number
+  dailySignups: number
   revenue: number
+  avgOrderValue: number
   pendingReports: number
 }
 
@@ -68,6 +70,9 @@ export const adminService = {
   async getDashboardStats(): Promise<AdminStats> {
     try {
       // 병렬로 모든 통계 쿼리 실행
+      const todayStart = new Date()
+      todayStart.setHours(0, 0, 0, 0)
+
       const [
         totalUsersQuery,
         verifiedUsersQuery,
@@ -75,6 +80,7 @@ export const adminService = {
         totalMatchesQuery,
         totalMessagesQuery,
         dailyActiveUsersQuery,
+        dailySignupsQuery,
         revenueQuery,
         pendingReportsQuery
       ] = await Promise.all([
@@ -85,12 +91,16 @@ export const adminService = {
         supabaseService.from('messages').select('id', { count: 'exact', head: true }),
         supabaseService.from('profiles').select('id', { count: 'exact', head: true })
           .gte('last_active', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()),
+        supabaseService.from('profiles').select('id', { count: 'exact', head: true })
+          .gte('created_at', todayStart.toISOString()),
         supabaseService.from('payments').select('amount').eq('payment_status', 'completed'),
         supabaseService.from('reports').select('id', { count: 'exact', head: true }).eq('status', 'pending')
       ])
 
-      // 수익 계산
-      const totalRevenue = revenueQuery.data?.reduce((sum, payment) => sum + payment.amount, 0) || 0
+      // Revenue and AOV calculation
+      const payments = revenueQuery.data ?? []
+      const totalRevenue = payments.reduce((sum, p) => sum + p.amount, 0)
+      const avgOrderValue = payments.length > 0 ? Math.round(totalRevenue / payments.length) : 0
 
       return {
         totalUsers: totalUsersQuery.count || 0,
@@ -99,7 +109,9 @@ export const adminService = {
         totalMatches: totalMatchesQuery.count || 0,
         totalMessages: totalMessagesQuery.count || 0,
         dailyActiveUsers: dailyActiveUsersQuery.count || 0,
+        dailySignups: dailySignupsQuery.count || 0,
         revenue: totalRevenue,
+        avgOrderValue,
         pendingReports: pendingReportsQuery.count || 0
       }
     } catch (error) {

@@ -167,7 +167,7 @@ function EventsContent() {
                     </div>
                     <div className="text-right">
                       <p className="text-sm font-semibold text-gray-900">
-                        {event.fee_per_person > 0 ? `${event.fee_per_person.toLocaleString()}원` : t('events_free')}
+                        {event.fee_per_person > 0 ? `₩${event.fee_per_person.toLocaleString()}` : t('events_free')}
                       </p>
                       <p className="text-xs text-gray-400">
                         {event.participants_count}/{event.max_participants}{t('events_persons')}

@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useEffect, useCallback } from 'react'
+import { CURRENCY_SYMBOL } from '@src/lib/currency'
 import { useAuth } from '@/contexts/AuthContext'
 import { useRouter } from 'next/navigation'
 import { matchingService, UserProfile } from '@/lib/matching'
@@ -19,9 +20,6 @@ interface ServiceItem {
 }
 
 const CATEGORIES = ['conversation', 'lesson', 'tour', 'meal', 'activity', 'other']
-const CURRENCY_SYMBOL: Record<string, string> = {
-  KRW: '₩', JPY: '¥', CNY: '¥', USD: '$', EUR: '€',
-}
 
 export default function DiscoverPage() {
   const { user, loading } = useAuth()

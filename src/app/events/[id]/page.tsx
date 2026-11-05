@@ -234,13 +234,13 @@ function EventDetailContent() {
               <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c.74 0 1.412.196 1.94.518M12 8V6m0 12v-2" />
               </svg>
-              {event.fee_per_person > 0 ? `${event.fee_per_person.toLocaleString()}원` : t('events_free')}
+              {event.fee_per_person > 0 ? `₩${event.fee_per_person.toLocaleString()}` : t('events_free')}
             </div>
           </div>
 
           {event.partner_venues?.discount_price != null && event.venue_type === 'partner' && (
             <p className="mt-3 text-xs text-pink-500 bg-pink-50 rounded-lg px-3 py-2">
-              {t('detail_partner_discount')}: {event.partner_venues.discount_price.toLocaleString()}원
+              {t('detail_partner_discount')}: ₩{event.partner_venues.discount_price.toLocaleString()}
             </p>
           )}
         </div>

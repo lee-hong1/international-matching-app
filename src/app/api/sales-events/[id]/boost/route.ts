@@ -13,8 +13,9 @@ import { isSuspended } from '@src/lib/suspended-check'
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
+  const { id: eventId } = await params
   // ── Rate limit ─────────────────────────────────────────────────────────
   const ip = req.headers.get('x-forwarded-for')?.split(',')[0].trim() ?? 'unknown'
   const rl = await checkRateLimit(ip, 'payment')
@@ -38,7 +39,6 @@ export async function POST(
   }
 
   // ── Path param validation ──────────────────────────────────────────────
-  const eventId = params.id
   if (!isValidUuid(eventId)) {
     return NextResponse.json({ error: 'Invalid event ID' }, { status: 400 })
   }
@@ -110,7 +110,7 @@ export async function POST(
 
     if (existing) {
       return NextResponse.json(
-        { message: '이미 처리된 부스트입니다', boost_ends_at: existing.boost_ends_at },
+        { message: 'Boost already applied', boost_ends_at: existing.boost_ends_at },
         { status: 200 },
       )
     }
@@ -140,7 +140,7 @@ export async function POST(
 
     if (payErr) {
       if (payErr.code === '23505') {
-        return NextResponse.json({ message: '이미 처리된 부스트입니다' }, { status: 200 })
+        return NextResponse.json({ message: 'Boost already applied' }, { status: 200 })
       }
       return NextResponse.json({ error: payErr.message }, { status: 500 })
     }
@@ -156,7 +156,7 @@ export async function POST(
 
     return NextResponse.json(
       {
-        message: '부스트가 적용되었습니다',
+        message: 'Boost applied successfully',
         boost_days,
         boost_ends_at: boostEndsAt,
         amount: expectedAmount,

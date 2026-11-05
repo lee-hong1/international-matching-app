@@ -24,10 +24,10 @@ export default async function NotFound() {
           404
         </div>
         <h2 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '0.75rem', color: '#111827' }}>
-          {t('error.not_found', lang)}
+          {t(lang, 'error_not_found')}
         </h2>
         <p style={{ color: '#6b7280', marginBottom: '1.5rem', lineHeight: 1.6 }}>
-          {t('error.generic', lang)}
+          {t(lang, 'error_generic')}
         </p>
         <a
           href="/"
@@ -42,7 +42,7 @@ export default async function NotFound() {
             fontSize: '0.9rem',
           }}
         >
-          {t('error.go_home', lang)}
+          {t(lang, 'error_go_home')}
         </a>
       </div>
     </div>
