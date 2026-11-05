@@ -60,7 +60,7 @@ export async function POST(req: NextRequest) {
   const { data: saleCreatorProfile } = await supabaseService
     .from('profiles').select('is_adult').eq('id', user.id).single()
   if (!saleCreatorProfile?.is_adult) {
-    return NextResponse.json({ error: 'Age verification required', redirect: '/verify-age' }, { status: 403 })
+    return NextResponse.json({ error: 'Age verification required', redirect: '/onboarding/verify-age' }, { status: 403 })
   }
 
   try {

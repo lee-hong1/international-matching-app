@@ -92,7 +92,7 @@ export async function POST(req: NextRequest) {
   const { data: reviewerProfile } = await supabaseService
     .from('profiles').select('is_adult').eq('id', user.id).single()
   if (!reviewerProfile?.is_adult) {
-    return NextResponse.json({ error: 'Age verification required', redirect: '/verify-age' }, { status: 403 })
+    return NextResponse.json({ error: 'Age verification required', redirect: '/onboarding/verify-age' }, { status: 403 })
   }
 
   let body: { booking_id?: string; rating?: number; comment?: string }

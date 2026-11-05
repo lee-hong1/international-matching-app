@@ -68,7 +68,7 @@ export async function POST(request: NextRequest) {
   const { data: posterProfile } = await supabaseService
     .from('profiles').select('is_adult').eq('id', user.id).single()
   if (!posterProfile?.is_adult) {
-    return NextResponse.json({ error: 'Age verification required', redirect: '/verify-age' }, { status: 403 })
+    return NextResponse.json({ error: 'Age verification required', redirect: '/onboarding/verify-age' }, { status: 403 })
   }
 
   let caption: string | null = null
