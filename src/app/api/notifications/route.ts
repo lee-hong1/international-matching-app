@@ -36,6 +36,10 @@ export async function GET(req: NextRequest) {
   if (cursor) {
     try {
       const { created_at, id } = JSON.parse(Buffer.from(cursor, 'base64').toString())
+      // Injection 방지: cursor 값 형식 검증
+      if (!isValidUuid(String(id)) || !/^\d{4}-\d{2}-\d{2}T[\d:.+Z-]+$/.test(String(created_at))) {
+        return NextResponse.json({ error: 'Invalid cursor' }, { status: 400 })
+      }
       query = query.or(`created_at.lt.${created_at},and(created_at.eq.${created_at},id.lt.${id})`)
     } catch {
       return NextResponse.json({ error: 'Invalid cursor' }, { status: 400 })
