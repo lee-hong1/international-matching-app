@@ -118,6 +118,10 @@ export type TranslationKeys = {
   'availability.save_success': string; 'availability.save_error': string
   // commission namespace
   'commission.earnings_title': string; 'commission.total_completed': string; 'commission.platform_fee': string
+  // notification namespace (email templates)
+  'notification.new_booking.title': string; 'notification.new_booking.body': string
+  'notification.confirmed.title': string; 'notification.confirmed.body': string
+  'notification.cancelled.title': string; 'notification.cancelled.body': string
 }
 
 const ko: TranslationKeys = {
@@ -228,6 +232,9 @@ const ko: TranslationKeys = {
   'availability.toggle_off': '예약 불가로 설정', 'availability.inactive_badge': '비활성', 'availability.delete': '삭제',
   'availability.save_success': '저장되었습니다!', 'availability.save_error': '저장에 실패했습니다.',
   'commission.earnings_title': '수익', 'commission.total_completed': '완료 합계', 'commission.platform_fee': '플랫폼 수수료',
+  'notification.new_booking.title': '새 예약이 도착했습니다', 'notification.new_booking.body': '예약 #{booking_id}이(가) 접수되었습니다.',
+  'notification.confirmed.title': '예약이 확정되었습니다', 'notification.confirmed.body': '예약 #{booking_id}이(가) 확정되었습니다.',
+  'notification.cancelled.title': '예약이 취소되었습니다', 'notification.cancelled.body': '예약 #{booking_id}이(가) 취소되었습니다.',
 }
 
 const en: TranslationKeys = {
@@ -339,6 +346,9 @@ const en: TranslationKeys = {
   'availability.toggle_off': 'Set Unavailable', 'availability.inactive_badge': 'Inactive', 'availability.delete': 'Delete',
   'availability.save_success': 'Saved!', 'availability.save_error': 'Failed to save.',
   'commission.earnings_title': 'Earnings', 'commission.total_completed': 'Total Completed', 'commission.platform_fee': 'Platform Fee',
+  'notification.new_booking.title': 'New Booking Received', 'notification.new_booking.body': 'Booking #{booking_id} has been submitted.',
+  'notification.confirmed.title': 'Booking Confirmed', 'notification.confirmed.body': 'Booking #{booking_id} has been confirmed.',
+  'notification.cancelled.title': 'Booking Cancelled', 'notification.cancelled.body': 'Booking #{booking_id} has been cancelled.',
 }
 
 const zh: TranslationKeys = {
@@ -450,6 +460,9 @@ const zh: TranslationKeys = {
   'availability.toggle_off': '设为不可预约', 'availability.inactive_badge': '已停用', 'availability.delete': '删除',
   'availability.save_success': '已保存！', 'availability.save_error': '保存失败。',
   'commission.earnings_title': '收益', 'commission.total_completed': '完成总计', 'commission.platform_fee': '平台手续费',
+  'notification.new_booking.title': '收到新预约', 'notification.new_booking.body': '预约 #{booking_id} 已提交。',
+  'notification.confirmed.title': '预约已确认', 'notification.confirmed.body': '预约 #{booking_id} 已确认。',
+  'notification.cancelled.title': '预约已取消', 'notification.cancelled.body': '预约 #{booking_id} 已取消。',
 }
 
 const ja: TranslationKeys = {
@@ -562,13 +575,16 @@ const ja: TranslationKeys = {
   'availability.toggle_off': '予約不可に設定', 'availability.inactive_badge': '無効', 'availability.delete': '削除',
   'availability.save_success': '保存しました！', 'availability.save_error': '保存に失敗しました。',
   'commission.earnings_title': '収益', 'commission.total_completed': '完了合計', 'commission.platform_fee': 'プラットフォーム手数料',
+  'notification.new_booking.title': '新しい予約が届きました', 'notification.new_booking.body': '予約 #{booking_id} が受付されました。',
+  'notification.confirmed.title': '予約が確定しました', 'notification.confirmed.body': '予約 #{booking_id} が確定されました。',
+  'notification.cancelled.title': '予約がキャンセルされました', 'notification.cancelled.body': '予約 #{booking_id} がキャンセルされました。',
 }
 
 export const translations: Record<Locale, TranslationKeys> = { ko, en, zh, ja }
 
 const LOCALES: readonly string[] = ['ko', 'en', 'zh', 'ja']
 
-export function t(localeOrKey: string, keyOrLocale: string): string {
+export function t(localeOrKey: string, keyOrLocale: string, vars?: Record<string, string>): string {
   let locale: Locale
   let key: keyof TranslationKeys
   if (LOCALES.includes(localeOrKey)) {
@@ -579,7 +595,11 @@ export function t(localeOrKey: string, keyOrLocale: string): string {
     key = localeOrKey as keyof TranslationKeys
   }
   const dict = translations[locale] ?? translations.ko
-  return (dict[key] ?? translations.ko[key] ?? key) as string
+  let result = (dict[key] ?? translations.ko[key] ?? key) as string
+  if (vars) {
+    result = result.replace(/\{(\w+)\}/g, (_, k) => vars[k] ?? `{${k}}`)
+  }
+  return result
 }
 
 export function detectLangFromHeader(acceptLanguage: string): Locale {
@@ -587,5 +607,16 @@ export function detectLangFromHeader(acceptLanguage: string): Locale {
   if (primary.startsWith('ko')) return 'ko'
   if (primary.startsWith('zh')) return 'zh'
   if (primary.startsWith('ja')) return 'ja'
+  return 'en'
+}
+
+export type Lang = Locale
+
+export function normalizeLang(lang: string | null | undefined): Lang {
+  if (!lang) return 'en'
+  const l = lang.toLowerCase()
+  if (l.startsWith('ko')) return 'ko'
+  if (l.startsWith('zh')) return 'zh'
+  if (l.startsWith('ja')) return 'ja'
   return 'en'
 }
