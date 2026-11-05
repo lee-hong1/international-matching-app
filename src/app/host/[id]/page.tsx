@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import ReviewCard from '@src/components/ReviewCard'
 import TrustBadge from '@src/components/TrustBadge'
-import { CURRENCY_SYMBOL } from '@src/lib/currency'
+import { CURRENCY_SYMBOL } from '@/lib/currency'
 import { detectLangFromHeader, t } from '@src/lib/i18n'
 
 interface PublicProfile {

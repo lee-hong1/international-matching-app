@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect, useCallback } from 'react'
-import { CURRENCY_SYMBOL } from '@src/lib/currency'
+import { CURRENCY_SYMBOL } from '@/lib/currency'
 import { useAuth } from '@/contexts/AuthContext'
 import { useRouter } from 'next/navigation'
 import { matchingService, UserProfile } from '@/lib/matching'
