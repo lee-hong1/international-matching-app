@@ -52,7 +52,7 @@ export default function PremiumPage() {
       await paymentService.redirectToCheckout(session.sessionId)
     } catch (error) {
       console.error('Error creating checkout session:', error)
-      alert('결제 페이지로 이동하는 중 오류가 발생했습니다.')
+      alert('Failed to load checkout. Please try again.')
     } finally {
       setSelectedPlan('')
     }

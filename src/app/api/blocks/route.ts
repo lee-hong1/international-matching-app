@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    const success = await reportingService.blockUser(user.id, blockedUserId, reason || '차단됨')
+    const success = await reportingService.blockUser(user.id, blockedUserId, reason || 'blocked')
 
     if (!success) {
       return NextResponse.json(

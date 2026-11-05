@@ -98,7 +98,7 @@ export async function POST(req: NextRequest) {
                 badge: '/icon-192x192.png',
                 tag: 'globalmatch',
                 requireInteraction: false,
-                actions: [{ action: 'open', title: '열기' }],
+                actions: [{ action: 'open', title: 'Open' }],
               },
               fcmOptions: { link: process.env.NEXT_PUBLIC_APP_URL ?? 'https://globalmatch.app' },
             },

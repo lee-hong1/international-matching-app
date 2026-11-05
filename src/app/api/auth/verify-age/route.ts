@@ -78,5 +78,5 @@ export async function POST(req: NextRequest) {
     .from('age_verification_logs')
     .insert({ result: 'passed', user_id: user.id })
 
-  return NextResponse.json({ verified: true, message: '연령 인증이 완료되었습니다' }, { status: 200 })
+  return NextResponse.json({ verified: true, message: 'Age verification completed' }, { status: 200 })
 }

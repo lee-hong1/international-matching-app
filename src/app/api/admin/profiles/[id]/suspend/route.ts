@@ -9,7 +9,7 @@ import { timingSafeEqual, createHash } from 'crypto'
  */
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   // ── Rate limit — admin key brute-force 방지 ────────────────────────────
   const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
@@ -38,7 +38,7 @@ export async function PATCH(
   }
 
   // ── 대상 사용자 UUID 검증 ─────────────────────────────────────────────
-  const { id } = params
+  const { id } = await params
   if (!id || !isValidUuid(id)) {
     return NextResponse.json({ error: 'Invalid user id' }, { status: 400 })
   }

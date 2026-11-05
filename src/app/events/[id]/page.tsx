@@ -119,7 +119,7 @@ function EventDetailContent() {
 
       // 유료 이벤트: 토스페이먼츠 결제창 호출
       if (!window.TossPayments) {
-        setError('결제 모듈을 불러오지 못했습니다. 잠시 후 다시 시도해주세요.')
+        setError('Payment module failed to load. Please try again.')
         return
       }
 
@@ -128,13 +128,13 @@ function EventDetailContent() {
         amount: data.payment.amount,
         orderId: data.payment.orderId,
         orderName: data.payment.orderName,
-        customerName: user?.user_metadata?.full_name ?? user?.email ?? '회원',
+        customerName: user?.user_metadata?.full_name ?? user?.email ?? 'Member',
         successUrl: `${window.location.origin}/payments/success?eventId=${eventId}`,
         failUrl: `${window.location.origin}/payments/fail?eventId=${eventId}`,
       })
     } catch (err: any) {
       if (err?.code !== 'USER_CANCEL') {
-        setError('결제 진행 중 오류가 발생했습니다')
+        setError('Payment failed. Please try again.')
       }
     } finally {
       setApplying(false)
