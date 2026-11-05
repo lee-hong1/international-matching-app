@@ -38,7 +38,7 @@ function PaymentSuccessContent() {
 
       if (!res.ok) {
         setStatus('error')
-        setErrorMessage(data.error ?? '결제 승인에 실패했습니다')
+        setErrorMessage(data.error ?? 'Payment approval failed')
         return
       }
 
@@ -51,7 +51,7 @@ function PaymentSuccessContent() {
       {status === 'confirming' && (
         <>
           <div className="w-8 h-8 border-2 border-pink-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-sm text-gray-500">결제를 확인하고 있습니다...</p>
+          <p className="text-sm text-gray-500">Confirming payment...</p>
         </>
       )}
       {status === 'success' && (
@@ -61,13 +61,13 @@ function PaymentSuccessContent() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
             </svg>
           </div>
-          <h3 className="font-semibold text-gray-900 mb-2">결제가 완료되었습니다</h3>
-          <p className="text-sm text-gray-500 mb-4">참가 신청이 승인되었습니다.</p>
+          <h3 className="font-semibold text-gray-900 mb-2">Payment complete</h3>
+          <p className="text-sm text-gray-500 mb-4">Your application has been approved.</p>
           <button
             onClick={() => router.push(eventId ? `/events/${eventId}` : '/events')}
             className="inline-block px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-600 text-white text-sm font-semibold rounded-xl"
           >
-            모임으로 돌아가기
+            Back to event
           </button>
         </>
       )}
@@ -78,10 +78,10 @@ function PaymentSuccessContent() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </div>
-          <h3 className="font-semibold text-gray-900 mb-2">결제 승인에 실패했습니다</h3>
+          <h3 className="font-semibold text-gray-900 mb-2">Payment failed</h3>
           <p className="text-sm text-gray-500 mb-4">{errorMessage}</p>
           <Link href={eventId ? `/events/${eventId}` : '/events'} className="inline-block px-4 py-2 bg-gray-100 text-gray-700 text-sm font-semibold rounded-xl">
-            모임으로 돌아가기
+            Back to event
           </Link>
         </>
       )}

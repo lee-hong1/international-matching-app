@@ -96,7 +96,7 @@ export default function PostDetailPage() {
   }
 
   const profile = post.profiles
-  const displayName = profile?.creator_profiles?.display_name ?? profile?.full_name ?? '사용자'
+  const displayName = profile?.creator_profiles?.display_name ?? profile?.full_name ?? 'User'
   const media = post.post_media ?? []
 
   return (
@@ -244,7 +244,7 @@ export default function PostDetailPage() {
                     <div className="flex-1">
                       <div className="bg-gray-50 rounded-2xl px-3 py-2">
                         <Link href={`/creator/${c.user_id}`} className="font-semibold text-gray-900 text-sm hover:underline">
-                          {c.profiles?.full_name ?? '사용자'}
+                          {c.profiles?.full_name ?? 'User'}
                         </Link>
                         <p className="text-sm text-gray-700 mt-0.5">{c.content}</p>
                       </div>

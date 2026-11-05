@@ -256,7 +256,7 @@ export default function ExplorePage() {
               filteredCreators
                 .filter((c) => c.id !== user?.id)
                 .map((creator) => {
-                  const name = creator.creator_profiles?.display_name ?? creator.full_name ?? '사용자'
+                  const name = creator.creator_profiles?.display_name ?? creator.full_name ?? 'User'
                   const category = CATEGORIES.find((c) => c.key === creator.creator_profiles?.category)?.label
                   return (
                     <div key={creator.id} className="bg-white rounded-2xl p-4 flex items-center gap-4 shadow-sm border border-gray-50">

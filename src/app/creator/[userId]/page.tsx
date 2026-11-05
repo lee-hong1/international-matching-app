@@ -116,7 +116,7 @@ export default function CreatorProfilePage() {
     )
   }
 
-  const displayName = profile.creator_profiles?.display_name ?? profile.full_name ?? '사용자'
+  const displayName = profile.creator_profiles?.display_name ?? profile.full_name ?? 'User'
   const category = profile.creator_profiles?.category
   const postsCount = profile.creator_profiles?.posts_count ?? posts.length
 
