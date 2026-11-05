@@ -127,7 +127,7 @@ export async function PATCH(
   // ── 예약 조회 ─────────────────────────────────────────────────────────────
   const { data: booking, error: fetchErr } = await supabaseService
     .from('bookings')
-    .select('id, user_id, host_id, status')
+    .select('id, guest_id, host_id, status')
     .eq('id', id)
     .single()
 
@@ -137,7 +137,7 @@ export async function PATCH(
 
   // ── 역할 판단 ─────────────────────────────────────────────────────────────
   const isHost = booking.host_id === user.id
-  const isUser = booking.user_id === user.id
+  const isUser = booking.guest_id === user.id
   if (!isHost && !isUser) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
@@ -236,10 +236,10 @@ export async function PATCH(
   // Fire-and-forget 알림
   // confirmed → 사용자에게, cancelled → 양측에게, completed → 사용자에게
   const notifyUserId = newStatus === 'confirmed' || newStatus === 'completed'
-    ? booking.user_id
+    ? booking.guest_id
     : null
   const notifyHostId = newStatus === 'cancelled' ? booking.host_id : null
-  const notifyGuestId = newStatus === 'cancelled' ? booking.user_id : null
+  const notifyGuestId = newStatus === 'cancelled' ? booking.guest_id : null
 
   if (notifyUserId) {
     void sendStatusNotification(req, { recipientId: notifyUserId, newStatus, bookingId: id })
@@ -252,10 +252,10 @@ export async function PATCH(
   }
 
   // 이메일 알림 (confirmed/cancelled만)
-  if (newStatus === 'confirmed' && booking.user_id) {
-    void sendBookingEmail(req, { booking_id: id, type: 'confirmed', recipient_id: booking.user_id })
+  if (newStatus === 'confirmed' && booking.guest_id) {
+    void sendBookingEmail(req, { booking_id: id, type: 'confirmed', recipient_id: booking.guest_id })
   } else if (newStatus === 'cancelled') {
-    if (booking.user_id) void sendBookingEmail(req, { booking_id: id, type: 'cancelled', recipient_id: booking.user_id })
+    if (booking.guest_id) void sendBookingEmail(req, { booking_id: id, type: 'cancelled', recipient_id: booking.guest_id })
     if (booking.host_id) void sendBookingEmail(req, { booking_id: id, type: 'cancelled', recipient_id: booking.host_id })
   }
 

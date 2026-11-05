@@ -44,11 +44,9 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json({ message: 'User blocked successfully' })
-  } catch (error: any) {
-    return NextResponse.json(
-      { error: error.message || 'Internal server error' },
-      { status: 500 }
-    )
+  } catch (error) {
+    console.error('[blocks POST]', (error as Error).message)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
 
@@ -73,10 +71,8 @@ export async function GET(req: NextRequest) {
       limit,
       totalPages: Math.ceil(total / limit),
     })
-  } catch (error: any) {
-    return NextResponse.json(
-      { error: error.message || 'Internal server error' },
-      { status: 500 }
-    )
+  } catch (error) {
+    console.error('[blocks GET]', (error as Error).message)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

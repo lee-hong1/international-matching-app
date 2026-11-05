@@ -49,12 +49,9 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json({ received: true })
-  } catch (error: any) {
-    console.error('Webhook error:', error)
-    return NextResponse.json(
-      { error: error.message || 'Webhook handler failed' },
-      { status: 500 }
-    )
+  } catch (error) {
+    console.error('Webhook error:', (error as Error).message)
+    return NextResponse.json({ error: 'Webhook handler failed' }, { status: 500 })
   }
 }
 
@@ -168,7 +165,13 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
   const customerId = subscription.customer as string
 
   // 고객 정보에서 사용자 ID 찾기
-  const customer = await stripe.customers.retrieve(customerId)
+  let customer: Stripe.Customer | Stripe.DeletedCustomer
+  try {
+    customer = await stripe.customers.retrieve(customerId)
+  } catch (e) {
+    console.error('Error retrieving customer:', (e as Error).message)
+    return
+  }
 
   if (customer && !customer.deleted && customer.metadata?.userId) {
     const userId = customer.metadata.userId

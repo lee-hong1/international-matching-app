@@ -2,19 +2,22 @@
 -- 예약 생성, 상태 관리, 슬롯 겹침 방지
 
 CREATE TABLE IF NOT EXISTS bookings (
-  id               UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id          UUID        NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-  host_id          UUID        NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-  service_id       UUID        REFERENCES services(id) ON DELETE SET NULL,
-  booked_at        TIMESTAMPTZ NOT NULL,
-  timezone         TEXT        NOT NULL DEFAULT 'UTC',
-  duration_minutes INTEGER     NOT NULL DEFAULT 60 CHECK (duration_minutes > 0 AND duration_minutes <= 480),
-  status           TEXT        NOT NULL DEFAULT 'pending'
-                               CHECK (status IN ('pending','confirmed','completed','cancelled')),
+  id               UUID           PRIMARY KEY DEFAULT gen_random_uuid(),
+  guest_id         UUID           NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  host_id          UUID           NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  service_id       UUID           REFERENCES services(id) ON DELETE SET NULL,
+  service_type     TEXT,
+  booked_at        TIMESTAMPTZ    NOT NULL,
+  timezone         TEXT           NOT NULL DEFAULT 'UTC',
+  duration_minutes INTEGER        NOT NULL DEFAULT 60 CHECK (duration_minutes > 0 AND duration_minutes <= 480),
+  amount           NUMERIC(12,2),
+  currency         TEXT           DEFAULT 'KRW',
+  status           TEXT           NOT NULL DEFAULT 'pending'
+                                  CHECK (status IN ('pending','confirmed','completed','cancelled')),
   notes            TEXT,
-  idempotency_key  TEXT        UNIQUE,
-  created_at       TIMESTAMPTZ NOT NULL DEFAULT now(),
-  updated_at       TIMESTAMPTZ NOT NULL DEFAULT now()
+  idempotency_key  TEXT           UNIQUE,
+  created_at       TIMESTAMPTZ    NOT NULL DEFAULT now(),
+  updated_at       TIMESTAMPTZ    NOT NULL DEFAULT now()
 );
 
 -- 호스트별 시간 조회 인덱스 (취소 제외)
@@ -35,9 +38,9 @@ ALTER TABLE bookings
   )
   WHERE (status NOT IN ('cancelled'));
 
--- 사용자별 최신 예약 조회 인덱스
-CREATE INDEX IF NOT EXISTS idx_bookings_user_created
-  ON bookings(user_id, created_at DESC);
+-- 게스트별 최신 예약 조회 인덱스
+CREATE INDEX IF NOT EXISTS idx_bookings_guest_created
+  ON bookings(guest_id, created_at DESC);
 
 -- updated_at 자동 갱신 트리거
 CREATE OR REPLACE FUNCTION update_bookings_updated_at()
@@ -58,20 +61,20 @@ ALTER TABLE bookings ENABLE ROW LEVEL SECURITY;
 
 -- 본인(예약자 또는 호스트)만 조회 가능
 CREATE POLICY "booking_select" ON bookings FOR SELECT
-  USING (auth.uid() = user_id OR auth.uid() = host_id);
+  USING (auth.uid() = guest_id OR auth.uid() = host_id);
 
--- 예약 생성: user_id는 본인만
+-- 예약 생성: guest_id는 본인만
 CREATE POLICY "booking_insert" ON bookings FOR INSERT
-  WITH CHECK (auth.uid() = user_id);
+  WITH CHECK (auth.uid() = guest_id);
 
 -- 호스트: confirmed/cancelled 가능 (pending → confirmed, confirmed → cancelled)
 CREATE POLICY "booking_host_update" ON bookings FOR UPDATE
   USING (auth.uid() = host_id)
   WITH CHECK (status IN ('confirmed','completed','cancelled'));
 
--- 사용자: cancelled만 가능
+-- 게스트: cancelled만 가능
 CREATE POLICY "booking_user_cancel" ON bookings FOR UPDATE
-  USING (auth.uid() = user_id AND auth.uid() != host_id)
+  USING (auth.uid() = guest_id AND auth.uid() != host_id)
   WITH CHECK (status = 'cancelled');
 
 -- ── 슬롯 겹침 방지 함수 ────────────────────────────────────────────────────

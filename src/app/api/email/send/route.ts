@@ -88,11 +88,8 @@ export async function POST(req: NextRequest) {
       messageId: `mock_${Date.now()}`
     })
     
-  } catch (error: any) {
-    console.error('Email sending error:', error)
-    return NextResponse.json(
-      { error: error.message || 'Failed to send email' },
-      { status: 500 }
-    )
+  } catch (error) {
+    console.error('Email sending error:', (error as Error).message)
+    return NextResponse.json({ error: 'Failed to send email' }, { status: 500 })
   }
 }

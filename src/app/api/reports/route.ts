@@ -74,11 +74,9 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json(report)
-  } catch (error: any) {
-    return NextResponse.json(
-      { error: error.message || 'Internal server error' },
-      { status: 500 }
-    )
+  } catch (error) {
+    console.error('[reports POST]', (error as Error).message)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
 
@@ -113,10 +111,8 @@ export async function GET(req: NextRequest) {
       limit: query.limit,
       totalPages: Math.ceil(total / query.limit),
     })
-  } catch (error: any) {
-    return NextResponse.json(
-      { error: error.message || 'Internal server error' },
-      { status: 500 }
-    )
+  } catch (error) {
+    console.error('[reports GET]', (error as Error).message)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
