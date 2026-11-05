@@ -1,19 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
-import { isValidUuid, supabaseService } from '@src/lib/commerce'
+import { isValidUuid, getAuthUser, supabaseService } from '@src/lib/commerce'
 import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
-
-async function getAuthUser(request: NextRequest) {
-  const authHeader = request.headers.get('authorization')
-  if (!authHeader) return null
-  const token = authHeader.replace('Bearer ', '')
-  const anonClient = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  )
-  const { data: { user } } = await anonClient.auth.getUser(token)
-  return user
-}
 
 // GET /api/profiles/:id — 공개 프로필 (email/birth_date 미포함)
 export async function GET(

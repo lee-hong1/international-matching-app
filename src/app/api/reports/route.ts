@@ -1,21 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { reportingService } from '@/lib/reporting'
 import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
-import { supabaseService } from '@src/lib/commerce'
-import { supabase } from '@/lib/supabase'
-
-async function getAuthUser(req: NextRequest) {
-  const authHeader = req.headers.get('authorization')
-  if (!authHeader) return null
-  const token = authHeader.replace('Bearer ', '')
-  const { data: { user } } = await supabase.auth.getUser(token)
-  return user
-}
+import { getAuthUser, supabaseService } from '@src/lib/commerce'
 
 async function isAdmin(userId: string): Promise<boolean> {
   const adminEmails = (process.env.ADMIN_EMAILS ?? '')
     .split(',').map(e => e.trim()).filter(Boolean)
-  const { data } = await supabase
+  const { data } = await supabaseService
     .from('profiles')
     .select('email')
     .eq('id', userId)
@@ -58,7 +49,7 @@ export async function POST(req: NextRequest) {
     }
 
     // 중복 신고 확인
-    const { data: existingReport } = await supabase
+    const { data: existingReport } = await supabaseService
       .from('reports')
       .select('id')
       .eq('reporter_id', user.id)

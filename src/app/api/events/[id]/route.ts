@@ -1,15 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
-import { isValidUuid } from '@src/lib/commerce'
-import { supabase } from '@/lib/supabase'
-
-async function getAuthUser(request: NextRequest) {
-  const authHeader = request.headers.get('authorization')
-  if (!authHeader) return null
-  const token = authHeader.replace('Bearer ', '')
-  const { data: { user } } = await supabase.auth.getUser(token)
-  return user
-}
+import { isValidUuid, getAuthUser, supabaseService } from '@src/lib/commerce'
 
 export async function GET(
   request: NextRequest,
@@ -32,7 +23,7 @@ export async function GET(
     return NextResponse.json({ error: 'Invalid event id' }, { status: 400 })
   }
 
-  const { data, error } = await supabase
+  const { data, error } = await supabaseService
     .from('events')
     .select(`
       *,

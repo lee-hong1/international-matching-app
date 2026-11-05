@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
-import { supabase } from '@/lib/supabase'
+import { getAuthUser } from '@src/lib/commerce'
 
 const SUPPORTED_LANGS = new Set(['ko', 'en', 'zh', 'ja', 'es', 'fr', 'de', 'it', 'pt', 'ar', 'ru', 'th', 'vi', 'id'])
 
@@ -15,14 +15,9 @@ export async function POST(request: NextRequest) {
   }
 
   // 인증 필수 — 비회원 번역 요청 차단 (비용 절감)
-  const authHeader = request.headers.get('authorization')
-  if (!authHeader) {
-    return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
-  }
-  const token = authHeader.replace('Bearer ', '')
-  const { data: { user } } = await supabase.auth.getUser(token)
+  const user = await getAuthUser(request)
   if (!user) {
-    return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
+    return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
   }
 
   const apiKey = process.env.GOOGLE_TRANSLATE_API_KEY

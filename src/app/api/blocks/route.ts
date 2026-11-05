@@ -1,16 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { reportingService } from '@/lib/reporting'
 import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
-import { supabaseService } from '@src/lib/commerce'
-import { supabase } from '@/lib/supabase'
-
-async function getAuthUser(req: NextRequest) {
-  const authHeader = req.headers.get('authorization')
-  if (!authHeader) return null
-  const token = authHeader.replace('Bearer ', '')
-  const { data: { user } } = await supabase.auth.getUser(token)
-  return user
-}
+import { getAuthUser, supabaseService } from '@src/lib/commerce'
 
 // 사용자 차단 — blockerId는 JWT에서 추출 (IDOR 방지)
 export async function POST(req: NextRequest) {

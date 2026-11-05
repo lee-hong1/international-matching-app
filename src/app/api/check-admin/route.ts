@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
-import { supabase } from '@/lib/supabase'
+import { getAuthUser } from '@src/lib/commerce'
 
 export async function GET(request: NextRequest) {
   const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
@@ -10,14 +10,8 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(r.body, { status: r.status, headers: r.headers })
   }
 
-  const authHeader = request.headers.get('authorization')
-  if (!authHeader) {
-    return NextResponse.json({ isAdmin: false }, { status: 401 })
-  }
-
-  const token = authHeader.replace('Bearer ', '')
-  const { data: { user }, error } = await supabase.auth.getUser(token)
-  if (error || !user) {
+  const user = await getAuthUser(request)
+  if (!user) {
     return NextResponse.json({ isAdmin: false }, { status: 401 })
   }
 

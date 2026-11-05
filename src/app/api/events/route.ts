@@ -1,15 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabase } from '@/lib/supabase'
-import { supabaseService } from '@src/lib/commerce'
+import { getAuthUser, supabaseService } from '@src/lib/commerce'
 import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
-
-async function getAuthUser(request: NextRequest) {
-  const authHeader = request.headers.get('authorization')
-  if (!authHeader) return null
-  const token = authHeader.replace('Bearer ', '')
-  const { data: { user } } = await supabase.auth.getUser(token)
-  return user
-}
 
 export async function GET(request: NextRequest) {
   const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
@@ -26,11 +17,11 @@ export async function GET(request: NextRequest) {
 
   const { searchParams } = new URL(request.url)
   const eventType = searchParams.get('type')
-  const limit = parseInt(searchParams.get('limit') ?? '20')
-  const offset = parseInt(searchParams.get('offset') ?? '0')
+  const limit = Math.min(parseInt(searchParams.get('limit') ?? '20', 10), 50)
+  const offset = Math.max(parseInt(searchParams.get('offset') ?? '0', 10), 0)
 
   try {
-    let query = supabase
+    let query = supabaseService
       .from('events')
       .select(`
         *,
@@ -84,7 +75,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 프리미엄 회원 검증
-    const { data: profile } = await supabase
+    const { data: profile } = await supabaseService
       .from('profiles')
       .select('is_premium')
       .eq('id', user.id)
@@ -94,7 +85,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: '유료 회원만 이벤트를 만들 수 있습니다' }, { status: 403 })
     }
 
-    const { data: event, error } = await supabase
+    const { data: event, error } = await supabaseService
       .from('events')
       .insert({
         host_id: user.id,
@@ -116,7 +107,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 팔로워에게 알림 발송
-    const { data: followers } = await supabase
+    const { data: followers } = await supabaseService
       .from('follows')
       .select('follower_id')
       .eq('following_id', user.id)
