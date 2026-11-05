@@ -29,7 +29,7 @@ export async function GET(req: NextRequest) {
     .order('created_at', { ascending: false })
     .limit(limit)
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (error) return NextResponse.json({ error: 'Failed to fetch shop links' }, { status: 500 })
 
   return NextResponse.json({ links: data ?? [] })
 }
@@ -99,7 +99,7 @@ export async function POST(req: NextRequest) {
       .select('id, title, external_platform, click_count, created_at')
       .single()
 
-    if (insertErr) return NextResponse.json({ error: insertErr.message }, { status: 500 })
+    if (insertErr) return NextResponse.json({ error: 'Failed to create shop link' }, { status: 500 })
 
     return NextResponse.json({ link }, { status: 201 })
   } catch {

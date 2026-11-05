@@ -81,7 +81,7 @@ export async function POST(
       .select()
       .single()
 
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+    if (error) return NextResponse.json({ error: 'Failed to register participant' }, { status: 500 })
     return NextResponse.json({ participant, requiresPayment: false }, { status: 201 })
   }
 
@@ -104,7 +104,7 @@ export async function POST(
     .single()
 
   if (paymentError || !payment) {
-    return NextResponse.json({ error: paymentError?.message ?? 'Failed to create payment' }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to create payment' }, { status: 500 })
   }
 
   const { data: participant, error: participantError } = await supabaseService
@@ -114,7 +114,7 @@ export async function POST(
     .single()
 
   if (participantError) {
-    return NextResponse.json({ error: participantError.message }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to register participant' }, { status: 500 })
   }
 
   return NextResponse.json({

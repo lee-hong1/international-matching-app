@@ -603,6 +603,26 @@ const MESSAGES: Messages = {
   'commission.error': { ko: '수익 정보를 불러오지 못했습니다', en: 'Failed to load earnings', ja: '収益情報の読み込みに失敗しました', zh: '无法加载收益信息' },
   'commission.currency_krw': { ko: '원', en: 'KRW', ja: '韓国ウォン', zh: '韩元' },
 
+  // ── 공통 액션 ─────────────────────────────────────────────────────────────
+  'common.delete': { ko: '삭제', en: 'Delete', ja: '削除', zh: '删除' },
+  'common.cancel': { ko: '취소', en: 'Cancel', ja: 'キャンセル', zh: '取消' },
+  'common.confirm': { ko: '확인', en: 'Confirm', ja: '確認', zh: '确认' },
+  'common.save': { ko: '저장', en: 'Save', ja: '保存', zh: '保存' },
+  'common.close': { ko: '닫기', en: 'Close', ja: '閉じる', zh: '关闭' },
+  'common.loading': { ko: '로딩 중...', en: 'Loading...', ja: '読み込み中...', zh: '加载中...' },
+
+  // ── 게시물 상세 ───────────────────────────────────────────────────────────
+  'post.title': { ko: '게시물', en: 'Post', ja: '投稿', zh: '帖子' },
+  'post.not_found': { ko: '게시물을 찾을 수 없습니다', en: 'Post not found', ja: '投稿が見つかりません', zh: '找不到帖子' },
+  'post.go_back': { ko: '돌아가기', en: 'Go Back', ja: '戻る', zh: '返回' },
+  'post.image_alt': { ko: '게시물', en: 'Post image', ja: '投稿画像', zh: '帖子图片' },
+  'post.likes_count': { ko: '좋아요 {n}개', en: '{n} likes', ja: '{n}件のいいね', zh: '{n}个赞' },
+  'post.comments_count': { ko: '댓글 {n}개', en: '{n} comments', ja: '{n}件のコメント', zh: '{n}条评论' },
+  'post.be_first_comment': { ko: '첫 댓글을 남겨보세요!', en: 'Be the first to comment!', ja: '最初のコメントを残しましょう！', zh: '成为第一个评论的人！' },
+  'post.comment_placeholder': { ko: '댓글 달기...', en: 'Add a comment...', ja: 'コメントを追加...', zh: '添加评论...' },
+  'post.add_comment': { ko: '게시', en: 'Post', ja: '投稿', zh: '发布' },
+  'post.loading': { ko: '게시물 로딩 중...', en: 'Loading post...', ja: '投稿を読み込み中...', zh: '加载帖子中...' },
+
   // ── 계정 정지 알림 ────────────────────────────────────────────────────────
   'suspension.title': { ko: '계정 임시 정지', en: 'Account Suspended', ja: 'アカウント一時停止', zh: '账号已暂停' },
   'suspension.reason_external': { ko: '외부 플랫폼 유도로 인한 임시 정지입니다.', en: 'Your account has been suspended for directing to external platforms.', ja: '外部プラットフォームへの誘導により一時停止されました。', zh: '由于引导至外部平台，您的账号已被暂停。' },

@@ -36,7 +36,7 @@ export async function GET(req: NextRequest) {
   if (hostId) query = query.eq('host_id', hostId)
 
   const { data, error } = await query
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (error) return NextResponse.json({ error: 'Failed to fetch sales events' }, { status: 500 })
 
   return NextResponse.json({ events: data ?? [] })
 }
@@ -121,7 +121,7 @@ export async function POST(req: NextRequest) {
       .select('id, event_type, title, status, starts_at, ends_at')
       .single()
 
-    if (insertErr) return NextResponse.json({ error: insertErr.message }, { status: 500 })
+    if (insertErr) return NextResponse.json({ error: 'Failed to create sales event' }, { status: 500 })
 
     return NextResponse.json({ event }, { status: 201 })
   } catch {

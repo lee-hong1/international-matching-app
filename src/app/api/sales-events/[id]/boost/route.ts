@@ -142,7 +142,7 @@ export async function POST(
       if (payErr.code === '23505') {
         return NextResponse.json({ message: 'Boost already applied' }, { status: 200 })
       }
-      return NextResponse.json({ error: payErr.message }, { status: 500 })
+      return NextResponse.json({ error: 'Failed to record boost payment' }, { status: 500 })
     }
 
     const { error: updateErr } = await supabaseService
@@ -151,7 +151,7 @@ export async function POST(
       .eq('id', eventId)
 
     if (updateErr) {
-      return NextResponse.json({ error: 'Boost apply error: ' + updateErr.message }, { status: 500 })
+      return NextResponse.json({ error: 'Failed to apply boost to event' }, { status: 500 })
     }
 
     return NextResponse.json(

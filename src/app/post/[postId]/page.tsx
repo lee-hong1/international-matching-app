@@ -9,11 +9,13 @@ import { postsService, type Post, type PostComment } from '@/lib/posts'
 import { followsService } from '@/lib/follows'
 import FollowButton from '@/components/FollowButton'
 import { formatDistanceToNow } from '@/lib/dateUtils'
+import { t, detectLangFromNavigator } from '@src/lib/i18n'
 
 export default function PostDetailPage() {
   const { postId } = useParams<{ postId: string }>()
   const { user } = useAuth()
   const router = useRouter()
+  const lang = detectLangFromNavigator()
 
   const [post, setPost] = useState<Post | null>(null)
   const [comments, setComments] = useState<PostComment[]>([])
@@ -89,8 +91,8 @@ export default function PostDetailPage() {
   if (!post) {
     return (
       <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center gap-4">
-        <p className="text-gray-500">게시물을 찾을 수 없습니다</p>
-        <button onClick={() => router.back()} className="text-pink-500 font-semibold">돌아가기</button>
+        <p className="text-gray-500">{t('post.not_found', lang)}</p>
+        <button onClick={() => router.back()} className="text-pink-500 font-semibold">{t('post.go_back', lang)}</button>
       </div>
     )
   }
@@ -109,7 +111,7 @@ export default function PostDetailPage() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
             </svg>
           </button>
-          <h1 className="font-semibold text-gray-900 flex-1">게시물</h1>
+          <h1 className="font-semibold text-gray-900 flex-1">{t('post.title', lang)}</h1>
         </div>
       </header>
 
@@ -149,7 +151,7 @@ export default function PostDetailPage() {
             <div className="relative bg-black aspect-square">
               <Image
                 src={media[mediaIndex].media_url}
-                alt="게시물"
+                alt={t('post.image_alt', lang)}
                 fill
                 className="object-cover"
                 priority
@@ -207,7 +209,7 @@ export default function PostDetailPage() {
             </div>
 
             {likesCount > 0 && (
-              <p className="text-sm font-semibold text-gray-900 mb-2">좋아요 {likesCount.toLocaleString()}개</p>
+              <p className="text-sm font-semibold text-gray-900 mb-2">{t('post.likes_count', lang, { n: likesCount.toLocaleString() })}</p>
             )}
 
             {post.caption && (
@@ -222,7 +224,7 @@ export default function PostDetailPage() {
 
           {/* 댓글 목록 */}
           <div className="border-t border-gray-100 px-4 py-3">
-            <h3 className="text-sm font-semibold text-gray-900 mb-3">댓글 {comments.length}개</h3>
+            <h3 className="text-sm font-semibold text-gray-900 mb-3">{t('post.comments_count', lang, { n: String(comments.length) })}</h3>
 
             {loadingComments ? (
               <div className="flex justify-center py-4">
@@ -255,7 +257,7 @@ export default function PostDetailPage() {
                             onClick={() => handleDeleteComment(c.id)}
                             className="text-xs text-red-400 hover:text-red-600"
                           >
-                            삭제
+                            {t('common.delete', lang)}
                           </button>
                         )}
                       </div>
@@ -263,7 +265,7 @@ export default function PostDetailPage() {
                   </div>
                 ))}
                 {comments.length === 0 && (
-                  <p className="text-sm text-gray-400 text-center py-4">첫 댓글을 남겨보세요!</p>
+                  <p className="text-sm text-gray-400 text-center py-4">{t('post.be_first_comment', lang)}</p>
                 )}
               </div>
             )}
@@ -283,7 +285,7 @@ export default function PostDetailPage() {
                     type="text"
                     value={comment}
                     onChange={(e) => setComment(e.target.value)}
-                    placeholder="댓글 달기..."
+                    placeholder={t('post.comment_placeholder', lang)}
                     className="flex-1 text-sm bg-transparent outline-none text-gray-900 placeholder-gray-400"
                   />
                   <button
@@ -291,7 +293,7 @@ export default function PostDetailPage() {
                     disabled={!comment.trim()}
                     className="text-pink-500 font-semibold text-sm ml-2 disabled:opacity-40"
                   >
-                    게시
+                    {t('post.add_comment', lang)}
                   </button>
                 </div>
               </form>

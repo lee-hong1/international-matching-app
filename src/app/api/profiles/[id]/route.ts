@@ -60,6 +60,30 @@ export async function DELETE(
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 
+  // Storage 파일 삭제 — GDPR Art.17 준수 (auth 삭제 전 처리)
+  // avatars 버킷: 경로 패턴 `{userId}/avatar.*` 또는 `avatar_{userId}.*`
+  try {
+    const { data: avatarFiles } = await supabaseService.storage
+      .from('avatars')
+      .list(id)
+    if (avatarFiles && avatarFiles.length > 0) {
+      await supabaseService.storage
+        .from('avatars')
+        .remove(avatarFiles.map((f) => `${id}/${f.name}`))
+    }
+    // 루트에 직접 업로드된 경우도 커버
+    const { data: rootFiles } = await supabaseService.storage
+      .from('avatars')
+      .list('', { search: id })
+    if (rootFiles && rootFiles.length > 0) {
+      await supabaseService.storage
+        .from('avatars')
+        .remove(rootFiles.map((f) => f.name))
+    }
+  } catch {
+    // storage 삭제 실패는 계정 삭제를 막지 않음 (best-effort)
+  }
+
   // Supabase auth.admin.deleteUser는 연결된 profiles row를 cascade 삭제
   const { error } = await supabaseService.auth.admin.deleteUser(id)
   if (error) {
