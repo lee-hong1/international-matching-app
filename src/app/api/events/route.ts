@@ -57,6 +57,13 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
   }
 
+  // 청소년보호법: 이벤트 생성은 성인 인증 필수
+  const { data: eventCreatorProfile } = await supabaseService
+    .from('profiles').select('is_adult').eq('id', user.id).single()
+  if (!eventCreatorProfile?.is_adult) {
+    return NextResponse.json({ error: 'Age verification required', redirect: '/verify-age' }, { status: 403 })
+  }
+
   try {
     const body = await request.json()
     const {
