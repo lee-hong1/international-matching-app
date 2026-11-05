@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabase } from '@/lib/supabase'
 import { supabaseService, isValidUuid } from '@src/lib/commerce'
 
 type NotificationData = Record<string, string>
@@ -56,7 +55,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'payload.title required' }, { status: 400 })
     }
 
-    const { data: tokens, error } = await supabase
+    const { data: tokens, error } = await supabaseService
       .from('device_tokens')
       .select('token, device_type')
       .eq('user_id', userId)

@@ -25,7 +25,7 @@ export function calculateCommission(
 ): CommissionBreakdown {
   const platformFeeAmount = Math.round(totalAmount * (platformFeeRate / 100))
   const venueCommissionAmount = Math.round(totalAmount * (venueCommissionRate / 100))
-  const hostPayoutAmount = totalAmount - platformFeeAmount
+  const hostPayoutAmount = totalAmount - platformFeeAmount - venueCommissionAmount
 
   return {
     totalAmount,

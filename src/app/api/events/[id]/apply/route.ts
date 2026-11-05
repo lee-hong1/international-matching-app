@@ -1,13 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
 import { isValidUuid, supabaseService } from '@src/lib/commerce'
-import { supabase } from '@/lib/supabase'
 
 async function getAuthUser(request: NextRequest) {
   const authHeader = request.headers.get('authorization')
   if (!authHeader) return null
   const token = authHeader.replace('Bearer ', '')
-  const { data: { user } } = await supabase.auth.getUser(token)
+  const { data: { user } } = await supabaseService.auth.getUser(token)
   return user
 }
 
@@ -40,7 +39,7 @@ export async function POST(
     return NextResponse.json({ error: 'Age verification required / 성인 인증이 필요합니다', redirect: '/verify-age' }, { status: 403 })
   }
 
-  const { data: event, error: eventError } = await supabase
+  const { data: event, error: eventError } = await supabaseService
     .from('events')
     .select('*, partner_venues (commission_rate)')
     .eq('id', eventId)
@@ -63,7 +62,7 @@ export async function POST(
   }
 
   // 이미 신청했는지 확인
-  const { data: existing } = await supabase
+  const { data: existing } = await supabaseService
     .from('event_participants')
     .select('id, status')
     .eq('event_id', eventId)
@@ -76,7 +75,7 @@ export async function POST(
 
   // 무료 이벤트: 결제 없이 바로 신청 등록 (승인 대기)
   if (!event.fee_per_person || event.fee_per_person === 0) {
-    const { data: participant, error } = await supabase
+    const { data: participant, error } = await supabaseService
       .from('event_participants')
       .insert({ event_id: eventId, user_id: user.id, status: 'pending_payment' })
       .select()
@@ -89,7 +88,7 @@ export async function POST(
   // 유료 이벤트: 결제 주문 생성 후 토스 결제창으로 연결
   const orderId = `event_${eventId}_${user.id}_${Date.now()}`
 
-  const { data: payment, error: paymentError } = await supabase
+  const { data: payment, error: paymentError } = await supabaseService
     .from('payments')
     .insert({
       user_id: user.id,
@@ -108,7 +107,7 @@ export async function POST(
     return NextResponse.json({ error: paymentError?.message ?? '결제 생성에 실패했습니다' }, { status: 500 })
   }
 
-  const { data: participant, error: participantError } = await supabase
+  const { data: participant, error: participantError } = await supabaseService
     .from('event_participants')
     .insert({ event_id: eventId, user_id: user.id, status: 'pending_payment', payment_id: payment.id })
     .select()
