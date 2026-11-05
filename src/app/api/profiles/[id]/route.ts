@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
+import Stripe from 'stripe'
 import { isValidUuid, getAuthUser, supabaseService } from '@src/lib/commerce'
 import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY ?? 'sk_test_placeholder', {
+  apiVersion: '2025-07-30.basil',
+})
 
 // GET /api/profiles/:id — 공개 프로필 (email/birth_date 미포함)
 export async function GET(
@@ -82,6 +87,43 @@ export async function DELETE(
     }
   } catch {
     // storage 삭제 실패는 계정 삭제를 막지 않음 (best-effort)
+  }
+
+  // Stripe 구독 취소 — 계정 삭제 전 과금 중단 (GDPR + 소비자보호법)
+  try {
+    const { data: activeSubs } = await supabaseService
+      .from('user_subscriptions')
+      .select('stripe_subscription_id')
+      .eq('user_id', id)
+      .eq('status', 'active')
+      .not('stripe_subscription_id', 'is', null)
+
+    if (activeSubs && activeSubs.length > 0) {
+      await Promise.all(
+        activeSubs.map(async (sub) => {
+          if (sub.stripe_subscription_id) {
+            try {
+              await stripe.subscriptions.cancel(sub.stripe_subscription_id)
+            } catch (e) {
+              console.error('[profiles DELETE] stripe cancel failed:', (e as Error).message)
+            }
+          }
+        })
+      )
+    }
+  } catch {
+    // 구독 취소 실패는 계정 삭제를 막지 않음 (best-effort)
+  }
+
+  // 미확정/확정 예약 취소 (호스트에게 cascade 알림은 webhook에서 처리)
+  try {
+    await supabaseService
+      .from('bookings')
+      .update({ status: 'cancelled' })
+      .eq('guest_id', id)
+      .in('status', ['pending', 'confirmed'])
+  } catch {
+    // best-effort
   }
 
   // Supabase auth.admin.deleteUser는 연결된 profiles row를 cascade 삭제
