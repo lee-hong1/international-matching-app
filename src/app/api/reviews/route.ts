@@ -20,7 +20,8 @@ export async function GET(req: NextRequest) {
   const hostId = searchParams.get('host_id')
   const reviewerId = searchParams.get('reviewer_id')
   const cursor = searchParams.get('cursor')
-  const limit = Math.min(Number(searchParams.get('limit') ?? '20'), 50)
+  const rawLimit = parseInt(searchParams.get('limit') ?? '20', 10)
+  const limit = Math.min(Number.isFinite(rawLimit) && rawLimit > 0 ? rawLimit : 20, 50)
 
   if (!hostId && !reviewerId) {
     return NextResponse.json({ error: 'host_id or reviewer_id required' }, { status: 400 })
