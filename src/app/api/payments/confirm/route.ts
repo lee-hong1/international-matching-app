@@ -53,7 +53,10 @@ export async function POST(request: NextRequest) {
     }
 
     // 토스페이먼츠 결제 승인 API 호출
-    const secretKey = process.env.TOSS_SECRET_KEY ?? 'test_sk_zXLkKEypNArWmo50nX3lmeaxYG5R'
+    const secretKey = process.env.TOSS_SECRET_KEY
+    if (!secretKey) {
+      return NextResponse.json({ error: 'Payment service not configured' }, { status: 503 })
+    }
     const basicAuth = Buffer.from(`${secretKey}:`).toString('base64')
 
     const tossRes = await fetch('https://api.tosspayments.com/v1/payments/confirm', {
@@ -67,8 +70,10 @@ export async function POST(request: NextRequest) {
 
     const tossData = await tossRes.json()
     if (!tossRes.ok) {
+      // 토스 에러 메시지는 내부 로그에만 기록 — 클라이언트에 직접 노출 금지
+      console.error('[payments/confirm] toss error:', tossData.code, tossData.message)
       await supabaseService.from('payments').update({ payment_status: 'failed' }).eq('id', paymentRecord.id)
-      return NextResponse.json({ error: tossData.message ?? 'Payment confirmation failed' }, { status: 400 })
+      return NextResponse.json({ error: 'Payment confirmation failed' }, { status: 400 })
     }
 
     // 수수료 분배 계산
@@ -111,6 +116,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true, breakdown })
   } catch (err) {
+    console.error('[payments/confirm] unexpected error:', (err as Error).message)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

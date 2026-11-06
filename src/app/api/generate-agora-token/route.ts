@@ -1,4 +1,4 @@
-import { createHmac, createHash, randomBytes } from 'crypto'
+import { createHmac, randomBytes } from 'crypto'
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthUser, supabaseService, isValidUuid } from '@src/lib/commerce'
 import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
