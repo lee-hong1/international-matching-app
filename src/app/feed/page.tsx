@@ -11,10 +11,13 @@ import StoryBar from '@/components/StoryBar'
 import CreatePost from '@/components/CreatePost'
 import CreateStory from '@/components/CreateStory'
 import { LanguageSwitcher } from '@/components/LanguageSwitcher'
+import { useLanguage } from '@/contexts/LanguageContext'
+import { t } from '@/lib/i18n'
 
 export default function FeedPage() {
   const { user, loading } = useAuth()
   const router = useRouter()
+  const { locale } = useLanguage()
   const [posts, setPosts] = useState<Post[]>([])
   const [loadingPosts, setLoadingPosts] = useState(true)
   const [offset, setOffset] = useState(0)
@@ -42,7 +45,7 @@ export default function FeedPage() {
       setHasMore(data.length === LIMIT)
       setOffset(currentOffset + data.length)
     } catch {
-      setFeedError('피드를 불러오는 데 실패했습니다. 잠시 후 다시 시도해주세요.')
+      setFeedError(t('feed.load_error', locale))
     } finally {
       setLoadingPosts(false)
     }
@@ -111,7 +114,7 @@ export default function FeedPage() {
               onClick={() => loadPosts(true)}
               className="ml-3 text-sm font-semibold text-red-700 underline underline-offset-2 flex-shrink-0"
             >
-              재시도
+              {t('feed.retry', locale)}
             </button>
           </div>
         )}
@@ -143,20 +146,20 @@ export default function FeedPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
               </svg>
             </div>
-            <h3 className="font-semibold text-gray-900 mb-2">아직 피드가 비어있습니다</h3>
-            <p className="text-sm text-gray-500 mb-4">크리에이터를 팔로우하거나 첫 게시물을 올려보세요!</p>
+            <h3 className="font-semibold text-gray-900 mb-2">{t('feed.empty_title', locale)}</h3>
+            <p className="text-sm text-gray-500 mb-4">{t('feed.empty_subtitle', locale)}</p>
             <div className="flex gap-3 justify-center">
               <Link
                 href="/explore"
                 className="px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-600 text-white text-sm font-semibold rounded-xl"
               >
-                크리에이터 탐색
+                {t('feed.explore', locale)}
               </Link>
               <button
                 onClick={() => setShowCreatePost(true)}
                 className="px-4 py-2 border border-gray-200 text-gray-700 text-sm font-semibold rounded-xl hover:bg-gray-50"
               >
-                게시물 올리기
+                {t('feed.create_post', locale)}
               </button>
             </div>
           </div>
@@ -178,7 +181,7 @@ export default function FeedPage() {
                   disabled={loadingPosts}
                   className="px-6 py-2 border border-gray-200 text-gray-600 text-sm font-medium rounded-xl hover:bg-gray-50 disabled:opacity-50"
                 >
-                  {loadingPosts ? '불러오는 중...' : '더 보기'}
+                  {loadingPosts ? t('feed.loading_more', locale) : t('feed.load_more', locale)}
                 </button>
               </div>
             )}
@@ -193,13 +196,13 @@ export default function FeedPage() {
             <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
               <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
             </svg>
-            <span className="text-xs font-medium">홈</span>
+            <span className="text-xs font-medium">{t('nav.home', locale)}</span>
           </Link>
           <Link href="/explore" className="flex flex-col items-center gap-0.5 text-gray-400 hover:text-gray-600">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
-            <span className="text-xs">탐색</span>
+            <span className="text-xs">{t('nav.explore', locale)}</span>
           </Link>
           <button
             onClick={() => setShowCreatePost(true)}
@@ -215,13 +218,13 @@ export default function FeedPage() {
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
-            <span className="text-xs">모임</span>
+            <span className="text-xs">{t('nav.events', locale)}</span>
           </Link>
           <Link href="/discover" className="flex flex-col items-center gap-0.5 text-gray-400 hover:text-gray-600">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
             </svg>
-            <span className="text-xs">매칭</span>
+            <span className="text-xs">{t('nav.matching', locale)}</span>
           </Link>
           <Link href={`/creator/${user?.id}`} className="flex flex-col items-center gap-0.5 text-gray-400 hover:text-gray-600">
             <div className="w-6 h-6 rounded-full bg-gradient-to-br from-pink-400 to-purple-500 overflow-hidden">
@@ -233,7 +236,7 @@ export default function FeedPage() {
                 </div>
               )}
             </div>
-            <span className="text-xs">프로필</span>
+            <span className="text-xs">{t('nav.profile', locale)}</span>
           </Link>
         </div>
       </nav>

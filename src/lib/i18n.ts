@@ -603,6 +603,26 @@ const MESSAGES: Messages = {
   'discover.match_message': { ko: '님과 매칭되었습니다! 지금 대화를 시작해 보세요.', en: 'matched with you! Start a conversation now.', ja: 'さんとマッチングしました！今すぐ会話を始めましょう。', zh: '和您配对成功！现在开始对话吧。' },
   'discover.all_categories': { ko: '전체', en: 'All', ja: 'すべて', zh: '全部' },
 
+  // ── 피드 ──────────────────────────────────────────────────────────────────
+  'feed.load_error': {
+    ko: '피드를 불러오는 데 실패했습니다. 잠시 후 다시 시도해주세요.',
+    en: 'Failed to load feed. Please try again later.',
+    ja: 'フィードの読み込みに失敗しました。後でもう一度お試しください。',
+    zh: '加载动态失败，请稍后重试。',
+  },
+  'feed.retry': { ko: '재시도', en: 'Retry', ja: '再試行', zh: '重试' },
+  'feed.empty_title': { ko: '아직 피드가 비어있습니다', en: 'Your feed is empty', ja: 'フィードはまだ空です', zh: '动态还是空的' },
+  'feed.empty_subtitle': {
+    ko: '크리에이터를 팔로우하거나 첫 게시물을 올려보세요!',
+    en: 'Follow creators or share your first post!',
+    ja: 'クリエイターをフォローするか、最初の投稿をしましょう！',
+    zh: '关注创作者或发布第一篇帖子！',
+  },
+  'feed.explore': { ko: '크리에이터 탐색', en: 'Explore Creators', ja: 'クリエイターを探す', zh: '探索创作者' },
+  'feed.create_post': { ko: '게시물 올리기', en: 'Create Post', ja: '投稿する', zh: '发布帖子' },
+  'feed.load_more': { ko: '더 보기', en: 'Load more', ja: 'もっと見る', zh: '加载更多' },
+  'feed.loading_more': { ko: '불러오는 중...', en: 'Loading...', ja: '読み込み中...', zh: '加载中...' },
+
   // ── 에러 페이지 ────────────────────────────────────────────────────────────
   'error.retry': { ko: '다시 시도', en: 'Try Again', ja: '再試行', zh: '重试' },
   'error.not_found': { ko: '페이지를 찾을 수 없습니다', en: 'Page not found', ja: 'ページが見つかりません', zh: '找不到页面' },
@@ -619,6 +639,13 @@ const MESSAGES: Messages = {
   'commission.loading': { ko: '수익 집계 중…', en: 'Loading earnings…', ja: '収益を集計中…', zh: '加载收益中…' },
   'commission.error': { ko: '수익 정보를 불러오지 못했습니다', en: 'Failed to load earnings', ja: '収益情報の読み込みに失敗しました', zh: '无法加载收益信息' },
   'commission.currency_krw': { ko: '원', en: 'KRW', ja: '韓国ウォン', zh: '韩元' },
+
+  // ── 하단 네비게이션 ───────────────────────────────────────────────────────
+  'nav.home': { ko: '홈', en: 'Home', ja: 'ホーム', zh: '首页' },
+  'nav.explore': { ko: '탐색', en: 'Explore', ja: '探索', zh: '探索' },
+  'nav.events': { ko: '모임', en: 'Events', ja: 'イベント', zh: '活动' },
+  'nav.matching': { ko: '매칭', en: 'Match', ja: 'マッチング', zh: '配对' },
+  'nav.profile': { ko: '프로필', en: 'Profile', ja: 'プロフィール', zh: '档案' },
 
   // ── 공통 액션 ─────────────────────────────────────────────────────────────
   'common.delete': { ko: '삭제', en: 'Delete', ja: '削除', zh: '删除' },
