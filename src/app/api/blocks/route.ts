@@ -27,6 +27,10 @@ export async function POST(req: NextRequest) {
       )
     }
 
+    if (reason !== undefined && reason !== null && (typeof reason !== 'string' || reason.length > 500)) {
+      return NextResponse.json({ error: 'reason must be a string under 500 characters' }, { status: 400 })
+    }
+
     if (user.id === blockedUserId) {
       return NextResponse.json(
         { error: 'Cannot block yourself' },

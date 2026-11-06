@@ -18,6 +18,9 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
   const userId = searchParams.get('userId')
 
+  const rawLimit = parseInt(new URL(request.url).searchParams.get('limit') ?? '50', 10)
+  const limit = Math.min(Number.isFinite(rawLimit) && rawLimit > 0 ? rawLimit : 50, 200)
+
   let query = supabaseService
     .from('stories')
     .select(`
@@ -28,6 +31,7 @@ export async function GET(request: NextRequest) {
     `)
     .gt('expires_at', new Date().toISOString())
     .order('created_at', { ascending: false })
+    .limit(limit)
 
   if (userId) {
     if (!isValidUuid(userId)) {
