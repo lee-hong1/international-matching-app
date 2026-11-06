@@ -27,8 +27,10 @@ export async function GET(request: NextRequest) {
   }
   const type = rawType as PostType
   const userId = searchParams.get('userId')
-  const limit = Math.min(parseInt(searchParams.get('limit') ?? '12', 10), 50)
-  const offset = Math.min(Math.max(parseInt(searchParams.get('offset') ?? '0', 10), 0), 10000)
+  const rawLimit = parseInt(searchParams.get('limit') ?? '12', 10)
+  const limit = Math.min(Number.isFinite(rawLimit) && rawLimit > 0 ? rawLimit : 12, 50)
+  const rawOffset = parseInt(searchParams.get('offset') ?? '0', 10)
+  const offset = Math.min(Number.isFinite(rawOffset) && rawOffset >= 0 ? rawOffset : 0, 10000)
 
   let query = supabaseService
     .from('posts')

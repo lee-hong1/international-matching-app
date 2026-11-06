@@ -90,7 +90,8 @@ export async function GET(req: NextRequest) {
   // ── 쿼리 파라미터 ─────────────────────────────────────────────────────────
   const url = new URL(req.url)
   const status = url.searchParams.get('status') // 'pending'|'confirmed'|'cancelled'|'completed'
-  const limit = Math.min(parseInt(url.searchParams.get('limit') ?? '20', 10), 100)
+  const rawLimit = parseInt(url.searchParams.get('limit') ?? '20', 10)
+  const limit = Math.min(Number.isFinite(rawLimit) && rawLimit > 0 ? rawLimit : 20, 100)
   // cursor 기반 페이지네이션: cursor = `${created_at}__${id}` (base64 인코딩)
   const cursorParam = url.searchParams.get('cursor')
   const rawTimezone = url.searchParams.get('timezone') ?? 'UTC'

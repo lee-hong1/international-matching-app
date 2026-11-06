@@ -25,7 +25,8 @@ export async function GET(req: NextRequest) {
   const url = new URL(req.url)
   const hostId = url.searchParams.get('host_id')
   const category = url.searchParams.get('category') as ServiceCategory | null
-  const limit = Math.min(parseInt(url.searchParams.get('limit') ?? '20', 10), 100)
+  const rawLimit = parseInt(url.searchParams.get('limit') ?? '20', 10)
+  const limit = Math.min(Number.isFinite(rawLimit) && rawLimit > 0 ? rawLimit : 20, 100)
 
   if (hostId && !isValidUuid(hostId)) {
     return NextResponse.json({ error: 'Invalid host_id' }, { status: 400 })

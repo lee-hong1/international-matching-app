@@ -45,7 +45,8 @@ export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url)
   const targetUserId = searchParams.get('target_user_id')
   const beforeId = searchParams.get('before_id')
-  const limit = Math.min(parseInt(searchParams.get('limit') ?? '20', 10), 100)
+  const rawLimit = parseInt(searchParams.get('limit') ?? '20', 10)
+  const limit = Math.min(Number.isFinite(rawLimit) && rawLimit > 0 ? rawLimit : 20, 100)
 
   if (targetUserId && !isValidUuid(targetUserId)) {
     return NextResponse.json({ error: 'Invalid target_user_id' }, { status: 400 })

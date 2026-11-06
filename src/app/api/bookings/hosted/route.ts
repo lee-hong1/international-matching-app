@@ -27,7 +27,8 @@ export async function GET(req: NextRequest) {
   // ── 쿼리 파라미터 ─────────────────────────────────────────────────────────
   const url = new URL(req.url)
   const status = url.searchParams.get('status')
-  const limit = Math.min(parseInt(url.searchParams.get('limit') ?? '20', 10), 100)
+  const rawLimit = parseInt(url.searchParams.get('limit') ?? '20', 10)
+  const limit = Math.min(Number.isFinite(rawLimit) && rawLimit > 0 ? rawLimit : 20, 100)
   const cursor = url.searchParams.get('cursor') // ISO timestamp for cursor-based pagination
   const rawTimezone = url.searchParams.get('timezone') ?? 'UTC'
 
