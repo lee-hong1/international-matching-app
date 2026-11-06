@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getAuthUser, supabaseService } from '@src/lib/commerce'
+import { getAuthUser, supabaseService, isValidUuid } from '@src/lib/commerce'
 import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
 import { isSuspended } from '@src/lib/suspended-check'
+
+const ALLOWED_EVENT_TYPES = ['dinner', 'cafe', 'activity', 'travel', 'online', 'other']
+const MAX_PARTICIPANTS_LIMIT = 100
 
 export async function GET(request: NextRequest) {
   const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
@@ -34,7 +37,12 @@ export async function GET(request: NextRequest) {
       .order('event_datetime', { ascending: true })
       .range(offset, offset + limit - 1)
 
-    if (eventType) query = query.eq('event_type', eventType)
+    if (eventType) {
+      if (!ALLOWED_EVENT_TYPES.includes(eventType)) {
+        return NextResponse.json({ error: 'Invalid event type' }, { status: 400 })
+      }
+      query = query.eq('event_type', eventType)
+    }
 
     const { data, error } = await query
     if (error) return NextResponse.json({ error: 'Failed to fetch events' }, { status: 500 })
@@ -79,11 +87,37 @@ export async function POST(request: NextRequest) {
     if (!eventType || !title || !venueType || !eventDatetime || !maxParticipants) {
       return NextResponse.json({ error: 'Required fields missing' }, { status: 400 })
     }
+    if (!ALLOWED_EVENT_TYPES.includes(eventType)) {
+      return NextResponse.json({ error: 'Invalid event type' }, { status: 400 })
+    }
+    if (!['partner', 'custom'].includes(venueType)) {
+      return NextResponse.json({ error: 'Invalid venue type' }, { status: 400 })
+    }
     if (venueType === 'partner' && !venueId) {
       return NextResponse.json({ error: 'Please select a partner venue' }, { status: 400 })
     }
+    if (venueType === 'partner' && !isValidUuid(venueId)) {
+      return NextResponse.json({ error: 'Invalid venueId' }, { status: 400 })
+    }
     if (venueType === 'custom' && !customLocation) {
       return NextResponse.json({ error: 'Please enter a location' }, { status: 400 })
+    }
+    if (typeof title !== 'string' || title.length > 100) {
+      return NextResponse.json({ error: 'title must be under 100 characters' }, { status: 400 })
+    }
+    if (description && (typeof description !== 'string' || description.length > 2000)) {
+      return NextResponse.json({ error: 'description must be under 2000 characters' }, { status: 400 })
+    }
+    if (customLocation && (typeof customLocation !== 'string' || customLocation.length > 500)) {
+      return NextResponse.json({ error: 'customLocation must be under 500 characters' }, { status: 400 })
+    }
+    const parsedDatetime = new Date(eventDatetime)
+    if (isNaN(parsedDatetime.getTime()) || parsedDatetime <= new Date()) {
+      return NextResponse.json({ error: 'eventDatetime must be a valid future datetime' }, { status: 400 })
+    }
+    const parsedMax = Number(maxParticipants)
+    if (!Number.isInteger(parsedMax) || parsedMax < 2 || parsedMax > MAX_PARTICIPANTS_LIMIT) {
+      return NextResponse.json({ error: `maxParticipants must be between 2 and ${MAX_PARTICIPANTS_LIMIT}` }, { status: 400 })
     }
 
     // 프리미엄 회원 검증

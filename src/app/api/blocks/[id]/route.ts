@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getAuthUser, supabaseService } from '@src/lib/commerce'
+import { getAuthUser, supabaseService, isValidUuid } from '@src/lib/commerce'
 import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
 
 // 사용자 차단 해제 — blockerId는 JWT에서 추출 (IDOR 방지)
@@ -20,6 +20,10 @@ export async function DELETE(
   }
 
   const { id: blockedUserId } = await params
+
+  if (!isValidUuid(blockedUserId)) {
+    return NextResponse.json({ error: 'Invalid user id' }, { status: 400 })
+  }
 
   try {
     const { error } = await supabaseService

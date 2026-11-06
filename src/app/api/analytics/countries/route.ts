@@ -24,16 +24,31 @@ export async function GET(req: NextRequest) {
   }
 
   try {
+    // 풀스캔 후 JS 집계 대신 DB 집계 쿼리 사용 (성능: O(N) → O(distinct countries))
     const { data, error } = await supabaseService
-      .from('profiles')
-      .select('country')
-      .not('country', 'is', null)
+      .rpc('get_country_counts')
 
-    if (error) throw error
+    // RPC 미존재 시 fallback: 집계된 뷰 또는 group by 쿼리
+    if (error) {
+      const { data: raw, error: rawErr } = await supabaseService
+        .from('profiles')
+        .select('country')
+        .not('country', 'is', null)
+        .limit(50000) // 최대 5만 행 제한 (무한 풀스캔 방지)
 
+      if (rawErr) throw rawErr
+
+      const counts: Record<string, number> = {}
+      for (const row of raw ?? []) {
+        if (row.country) counts[row.country] = (counts[row.country] ?? 0) + 1
+      }
+      return NextResponse.json({ data: counts })
+    }
+
+    // RPC 결과: [{country, count}] 형태
     const counts: Record<string, number> = {}
     for (const row of data ?? []) {
-      if (row.country) counts[row.country] = (counts[row.country] ?? 0) + 1
+      if (row.country) counts[row.country] = Number(row.count)
     }
 
     return NextResponse.json({ data: counts })

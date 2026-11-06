@@ -1,7 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { reportingService } from '@/lib/reporting'
 import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
-import { getAuthUser, supabaseService } from '@src/lib/commerce'
+import { getAuthUser, supabaseService, isValidUuid } from '@src/lib/commerce'
+
+const ALLOWED_REPORT_TYPES = [
+  'harassment', 'spam', 'inappropriate_content', 'fake_profile',
+  'external_platform', 'underage', 'scam', 'violence', 'other',
+]
+const ALLOWED_STATUS = ['pending', 'reviewed', 'resolved', 'dismissed']
+const ALLOWED_PRIORITY = ['low', 'medium', 'high', 'critical']
 
 async function isAdmin(userId: string): Promise<boolean> {
   const adminEmails = (process.env.ADMIN_EMAILS ?? '')
@@ -36,6 +43,16 @@ export async function POST(req: NextRequest) {
         { error: 'Missing required fields' },
         { status: 400 }
       )
+    }
+
+    if (!isValidUuid(reportData.reported_user_id)) {
+      return NextResponse.json({ error: 'Invalid reported_user_id' }, { status: 400 })
+    }
+    if (reportData.reported_content_id && !isValidUuid(reportData.reported_content_id)) {
+      return NextResponse.json({ error: 'Invalid reported_content_id' }, { status: 400 })
+    }
+    if (!ALLOWED_REPORT_TYPES.includes(reportData.report_type)) {
+      return NextResponse.json({ error: 'Invalid report_type' }, { status: 400 })
     }
 
     // reporter_id는 클라이언트 입력이 아닌 JWT 검증된 uid 사용
@@ -82,6 +99,13 @@ export async function POST(req: NextRequest) {
 
 // 신고 목록 조회 (관리자 전용 — 인증 필수)
 export async function GET(req: NextRequest) {
+  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
+  const rl = await checkRateLimit(`reports-get:${ip}`, 'general')
+  if (!rl.allowed) {
+    const r = rateLimitResponse(rl.resetAt)
+    return NextResponse.json(r.body, { status: r.status, headers: r.headers })
+  }
+
   const user = await getAuthUser(req)
   if (!user) {
     return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
@@ -94,11 +118,15 @@ export async function GET(req: NextRequest) {
 
   try {
     const { searchParams } = new URL(req.url)
+    const rawStatus = searchParams.get('status')
+    const rawPriority = searchParams.get('priority')
+    const rawReportType = searchParams.get('report_type')
+
     const query = {
-      status: searchParams.get('status') as any,
-      priority: searchParams.get('priority') as any,
-      report_type: searchParams.get('report_type') as any,
-      page: parseInt(searchParams.get('page') || '1'),
+      status: rawStatus && ALLOWED_STATUS.includes(rawStatus) ? rawStatus as any : undefined,
+      priority: rawPriority && ALLOWED_PRIORITY.includes(rawPriority) ? rawPriority as any : undefined,
+      report_type: rawReportType && ALLOWED_REPORT_TYPES.includes(rawReportType) ? rawReportType as any : undefined,
+      page: Math.max(parseInt(searchParams.get('page') || '1'), 1),
       limit: Math.min(parseInt(searchParams.get('limit') || '20'), 100),
     }
 
