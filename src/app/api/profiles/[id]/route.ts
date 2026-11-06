@@ -15,7 +15,7 @@ export async function GET(
   // anon 스크래핑 방지 — graceful fallback (rate limit 실패해도 응답 반환)
   try {
     const ip = req.headers.get('x-forwarded-for')?.split(',')[0].trim() ?? 'unknown'
-    const rl = await checkRateLimit(ip, 'general')
+    const rl = await checkRateLimit(`profiles-id-get:${ip}`, 'general')
     if (!rl.allowed) {
       const { body, headers, status } = rateLimitResponse(rl.resetAt)
       return NextResponse.json(body, { status, headers })
@@ -49,6 +49,14 @@ export async function DELETE(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  // GDPR 삭제는 rate limit 엄격 적용 (악용 방지)
+  const delIp = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
+  const delRl = await checkRateLimit(`profiles-id-delete:${delIp}`, 'payment')
+  if (!delRl.allowed) {
+    const { body, headers, status } = rateLimitResponse(delRl.resetAt)
+    return NextResponse.json(body, { status, headers })
+  }
+
   const user = await getAuthUser(req)
   if (!user) {
     return NextResponse.json({ error: 'Authentication required' }, { status: 401 })

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getAuthUser, supabaseService } from '@src/lib/commerce'
+import { getAuthUser, supabaseService, isValidUuid } from '@src/lib/commerce'
 import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
 
 // 사용자별 상세 분석 — 본인 데이터만 조회 가능 (IDOR 방지)
@@ -20,6 +20,10 @@ export async function GET(
   }
 
   const { userId } = await params
+
+  if (!isValidUuid(userId)) {
+    return NextResponse.json({ error: 'Invalid userId' }, { status: 400 })
+  }
 
   // 본인 데이터만 조회 허용 (관리자 예외는 별도 admin 엔드포인트 사용)
   if (user.id !== userId) {

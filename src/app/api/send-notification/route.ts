@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseService, isValidUuid } from '@src/lib/commerce'
+import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
 
 type NotificationData = Record<string, string>
 
@@ -35,6 +36,13 @@ async function getFirebaseMessaging() {
 }
 
 export async function POST(req: NextRequest) {
+  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
+  const rl = await checkRateLimit(`send-notification:${ip}`, 'general')
+  if (!rl.allowed) {
+    const r = rateLimitResponse(rl.resetAt)
+    return NextResponse.json(r.body, { status: r.status, headers: r.headers })
+  }
+
   // 내부 서버→서버 전용: x-service-key 필수
   const authHeader = req.headers.get('x-service-key')
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
