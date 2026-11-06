@@ -704,6 +704,26 @@ const MESSAGES: Messages = {
   'suspension.title': { ko: '계정 임시 정지', en: 'Account Suspended', ja: 'アカウント一時停止', zh: '账号已暂停' },
   'suspension.reason_external': { ko: '외부 플랫폼 유도로 인한 임시 정지입니다.', en: 'Your account has been suspended for directing to external platforms.', ja: '外部プラットフォームへの誘導により一時停止されました。', zh: '由于引导至外部平台，您的账号已被暂停。' },
   'suspension.warning': { ko: '외부 플랫폼 유도 경고 ({n}회 / 3회)', en: 'External platform warning ({n} of 3)', ja: '外部プラットフォーム誘導警告 ({n}/3)', zh: '外部平台引导警告（{n}/3次）' },
+
+  // ── 메시지(채팅방 목록) 페이지 ────────────────────────────────────────────
+  'messages.title': { ko: '메시지', en: 'Messages', ja: 'メッセージ', zh: '消息' },
+  'messages.search_placeholder': { ko: '대화 상대 검색...', en: 'Search conversations...', ja: '会話を検索...', zh: '搜索对话...' },
+  'messages.empty_no_matches': { ko: '아직 대화가 없습니다', en: 'No conversations yet', ja: 'まだ会話がありません', zh: '暂无对话' },
+  'messages.empty_search': { ko: '검색 결과가 없습니다', en: 'No results found', ja: '検索結果がありません', zh: '没有搜索结果' },
+  'messages.empty_hint_search': { ko: '다른 검색어를 시도해보세요', en: 'Try a different search term', ja: '別の検索ワードを試してください', zh: '请尝试不同的搜索词' },
+  'messages.empty_hint_match': { ko: '새로운 사람들과 매칭되면 여기에서 대화할 수 있습니다', en: 'Match with someone to start a conversation here', ja: 'マッチングすると会話が始められます', zh: '与他人匹配后即可在此开始对话' },
+  'messages.find_people': { ko: '새로운 사람 찾기', en: 'Find someone new', ja: '新しい人を探す', zh: '寻找新朋友' },
+  'messages.sent_prefix': { ko: '나: ', en: 'Me: ', ja: '自分: ', zh: '我：' },
+  'messages.tips_title': { ko: '채팅 팁', en: 'Chat Tips', ja: 'チャットのヒント', zh: '聊天提示' },
+  'messages.tip_1': { ko: '정중하고 친근한 대화로 시작해보세요', en: 'Start with a polite and friendly greeting', ja: '丁寧で親しみやすい会話から始めましょう', zh: '从礼貌友好的对话开始' },
+  'messages.tip_2': { ko: '상대방의 프로필을 참고해서 공통 관심사를 찾아보세요', en: "Check their profile to find common interests", ja: '相手のプロフィールを参考に共通の趣味を探しましょう', zh: '参考对方资料，寻找共同兴趣' },
+  'messages.tip_3': { ko: '번역 기능을 사용해 언어 장벽을 극복하세요', en: 'Use translation to break language barriers', ja: '翻訳機能を使って言語の壁を乗り越えましょう', zh: '使用翻译功能打破语言障碍' },
+  'messages.tip_4': { ko: '개인정보는 충분히 알게 된 후에 공유하세요', en: 'Share personal information only when you feel comfortable', ja: '十分信頼できると感じてから個人情報をシェアしましょう', zh: '充分了解对方后再分享个人信息' },
+
+  // ── 헤더 네비게이션 (추가) ──────────────────────────────────────────────
+  'nav.dashboard': { ko: '대시보드', en: 'Dashboard', ja: 'ダッシュボード', zh: '仪表板' },
+  'nav.messages': { ko: '메시지', en: 'Messages', ja: 'メッセージ', zh: '消息' },
+  'nav.discover': { ko: '탐색', en: 'Discover', ja: '探索', zh: '探索' },
 }
 
 /** 언어 코드를 지원 언어로 정규화 */
