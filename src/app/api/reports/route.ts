@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { reportingService } from '@/lib/reporting'
 import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
 import { getAuthUser, supabaseService, isValidUuid } from '@src/lib/commerce'
+import { isSuspended } from '@src/lib/suspended-check'
 
 const ALLOWED_REPORT_TYPES = [
   'harassment', 'spam', 'inappropriate_content', 'fake_profile',
@@ -33,6 +34,10 @@ export async function POST(req: NextRequest) {
   const user = await getAuthUser(req)
   if (!user) {
     return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
+  }
+
+  if (await isSuspended(user.id)) {
+    return NextResponse.json({ error: 'Account suspended' }, { status: 403 })
   }
 
   try {
