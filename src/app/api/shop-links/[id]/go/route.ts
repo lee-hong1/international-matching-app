@@ -13,7 +13,7 @@ export async function GET(
   // Rate limit — bot click farming 방지 (graceful: 실패해도 redirect 허용)
   const ip = req.headers.get('x-forwarded-for')?.split(',')[0] ?? 'unknown'
   try {
-    const rl = await checkRateLimit(ip, 'general')
+    const rl = await checkRateLimit(`shop-link-go:${ip}`, 'general')
     if (!rl.allowed) {
       return NextResponse.json({ error: 'Too many requests. Please try again later' }, { status: 429 })
     }

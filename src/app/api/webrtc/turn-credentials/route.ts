@@ -26,7 +26,7 @@ export async function GET(req: NextRequest) {
 
   // ── rate limit: payment window(5/min) 재활용 ─────────────────────────────
   const ip = req.headers.get('x-forwarded-for')?.split(',')[0].trim() ?? 'unknown'
-  const rl = await checkRateLimit(ip, 'payment')
+  const rl = await checkRateLimit(`webrtc-turn:${ip}`, 'payment')
   if (!rl.allowed) {
     const r = rateLimitResponse(rl.resetAt)
     return NextResponse.json(r.body, { status: r.status, headers: r.headers })
