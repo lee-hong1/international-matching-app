@@ -186,6 +186,10 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
 
   if (customer && !customer.deleted && customer.metadata?.userId) {
     const userId = customer.metadata.userId
+    if (!isValidUuid(userId)) {
+      console.error('[webhook] Invalid userId format in customer metadata:', customerId)
+      return
+    }
 
     // 구독 상태를 취소로 업데이트
     const { error: subscriptionError } = await supabaseService

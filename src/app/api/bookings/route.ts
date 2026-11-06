@@ -283,6 +283,11 @@ export async function POST(req: NextRequest) {
   if (service_id && !isValidUuid(service_id)) {
     return NextResponse.json({ error: 'Invalid service_id' }, { status: 400 })
   }
+  if (notes !== undefined && notes !== null) {
+    if (typeof notes !== 'string' || notes.length > 1000) {
+      return NextResponse.json({ error: 'notes must be a string under 1000 characters' }, { status: 400 })
+    }
+  }
 
   // ── booked_at 유효성 ───────────────────────────────────────────────────────
   const bookedDate = new Date(booked_at)
