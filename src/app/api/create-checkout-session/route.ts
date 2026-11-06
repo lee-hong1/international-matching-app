@@ -94,6 +94,12 @@ export async function POST(req: NextRequest) {
       })
     }
 
+    // Host 헤더 인젝션 방지: 반드시 환경변수 사용. req.headers.get('host') fallback 금지.
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL
+    if (!siteUrl) {
+      return NextResponse.json({ error: 'Site URL not configured' }, { status: 503 })
+    }
+
     // 결제 세션 생성 — userId는 JWT 기반 user.id 사용
     const session = await stripe.checkout.sessions.create({
       customer: customer.id,
@@ -110,8 +116,8 @@ export async function POST(req: NextRequest) {
         quantity: 1,
       }],
       mode: 'payment',
-      success_url: `${process.env.NEXT_PUBLIC_SITE_URL ?? `https://${req.headers.get('host')}`}/payment/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_SITE_URL ?? `https://${req.headers.get('host')}`}/premium`,
+      success_url: `${siteUrl}/payment/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${siteUrl}/premium`,
       metadata: { userId: user.id, planId },
     })
 

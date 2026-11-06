@@ -171,6 +171,8 @@ async function handleSubscriptionCreated(subscription: Stripe.Subscription) {
 async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
   console.log('Subscription deleted:', subscription.id)
 
+  if (!stripe) return
+
   const customerId = subscription.customer as string
 
   // 고객 정보에서 사용자 ID 찾기
