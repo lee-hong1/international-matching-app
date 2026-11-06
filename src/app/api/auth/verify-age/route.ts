@@ -12,13 +12,15 @@ import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
 import { isSuspended } from '@src/lib/suspended-check'
 
 const MIN_AGE_YEARS = 19
-const MS_PER_YEAR = 365.25 * 24 * 60 * 60 * 1000
 
+// DB 트리거(birth_date + INTERVAL '19 years' <= CURRENT_DATE)와 동일한 계산 방식
+// ms 기반 계산(365.25 * 19)은 윤년 오차로 DB 결과와 불일치 가능 → setFullYear 사용
 function isAdult(birthDate: string): boolean {
   const birth = new Date(birthDate)
   if (isNaN(birth.getTime())) return false
-  const ageMs = Date.now() - birth.getTime()
-  return ageMs >= MIN_AGE_YEARS * MS_PER_YEAR
+  const adultDate = new Date(birth)
+  adultDate.setFullYear(adultDate.getFullYear() + MIN_AGE_YEARS)
+  return adultDate <= new Date()
 }
 
 export async function POST(req: NextRequest) {
@@ -79,7 +81,7 @@ export async function POST(req: NextRequest) {
     )
   }
 
-  // birth_date 저장 — is_adult는 DB GENERATED ALWAYS로 자동 계산
+  // birth_date 저장 — is_adult는 DB 트리거(compute_is_adult)가 자동 계산
   const { error: updateErr } = await supabaseService
     .from('profiles')
     .update({ birth_date })
