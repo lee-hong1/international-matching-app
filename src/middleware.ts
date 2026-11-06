@@ -190,7 +190,9 @@ async function handleHostPageRoute(request: NextRequest): Promise<NextResponse> 
 
   const accessToken = extractToken(request, supabaseUrl)
   if (!accessToken) {
-    return NextResponse.redirect(new URL('/login', request.url))
+    const loginUrl = new URL('/login', request.url)
+    loginUrl.searchParams.set('returnUrl', request.nextUrl.pathname)
+    return NextResponse.redirect(loginUrl)
   }
 
   try {
@@ -198,7 +200,9 @@ async function handleHostPageRoute(request: NextRequest): Promise<NextResponse> 
     const { data: { user }, error: authErr } = await supabaseAnon.auth.getUser(accessToken)
 
     if (authErr || !user) {
-      return NextResponse.redirect(new URL('/login', request.url))
+      const loginUrl = new URL('/login', request.url)
+      loginUrl.searchParams.set('returnUrl', request.nextUrl.pathname)
+      return NextResponse.redirect(loginUrl)
     }
 
     const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey)
@@ -210,7 +214,9 @@ async function handleHostPageRoute(request: NextRequest): Promise<NextResponse> 
 
     if (!profile || profile.is_adult !== true) {
       // 페이지 라우트: 403 대신 연령 인증 페이지로 리디렉션
-      return NextResponse.redirect(new URL('/onboarding/verify-age', request.url))
+      const verifyUrl = new URL('/onboarding/verify-age', request.url)
+      verifyUrl.searchParams.set('returnUrl', request.nextUrl.pathname)
+      return NextResponse.redirect(verifyUrl)
     }
 
     return NextResponse.next()
