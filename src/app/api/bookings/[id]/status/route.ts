@@ -94,7 +94,7 @@ export async function PATCH(
 ) {
   // ── Rate limit ─────────────────────────────────────────────────────────────
   const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
-  const rl = await checkRateLimit(`status:${ip}`, 'general')
+  const rl = await checkRateLimit(`booking-status:${ip}`, 'general')
   if (!rl.allowed) {
     const r = rateLimitResponse(rl.resetAt)
     return NextResponse.json(r.body, { status: r.status, headers: r.headers })
