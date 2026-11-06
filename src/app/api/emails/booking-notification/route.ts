@@ -1,3 +1,4 @@
+import { timingSafeEqual } from 'crypto'
 import { NextRequest, NextResponse } from 'next/server'
 import { isValidUuid } from '@src/lib/commerce'
 import { t, normalizeLang, type Lang } from '@src/lib/i18n'
@@ -51,9 +52,11 @@ export async function POST(req: NextRequest) {
   }
 
   // 내부 호출 인증 — service role key 헤더
-  const authHeader = req.headers.get('x-service-key')
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-  if (!serviceKey || authHeader !== serviceKey) {
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY ?? ''
+  const provided = req.headers.get('x-service-key')
+  const bufA = Buffer.from(provided ?? '')
+  const bufB = Buffer.from(serviceKey)
+  if (!provided || bufA.length !== bufB.length || !timingSafeEqual(bufA, bufB)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 

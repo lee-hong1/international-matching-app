@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
-import { getAuthUser } from '@src/lib/commerce'
+import { getAuthUser, supabaseService } from '@src/lib/commerce'
 import { isSuspended } from '@src/lib/suspended-check'
 
 // ⚠️ SECURITY: 이 엔드포인트를 실제 이메일 서비스에 연결하기 전에
@@ -40,13 +40,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid email address' }, { status: 400 })
     }
 
-    // 스팸 릴레이 방지: to 주소가 플랫폼 등록 사용자여야 함
-    const { count: recipientCount } = await (await import('@src/lib/commerce')).supabaseService
-      .from('profiles')
-      .select('id', { count: 'exact', head: true })
-      .eq('email', to)
-    if (!recipientCount || recipientCount === 0) {
-      return NextResponse.json({ error: 'Recipient not found on platform' }, { status: 403 })
+    // 스팸 릴레이 방지: 본인 이메일로만 발송 가능
+    const { data: authUserData, error: authUserErr } = await supabaseService.auth.admin.getUserById(user.id)
+    if (authUserErr || !authUserData?.user?.email) {
+      return NextResponse.json({ error: 'User email not found' }, { status: 403 })
+    }
+    if (authUserData.user.email !== to) {
+      return NextResponse.json({ error: 'Can only send emails to your own address' }, { status: 403 })
     }
     // 콘텐츠 길이 제한 (DoS / 대용량 이메일 방지)
     if (typeof subject !== 'string' || subject.length > 200) {
