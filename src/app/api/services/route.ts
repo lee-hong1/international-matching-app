@@ -90,10 +90,10 @@ export async function POST(req: NextRequest) {
   if (typeof title !== 'string' || title.trim().length < 2 || title.trim().length > 100) {
     return NextResponse.json({ error: 'title must be 2–100 characters' }, { status: 400 })
   }
-  if (typeof duration_minutes !== 'number' || duration_minutes <= 0 || duration_minutes > 480) {
+  if (typeof duration_minutes !== 'number' || !Number.isFinite(duration_minutes) || duration_minutes <= 0 || duration_minutes > 480) {
     return NextResponse.json({ error: 'duration_minutes must be 1–480' }, { status: 400 })
   }
-  if (typeof price !== 'number' || price < 0) {
+  if (typeof price !== 'number' || !Number.isFinite(price) || price < 0) {
     return NextResponse.json({ error: 'price must be >= 0' }, { status: 400 })
   }
   if (currency !== undefined && !VALID_CURRENCIES.includes(currency as typeof VALID_CURRENCIES[number])) {
@@ -102,9 +102,14 @@ export async function POST(req: NextRequest) {
   if (!VALID_CATEGORIES.includes(category as ServiceCategory)) {
     return NextResponse.json({ error: `category must be one of: ${VALID_CATEGORIES.join(', ')}` }, { status: 400 })
   }
+  if (description !== undefined && description !== null) {
+    if (typeof description !== 'string' || description.length > 2000) {
+      return NextResponse.json({ error: 'description must be under 2000 characters' }, { status: 400 })
+    }
+  }
   if (max_bookings_per_day !== undefined && max_bookings_per_day !== null) {
-    if (typeof max_bookings_per_day !== 'number' || max_bookings_per_day <= 0) {
-      return NextResponse.json({ error: 'max_bookings_per_day must be a positive integer' }, { status: 400 })
+    if (!Number.isInteger(max_bookings_per_day) || (max_bookings_per_day as number) < 1 || (max_bookings_per_day as number) > 100) {
+      return NextResponse.json({ error: 'max_bookings_per_day must be an integer between 1 and 100' }, { status: 400 })
     }
   }
 
