@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseService, ALLOWED_DOMAINS, isAllowedUrl, getAuthUser, hasForbiddenContent } from '@src/lib/commerce'
+import { supabaseService, ALLOWED_DOMAINS, isAllowedUrl, getAuthUser, hasForbiddenContent, isValidUuid } from '@src/lib/commerce'
 import { isSuspended } from '@src/lib/suspended-check'
 import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
 
@@ -18,6 +18,9 @@ export async function GET(req: NextRequest) {
 
   if (!hostId) {
     return NextResponse.json({ error: 'host_id is required' }, { status: 400 })
+  }
+  if (!isValidUuid(hostId)) {
+    return NextResponse.json({ error: 'Invalid host_id' }, { status: 400 })
   }
 
   const { data, error } = await supabaseService

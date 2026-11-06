@@ -17,11 +17,18 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
   }
 
+  const VALID_POST_TYPES = ['feed', 'user', 'explore'] as const
+  type PostType = typeof VALID_POST_TYPES[number]
+
   const { searchParams } = new URL(request.url)
-  const type = searchParams.get('type') ?? 'feed'
+  const rawType = searchParams.get('type') ?? 'feed'
+  if (!VALID_POST_TYPES.includes(rawType as PostType)) {
+    return NextResponse.json({ error: `type must be one of: ${VALID_POST_TYPES.join(', ')}` }, { status: 400 })
+  }
+  const type = rawType as PostType
   const userId = searchParams.get('userId')
   const limit = Math.min(parseInt(searchParams.get('limit') ?? '12', 10), 50)
-  const offset = Math.max(parseInt(searchParams.get('offset') ?? '0', 10), 0)
+  const offset = Math.min(Math.max(parseInt(searchParams.get('offset') ?? '0', 10), 0), 10000)
 
   let query = supabaseService
     .from('posts')

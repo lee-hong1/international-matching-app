@@ -15,6 +15,13 @@ const VALID_CURRENCIES = ['KRW', 'JPY', 'CNY', 'USD'] as const
  * 호스트의 활성 서비스 목록 조회 (인증 불필요).
  */
 export async function GET(req: NextRequest) {
+  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
+  const rl = await checkRateLimit(`services-get:${ip}`, 'general')
+  if (!rl.allowed) {
+    const r = rateLimitResponse(rl.resetAt)
+    return NextResponse.json(r.body, { status: r.status, headers: r.headers })
+  }
+
   const url = new URL(req.url)
   const hostId = url.searchParams.get('host_id')
   const category = url.searchParams.get('category') as ServiceCategory | null
