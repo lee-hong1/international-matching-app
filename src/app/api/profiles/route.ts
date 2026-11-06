@@ -116,6 +116,24 @@ export async function PATCH(req: NextRequest) {
     }
   }
 
+  if ('languages' in updates) {
+    const langs = updates.languages
+    if (langs !== null) {
+      if (!Array.isArray(langs) || langs.length > 20 || langs.some((l) => typeof l !== 'string' || l.length > 50)) {
+        return NextResponse.json({ error: 'languages must be an array of up to 20 strings (each ≤50 chars)' }, { status: 400 })
+      }
+    }
+  }
+
+  if ('interests' in updates) {
+    const ints = updates.interests
+    if (ints !== null) {
+      if (!Array.isArray(ints) || ints.length > 30 || ints.some((i) => typeof i !== 'string' || i.length > 50)) {
+        return NextResponse.json({ error: 'interests must be an array of up to 30 strings (each ≤50 chars)' }, { status: 400 })
+      }
+    }
+  }
+
   if (Object.keys(updates).length === 0) {
     return NextResponse.json({ error: 'No valid fields to update' }, { status: 400 })
   }
