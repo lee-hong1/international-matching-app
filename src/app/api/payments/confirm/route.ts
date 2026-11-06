@@ -66,6 +66,20 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: true, payment: paymentRecord })
     }
 
+    // 원자적 잠금: pending → processing (동시 요청이 Toss API를 2번 호출하는 race condition 방지)
+    // 다른 요청이 이미 processing 중이면 0 rows 반환 → 409
+    const { data: locked, error: lockErr } = await supabaseService
+      .from('payments')
+      .update({ payment_status: 'processing' })
+      .eq('id', paymentRecord.id)
+      .eq('payment_status', 'pending')
+      .select('id')
+      .single()
+
+    if (lockErr || !locked) {
+      return NextResponse.json({ error: 'Payment is already being processed' }, { status: 409 })
+    }
+
     // 토스페이먼츠 결제 승인 API 호출
     const secretKey = process.env.TOSS_SECRET_KEY
     if (!secretKey) {
@@ -91,7 +105,7 @@ export async function POST(request: NextRequest) {
       } catch {
         console.error('[payments/confirm] toss error: non-JSON response', tossRes.status)
       }
-      await supabaseService.from('payments').update({ payment_status: 'failed' }).eq('id', paymentRecord.id)
+      await supabaseService.from('payments').update({ payment_status: 'failed' }).eq('id', locked.id)
       return NextResponse.json({ error: 'Payment confirmation failed' }, { status: 400 })
     }
 
