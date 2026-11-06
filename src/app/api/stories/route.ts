@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
-import { getAuthUser, supabaseService } from '@src/lib/commerce'
+import { getAuthUser, supabaseService, isValidUuid } from '@src/lib/commerce'
 
 export async function GET(request: NextRequest) {
   const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
@@ -59,8 +59,8 @@ export async function DELETE(request: NextRequest) {
   const { searchParams } = new URL(request.url)
   const storyId = searchParams.get('storyId')
 
-  if (!storyId) {
-    return NextResponse.json({ error: 'storyId is required' }, { status: 400 })
+  if (!storyId || !isValidUuid(storyId)) {
+    return NextResponse.json({ error: 'Valid storyId (UUID) is required' }, { status: 400 })
   }
 
   const { error } = await supabaseService

@@ -27,6 +27,20 @@ export async function POST(req: NextRequest) {
       )
     }
 
+    // 기본 이메일 형식 검증 (스팸 릴레이 방지)
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (typeof to !== 'string' || !emailRegex.test(to) || to.length > 254) {
+      return NextResponse.json({ error: 'Invalid email address' }, { status: 400 })
+    }
+    // 콘텐츠 길이 제한 (DoS / 대용량 이메일 방지)
+    if (typeof subject !== 'string' || subject.length > 200) {
+      return NextResponse.json({ error: 'subject must be under 200 characters' }, { status: 400 })
+    }
+    const contentLen = (html?.length ?? 0) + (text?.length ?? 0)
+    if (contentLen > 50_000) {
+      return NextResponse.json({ error: 'Email content too large (max 50,000 chars)' }, { status: 400 })
+    }
+
     // 실제 구현에서는 여기서 외부 이메일 서비스 API를 호출
     // 예: SendGrid, AWS SES, Mailgun, Nodemailer 등
     

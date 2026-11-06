@@ -1,15 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
-import { isValidUuid, supabaseService } from '@src/lib/commerce'
+import { isValidUuid, supabaseService, getAuthUser } from '@src/lib/commerce'
 import { isSuspended } from '@src/lib/suspended-check'
-
-async function getAuthUser(request: NextRequest) {
-  const authHeader = request.headers.get('authorization')
-  if (!authHeader) return null
-  const token = authHeader.replace('Bearer ', '')
-  const { data: { user } } = await supabaseService.auth.getUser(token)
-  return user
-}
 
 // 이벤트 참가 신청: 무료 이벤트는 즉시 승인 대기, 유료 이벤트는 결제용 주문(payment) 생성
 export async function POST(

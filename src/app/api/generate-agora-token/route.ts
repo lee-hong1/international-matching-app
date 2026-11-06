@@ -64,6 +64,11 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid roomId' }, { status: 400 })
   }
 
+  // roomId는 UUID여야 함 — 비UUID 채널명으로 참여자 검증 우회 방지 (IDOR)
+  if (!isValidUuid(roomId)) {
+    return NextResponse.json({ error: 'roomId must be a valid UUID' }, { status: 400 })
+  }
+
   // 사용자가 해당 채팅방의 참여자인지 검증 (IDOR 방지)
   if (isValidUuid(roomId)) {
     const { data: room } = await supabaseService
