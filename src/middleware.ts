@@ -149,13 +149,20 @@ async function handleHostApiRoute(request: NextRequest): Promise<NextResponse> {
       )
     }
 
-    // Service role로 is_adult 확인 (RLS 우회 불가능하므로 service key 사용)
+    // Service role로 is_adult + is_suspended 확인
     const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey)
     const { data: profile } = await supabaseAdmin
       .from('profiles')
-      .select('is_adult')
+      .select('is_adult, is_suspended')
       .eq('id', user.id)
       .single()
+
+    if (profile?.is_suspended === true) {
+      return NextResponse.json(
+        { error: '계정이 정지되었습니다 / Account suspended' },
+        { status: 403 },
+      )
+    }
 
     if (!profile || profile.is_adult !== true) {
       return NextResponse.json(
