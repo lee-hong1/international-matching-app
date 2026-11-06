@@ -47,10 +47,20 @@ CREATE INDEX IF NOT EXISTS idx_user_behavior_stats_engagement  ON user_behavior_
 
 ALTER TABLE user_behavior_stats ENABLE ROW LEVEL SECURITY;
 
--- 본인 통계만 조회·수정
+-- 본인 통계만 조회 (engagement_score 등 집계 필드는 직접 수정 불가)
 DROP POLICY IF EXISTS "users manage own behavior stats" ON user_behavior_stats;
-CREATE POLICY "users manage own behavior stats" ON user_behavior_stats
-  FOR ALL USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
+DROP POLICY IF EXISTS "users read own behavior stats" ON user_behavior_stats;
+CREATE POLICY "users read own behavior stats" ON user_behavior_stats
+  FOR SELECT USING (auth.uid() = user_id);
+
+-- INSERT/UPDATE: service_role만 (서버 집계, 클라이언트 engagement_score 직접 조작 차단)
+DROP POLICY IF EXISTS "service only write behavior stats" ON user_behavior_stats;
+CREATE POLICY "service only write behavior stats" ON user_behavior_stats
+  FOR INSERT WITH CHECK (false);
+
+DROP POLICY IF EXISTS "service only update behavior stats" ON user_behavior_stats;
+CREATE POLICY "service only update behavior stats" ON user_behavior_stats
+  FOR UPDATE USING (false);
 
 -- ── 집계 함수 (관리자 대시보드용, service_role만 호출) ─────────────────────────
 -- getPlatformStatistics는 집계 COUNT만 조회 (개인 식별 불가)

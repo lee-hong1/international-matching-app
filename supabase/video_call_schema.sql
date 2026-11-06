@@ -32,9 +32,17 @@ CREATE POLICY "caller creates invitation" ON call_invitations
   FOR INSERT
   WITH CHECK (auth.uid() = "callerId");
 
--- receiver만 상태 업데이트 (accept/decline), caller만 취소 가능
+-- receiver만 accept/decline 가능
 DROP POLICY IF EXISTS "participants update invitation" ON call_invitations;
-CREATE POLICY "participants update invitation" ON call_invitations
+DROP POLICY IF EXISTS "receiver responds invitation" ON call_invitations;
+CREATE POLICY "receiver responds invitation" ON call_invitations
   FOR UPDATE
-  USING (auth.uid() = "receiverId" OR auth.uid() = "callerId")
-  WITH CHECK (auth.uid() = "receiverId" OR auth.uid() = "callerId");
+  USING (auth.uid() = "receiverId")
+  WITH CHECK (auth.uid() = "receiverId" AND status IN ('accepted', 'declined'));
+
+-- caller만 취소 가능 (receiver가 'cancelled'로 위장 차단)
+DROP POLICY IF EXISTS "caller cancels invitation" ON call_invitations;
+CREATE POLICY "caller cancels invitation" ON call_invitations
+  FOR UPDATE
+  USING (auth.uid() = "callerId")
+  WITH CHECK (auth.uid() = "callerId" AND status = 'cancelled');

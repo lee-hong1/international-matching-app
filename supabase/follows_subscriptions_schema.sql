@@ -25,10 +25,24 @@ DROP POLICY IF EXISTS "authenticated read creator profiles" ON creator_profiles;
 CREATE POLICY "authenticated read creator profiles" ON creator_profiles
   FOR SELECT USING (auth.role() = 'authenticated');
 
--- 본인 프로필만 수정
+-- 본인 프로필 INSERT
 DROP POLICY IF EXISTS "users manage own creator profile" ON creator_profiles;
-CREATE POLICY "users manage own creator profile" ON creator_profiles
-  FOR ALL USING (auth.uid() = id) WITH CHECK (auth.uid() = id);
+DROP POLICY IF EXISTS "users insert own creator profile" ON creator_profiles;
+CREATE POLICY "users insert own creator profile" ON creator_profiles
+  FOR INSERT WITH CHECK (auth.uid() = id);
+
+-- 본인 프로필 UPDATE: display_name, bio, category만 허용
+-- is_verified, followers_count, following_count는 service_role만 변경 가능
+DROP POLICY IF EXISTS "users update own creator profile" ON creator_profiles;
+CREATE POLICY "users update own creator profile" ON creator_profiles
+  FOR UPDATE
+  USING (auth.uid() = id)
+  WITH CHECK (
+    auth.uid() = id
+    AND is_verified = (SELECT cp.is_verified FROM creator_profiles cp WHERE cp.id = auth.uid())
+    AND followers_count = (SELECT cp.followers_count FROM creator_profiles cp WHERE cp.id = auth.uid())
+    AND following_count = (SELECT cp.following_count FROM creator_profiles cp WHERE cp.id = auth.uid())
+  );
 
 -- followers_count / following_count는 카운터 RPC로만 변경 (클라이언트 직접 UPDATE 차단)
 -- 단, SELECT+INSERT/DELETE 정책이 있으므로 UPDATE는 별도 정책 불필요 (ALL 정책 커버)
