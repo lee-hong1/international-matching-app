@@ -1,18 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabase } from '@/lib/supabase'
-import { supabaseService, isValidUuid } from '@src/lib/commerce'
+import { getAuthUser, supabaseService, isValidUuid } from '@src/lib/commerce'
 import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
+import { isSuspended } from '@src/lib/suspended-check'
 
 const BOOST_AMOUNT = 9900
 const BOOST_HOURS = 24
-
-async function getAuthUser(request: NextRequest) {
-  const authHeader = request.headers.get('authorization')
-  if (!authHeader) return null
-  const token = authHeader.replace('Bearer ', '')
-  const { data: { user } } = await supabase.auth.getUser(token)
-  return user
-}
 
 // POST /api/events/[id]/boost — initiate boost payment
 export async function POST(
@@ -28,6 +20,17 @@ export async function POST(
 
   const user = await getAuthUser(request)
   if (!user) return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
+
+  if (await isSuspended(user.id)) {
+    return NextResponse.json({ error: 'Account suspended' }, { status: 403 })
+  }
+
+  // 청소년보호법: 결제 기능은 성인 인증 필수
+  const { data: boostProfile } = await supabaseService
+    .from('profiles').select('is_adult').eq('id', user.id).single()
+  if (!boostProfile?.is_adult) {
+    return NextResponse.json({ error: 'Age verification required', redirect: '/onboarding/verify-age' }, { status: 403 })
+  }
 
   const { id: eventId } = await params
   if (!isValidUuid(eventId)) {
@@ -77,6 +80,10 @@ export async function PATCH(
   const user = await getAuthUser(request)
   if (!user) return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
 
+  if (await isSuspended(user.id)) {
+    return NextResponse.json({ error: 'Account suspended' }, { status: 403 })
+  }
+
   const { id: eventId } = await params
   if (!isValidUuid(eventId)) {
     return NextResponse.json({ error: 'Invalid event id' }, { status: 400 })
@@ -104,7 +111,10 @@ export async function PATCH(
   }
 
   // Confirm with Toss Payments
-  const secretKey = process.env.TOSS_SECRET_KEY ?? 'test_sk_zXLkKEypNArWmo50nX3lmeaxYG5R'
+  const secretKey = process.env.TOSS_SECRET_KEY
+  if (!secretKey) {
+    return NextResponse.json({ error: 'Payment service not configured' }, { status: 503 })
+  }
   const basicAuth = Buffer.from(`${secretKey}:`).toString('base64')
 
   const tossRes = await fetch('https://api.tosspayments.com/v1/payments/confirm', {
@@ -115,7 +125,8 @@ export async function PATCH(
 
   if (!tossRes.ok) {
     const tossData = await tossRes.json()
-    return NextResponse.json({ error: tossData.message ?? 'Payment confirmation failed' }, { status: 400 })
+    console.error('[event-boost/PATCH] toss error:', tossData.code, tossData.message)
+    return NextResponse.json({ error: 'Payment confirmation failed' }, { status: 400 })
   }
 
   const expiresAt = new Date(Date.now() + BOOST_HOURS * 60 * 60 * 1000).toISOString()

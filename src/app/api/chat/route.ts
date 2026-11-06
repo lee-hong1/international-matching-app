@@ -56,7 +56,7 @@ export async function POST(req: NextRequest) {
   // ── 정지된 계정 차단 ─────────────────────────────────────────────────────
   const { data: profile, error: profileErr } = await supabaseService
     .from('profiles')
-    .select('is_suspended, violation_count')
+    .select('is_suspended, violation_count, is_adult')
     .eq('id', user.id)
     .single()
 
@@ -68,6 +68,11 @@ export async function POST(req: NextRequest) {
       { error: 'Account suspended' },
       { status: 403 }
     )
+  }
+
+  // 청소년보호법: 채팅은 성인 인증 필수
+  if (!profile?.is_adult) {
+    return NextResponse.json({ error: 'Age verification required', redirect: '/onboarding/verify-age' }, { status: 403 })
   }
 
   // ── 채팅방 참여자 확인 ──────────────────────────────────────────────────
