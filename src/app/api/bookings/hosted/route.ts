@@ -79,6 +79,9 @@ export async function GET(req: NextRequest) {
   }
 
   if (cursor) {
+    if (cursor.length > 100) {
+      return NextResponse.json({ error: 'Invalid cursor' }, { status: 400 })
+    }
     const cursorDate = new Date(cursor)
     if (isNaN(cursorDate.getTime())) {
       return NextResponse.json({ error: 'Invalid cursor' }, { status: 400 })

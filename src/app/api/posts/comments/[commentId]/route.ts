@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
 import { isValidUuid, getAuthUser, supabaseService } from '@src/lib/commerce'
+import { isSuspended } from '@src/lib/suspended-check'
 
 // DELETE /api/posts/comments/:commentId — 본인 댓글 삭제 (IDOR 방지)
 export async function DELETE(
@@ -17,6 +18,10 @@ export async function DELETE(
   const user = await getAuthUser(request)
   if (!user) {
     return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
+  }
+
+  if (await isSuspended(user.id)) {
+    return NextResponse.json({ error: 'Account suspended' }, { status: 403 })
   }
 
   const { commentId } = await params
