@@ -20,6 +20,7 @@ export default function FeedPage() {
   const [hasMore, setHasMore] = useState(true)
   const [showCreatePost, setShowCreatePost] = useState(false)
   const [showCreateStory, setShowCreateStory] = useState(false)
+  const [feedError, setFeedError] = useState<string | null>(null)
   const LIMIT = 10
 
   useEffect(() => {
@@ -29,6 +30,7 @@ export default function FeedPage() {
   const loadPosts = useCallback(async (reset = false) => {
     const currentOffset = reset ? 0 : offset
     setLoadingPosts(true)
+    if (reset) setFeedError(null)
     try {
       const data = await postsService.getFeed(LIMIT, currentOffset)
       if (reset) {
@@ -38,6 +40,8 @@ export default function FeedPage() {
       }
       setHasMore(data.length === LIMIT)
       setOffset(currentOffset + data.length)
+    } catch {
+      setFeedError('피드를 불러오는 데 실패했습니다. 잠시 후 다시 시도해주세요.')
     } finally {
       setLoadingPosts(false)
     }
@@ -96,6 +100,19 @@ export default function FeedPage() {
         <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 mb-4">
           <StoryBar onAddStory={() => setShowCreateStory(true)} />
         </div>
+
+        {/* 피드 에러 */}
+        {feedError && (
+          <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 mb-4 flex items-center justify-between">
+            <p className="text-sm text-red-700">{feedError}</p>
+            <button
+              onClick={() => loadPosts(true)}
+              className="ml-3 text-sm font-semibold text-red-700 underline underline-offset-2 flex-shrink-0"
+            >
+              재시도
+            </button>
+          </div>
+        )}
 
         {/* 피드 */}
         {loadingPosts && posts.length === 0 ? (
