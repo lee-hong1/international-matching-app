@@ -65,7 +65,7 @@ async function handleAdminRoute(request: NextRequest): Promise<NextResponse> {
       return NextResponse.redirect(new URL('/login', request.url))
     }
 
-    const adminEmails = (process.env.ADMIN_EMAILS ?? process.env.NEXT_PUBLIC_ADMIN_EMAILS ?? '')
+    const adminEmails = (process.env.ADMIN_EMAILS ?? '')
       .split(',')
       .map((e) => e.trim())
       .filter(Boolean)
