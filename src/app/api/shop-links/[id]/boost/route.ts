@@ -20,7 +20,7 @@ export async function POST(
   const { id: linkId } = await params
   // ── Rate limit (payment window: 5 req / 60 s) ──────────────────────────
   const ip = req.headers.get('x-forwarded-for')?.split(',')[0].trim() ?? 'unknown'
-  const rl = await checkRateLimit(ip, 'payment')
+  const rl = await checkRateLimit(`shop-link-boost:${ip}`, 'payment')
   if (!rl.allowed) {
     const r = rateLimitResponse(rl.resetAt)
     return NextResponse.json(r.body, { status: r.status, headers: r.headers })

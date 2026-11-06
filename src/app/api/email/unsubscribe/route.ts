@@ -38,7 +38,9 @@ export async function GET(req: NextRequest) {
 
   const { searchParams } = new URL(req.url)
   const email = searchParams.get('email')
-  const type = searchParams.get('type') || 'all'
+  const rawType = searchParams.get('type') || 'all'
+  const VALID_UNSUB_TYPES_GET = ['all', 'marketing', 'booking', 'system']
+  const type = VALID_UNSUB_TYPES_GET.includes(rawType) ? rawType : 'all'
 
   if (!email) {
     return NextResponse.json({ error: 'Email parameter is required' }, { status: 400 })
