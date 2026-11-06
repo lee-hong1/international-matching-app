@@ -65,7 +65,8 @@ export async function POST(req: NextRequest) {
   }
 
   // 최대 나이 제한 (150세) — 비정상 날짜 차단
-  if (Date.now() - parsedBirth.getTime() > 150 * MS_PER_YEAR) {
+  const MAX_AGE_MS = 150 * 365.25 * 24 * 60 * 60 * 1000
+  if (Date.now() - parsedBirth.getTime() > MAX_AGE_MS) {
     return NextResponse.json({ error: 'Invalid birth date' }, { status: 400 })
   }
 
