@@ -18,6 +18,14 @@ export async function GET(request: NextRequest) {
   if (!userId) {
     return NextResponse.json({ error: 'userId is required' }, { status: 400 })
   }
+  if (!isValidUuid(userId)) {
+    return NextResponse.json({ error: 'Invalid userId' }, { status: 400 })
+  }
+
+  const VALID_FOLLOW_TYPES = ['followers', 'following', 'stats']
+  if (!VALID_FOLLOW_TYPES.includes(type)) {
+    return NextResponse.json({ error: 'type must be followers, following, or stats' }, { status: 400 })
+  }
 
   try {
     const { data: creatorProfile } = await supabaseService
@@ -127,6 +135,9 @@ export async function DELETE(request: NextRequest) {
 
   if (!followingId) {
     return NextResponse.json({ error: 'following_id is required' }, { status: 400 })
+  }
+  if (!isValidUuid(followingId)) {
+    return NextResponse.json({ error: 'Invalid following_id' }, { status: 400 })
   }
 
   const { error } = await supabaseService

@@ -76,6 +76,13 @@ export async function DELETE(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const delIp = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
+  const delRl = await checkRateLimit(`availability-delete:${delIp}`, 'general')
+  if (!delRl.allowed) {
+    const r = rateLimitResponse(delRl.resetAt)
+    return NextResponse.json(r.body, { status: r.status, headers: r.headers })
+  }
+
   const { id } = await params
 
   if (!isValidUuid(id)) {

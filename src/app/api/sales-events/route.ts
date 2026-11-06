@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseService, isAllowedUrl, getAuthUser, hasForbiddenContent } from '@src/lib/commerce'
+import { supabaseService, isAllowedUrl, getAuthUser, hasForbiddenContent, isValidUuid } from '@src/lib/commerce'
 import { isSuspended } from '@src/lib/suspended-check'
 import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
 
@@ -32,8 +32,20 @@ export async function GET(req: NextRequest) {
     .order('created_at', { ascending: false })
     .range(offset, offset + limit - 1)
 
-  if (eventType) query = query.eq('event_type', eventType)
-  if (hostId) query = query.eq('host_id', hostId)
+  const VALID_EVENT_TYPES = ['groupbuy', 'flash_sale', 'limited', 'presale', 'collaboration']
+  if (eventType) {
+    if (!VALID_EVENT_TYPES.includes(eventType)) {
+      return NextResponse.json({ error: `type must be one of: ${VALID_EVENT_TYPES.join(', ')}` }, { status: 400 })
+    }
+    query = query.eq('event_type', eventType)
+  }
+  if (hostId) {
+    // isValidUuid import 필요 — supabaseService와 같은 모듈에서 가져옴
+    if (!isValidUuid(hostId)) {
+      return NextResponse.json({ error: 'Invalid host_id' }, { status: 400 })
+    }
+    query = query.eq('host_id', hostId)
+  }
 
   const { data, error } = await query
   if (error) return NextResponse.json({ error: 'Failed to fetch sales events' }, { status: 500 })
@@ -86,6 +98,17 @@ export async function POST(req: NextRequest) {
         { error: 'External URL not allowed' },
         { status: 400 }
       )
+    }
+
+    const VALID_PLATFORMS = ['coupang', 'naver', 'kakao', 'instagram', 'youtube', 'other']
+    if (external_platform && !VALID_PLATFORMS.includes(external_platform)) {
+      return NextResponse.json({ error: `external_platform must be one of: ${VALID_PLATFORMS.join(', ')}` }, { status: 400 })
+    }
+
+    if (images !== undefined) {
+      if (!Array.isArray(images) || images.length > 10 || images.some((img: unknown) => typeof img !== 'string' || img.length > 2048)) {
+        return NextResponse.json({ error: 'images must be an array of up to 10 URL strings' }, { status: 400 })
+      }
     }
 
     // 금지 콘텐츠 필터 (도박/성인/불법)

@@ -13,12 +13,15 @@ export async function POST(req: NextRequest) {
   try {
     const { email, type } = await req.json()
 
-    if (!email || typeof email !== 'string') {
-      return NextResponse.json({ error: 'Email is required' }, { status: 400 })
+    if (!email || typeof email !== 'string' || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return NextResponse.json({ error: 'Valid email is required' }, { status: 400 })
     }
 
+    const VALID_UNSUB_TYPES = ['all', 'marketing', 'booking', 'system']
+    const resolvedType = type && VALID_UNSUB_TYPES.includes(type) ? type : 'all'
+
     // 이메일 존재 여부를 외부에 노출하지 않기 위해 항상 200 반환
-    await emailService.unsubscribe(email, type).catch(() => {})
+    await emailService.unsubscribe(email, resolvedType as Parameters<typeof emailService.unsubscribe>[1]).catch(() => {})
 
     return NextResponse.json({ message: 'Successfully unsubscribed from emails' })
   } catch {

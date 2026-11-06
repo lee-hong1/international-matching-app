@@ -30,6 +30,9 @@ export async function GET(request: NextRequest) {
     .order('created_at', { ascending: false })
 
   if (userId) {
+    if (!isValidUuid(userId)) {
+      return NextResponse.json({ error: 'Invalid userId' }, { status: 400 })
+    }
     query = query.eq('user_id', userId)
   }
 

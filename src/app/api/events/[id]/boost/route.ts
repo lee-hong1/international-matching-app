@@ -77,6 +77,13 @@ export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
+  const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
+  const patchRl = await checkRateLimit(`event-boost-confirm:${ip}`, 'payment')
+  if (!patchRl.allowed) {
+    const r = rateLimitResponse(patchRl.resetAt)
+    return NextResponse.json(r.body, { status: r.status, headers: r.headers })
+  }
+
   const user = await getAuthUser(request)
   if (!user) return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
 
@@ -89,10 +96,18 @@ export async function PATCH(
     return NextResponse.json({ error: 'Invalid event id' }, { status: 400 })
   }
 
-  const { paymentKey, orderId, amount } = await request.json()
+  let paymentKey: string, orderId: string, amount: number
+  try {
+    const body = await request.json()
+    paymentKey = body.paymentKey
+    orderId = body.orderId
+    amount = body.amount
+  } catch {
+    return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 })
+  }
 
-  if (!paymentKey || !orderId || amount === undefined) {
-    return NextResponse.json({ error: 'Required parameters missing' }, { status: 400 })
+  if (!paymentKey || typeof paymentKey !== 'string' || !orderId || typeof orderId !== 'string' || typeof amount !== 'number' || amount <= 0) {
+    return NextResponse.json({ error: 'Required parameters missing or invalid' }, { status: 400 })
   }
 
   const { data: boost, error: boostError } = await supabaseService
