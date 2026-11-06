@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
-import { supabaseService } from '@src/lib/commerce'
+import { supabaseService, isValidUuid } from '@src/lib/commerce'
 
 const stripeKey = process.env.STRIPE_SECRET_KEY
 const stripe = stripeKey
@@ -69,6 +69,10 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       console.error('Missing metadata in checkout session')
       return
     }
+    if (!isValidUuid(userId) || !isValidUuid(planId)) {
+      console.error('[webhook] Invalid userId or planId format in session metadata')
+      return
+    }
 
     // 구독 플랜 정보 가져오기
     const { data: plan } = await supabaseService
@@ -113,7 +117,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       .from('payments')
       .insert({
         user_id: userId,
-        amount: session.amount_total! / 100,
+        amount: (session.amount_total ?? 0) / 100,
         currency: 'KRW',
         payment_method: 'stripe',
         payment_status: 'completed',
