@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getAuthUser, supabaseService } from '@src/lib/commerce'
+import { getAuthUser, supabaseService, isValidUuid } from '@src/lib/commerce'
 import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
+
+const VALID_REPORT_STATUSES = new Set(['pending', 'reviewing', 'resolved', 'dismissed'])
 
 // 신고 처리 — 관리자 전용 (adminId는 JWT에서 추출, body에서 받지 않음)
 export async function PATCH(
@@ -27,12 +29,21 @@ export async function PATCH(
   }
 
   const { id: reportId } = await params
+  if (!reportId || !isValidUuid(reportId)) {
+    return NextResponse.json({ error: 'Invalid report id' }, { status: 400 })
+  }
 
   try {
     const { status, resolutionNotes } = await req.json()
 
     if (!status || !resolutionNotes) {
       return NextResponse.json({ error: 'status and resolutionNotes are required' }, { status: 400 })
+    }
+    if (!VALID_REPORT_STATUSES.has(status)) {
+      return NextResponse.json(
+        { error: `status must be one of: ${[...VALID_REPORT_STATUSES].join(', ')}` },
+        { status: 400 }
+      )
     }
 
     const { error } = await supabaseService
