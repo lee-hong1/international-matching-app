@@ -141,7 +141,7 @@ export async function PATCH(req: NextRequest) {
     .from('profiles')
     .update(updates)
     .eq('id', user.id)
-    .select()
+    .select('id, display_name, full_name, avatar_url, bio, country, city, preferred_lang, languages, interests, is_host, is_premium, is_adult, trust_score, trust_badge, created_at, updated_at')
     .single()
 
   if (error) {
@@ -153,9 +153,5 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({ error: 'Update failed' }, { status: 500 })
   }
 
-  // birth_date는 select 목록에서 미포함 처리 (PATCH도 select 컬럼 명시 필요 시 아래 활용)
-  const { birth_date: _bd, ...safeProfile } = data as Record<string, unknown>
-  void _bd
-
-  return NextResponse.json(safeProfile)
+  return NextResponse.json(data)
 }
