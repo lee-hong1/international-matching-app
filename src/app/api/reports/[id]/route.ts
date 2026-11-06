@@ -45,8 +45,11 @@ export async function PATCH(
         { status: 400 }
       )
     }
+    if (typeof resolutionNotes !== 'string' || resolutionNotes.length > 5000) {
+      return NextResponse.json({ error: 'resolutionNotes must be a string under 5000 characters' }, { status: 400 })
+    }
 
-    const { error } = await supabaseService
+    const { data: updated, error } = await supabaseService
       .from('reports')
       .update({
         status,
@@ -55,7 +58,12 @@ export async function PATCH(
         resolved_at: new Date().toISOString(),
       })
       .eq('id', reportId)
+      .select('id')
+      .single()
 
+    if (error?.code === 'PGRST116' || !updated) {
+      return NextResponse.json({ error: 'Report not found' }, { status: 404 })
+    }
     if (error) {
       return NextResponse.json({ error: 'Failed to process report' }, { status: 500 })
     }

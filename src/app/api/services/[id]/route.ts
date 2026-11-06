@@ -66,6 +66,10 @@ export async function PATCH(
     return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
   }
 
+  if (await isSuspended(user.id)) {
+    return NextResponse.json({ error: 'Account suspended' }, { status: 403 })
+  }
+
   // 소유권 확인 (IDOR 방지)
   const { data: existing, error: fetchErr } = await supabaseService
     .from('services')
@@ -118,11 +122,19 @@ export async function PATCH(
   if (updates.currency !== undefined && !VALID_CURRENCIES.includes(updates.currency as typeof VALID_CURRENCIES[number])) {
     return NextResponse.json({ error: 'Invalid currency' }, { status: 400 })
   }
-  if (updates.price !== undefined && (typeof updates.price !== 'number' || updates.price < 0)) {
-    return NextResponse.json({ error: 'price must be a non-negative number' }, { status: 400 })
+  if (updates.price !== undefined && (typeof updates.price !== 'number' || !Number.isFinite(updates.price) || updates.price < 0)) {
+    return NextResponse.json({ error: 'price must be a non-negative finite number' }, { status: 400 })
   }
-  if (updates.duration_minutes !== undefined && (typeof updates.duration_minutes !== 'number' || updates.duration_minutes <= 0)) {
-    return NextResponse.json({ error: 'duration_minutes must be positive' }, { status: 400 })
+  if (updates.duration_minutes !== undefined && (typeof updates.duration_minutes !== 'number' || !Number.isFinite(updates.duration_minutes) || updates.duration_minutes <= 0)) {
+    return NextResponse.json({ error: 'duration_minutes must be a positive finite number' }, { status: 400 })
+  }
+  if (updates.max_bookings_per_day !== undefined) {
+    if (!Number.isInteger(updates.max_bookings_per_day) || (updates.max_bookings_per_day as number) < 1 || (updates.max_bookings_per_day as number) > 100) {
+      return NextResponse.json({ error: 'max_bookings_per_day must be an integer between 1 and 100' }, { status: 400 })
+    }
+  }
+  if (updates.is_active !== undefined && typeof updates.is_active !== 'boolean') {
+    return NextResponse.json({ error: 'is_active must be a boolean' }, { status: 400 })
   }
 
   const { data: updated, error } = await supabaseService
