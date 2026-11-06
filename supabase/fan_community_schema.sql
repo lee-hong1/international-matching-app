@@ -155,18 +155,34 @@ CREATE POLICY "게시물 작성자만 미디어 삭제" ON post_media FOR DELETE
 );
 
 -- 좋아요 정책
-CREATE POLICY "누구나 좋아요 조회" ON post_likes FOR SELECT USING (true);
+-- 비공개 게시물(is_public=false) 좋아요는 게시물 작성자와 좋아요 본인만 조회 가능
+CREATE POLICY "공개 게시물 또는 본인 좋아요 조회" ON post_likes FOR SELECT USING (
+  auth.uid() = user_id
+  OR EXISTS (SELECT 1 FROM posts WHERE posts.id = post_likes.post_id AND posts.is_public = true)
+);
 CREATE POLICY "인증된 사용자만 좋아요" ON post_likes FOR INSERT WITH CHECK (auth.uid() = user_id);
 CREATE POLICY "본인만 좋아요 취소" ON post_likes FOR DELETE USING (auth.uid() = user_id);
 
 -- 댓글 정책
-CREATE POLICY "누구나 댓글 조회" ON post_comments FOR SELECT USING (true);
+-- 비공개 게시물 댓글은 게시물 작성자와 댓글 작성자만 조회 가능
+CREATE POLICY "공개 게시물 또는 본인 댓글 조회" ON post_comments FOR SELECT USING (
+  auth.uid() = user_id
+  OR EXISTS (SELECT 1 FROM posts WHERE posts.id = post_comments.post_id AND (posts.is_public = true OR posts.user_id = auth.uid()))
+);
 CREATE POLICY "인증된 사용자만 댓글 작성" ON post_comments FOR INSERT WITH CHECK (auth.uid() = user_id);
 CREATE POLICY "본인만 댓글 수정" ON post_comments FOR UPDATE USING (auth.uid() = user_id);
 CREATE POLICY "본인만 댓글 삭제" ON post_comments FOR DELETE USING (auth.uid() = user_id);
 
 -- 댓글 좋아요 정책
-CREATE POLICY "누구나 댓글 좋아요 조회" ON comment_likes FOR SELECT USING (true);
+-- 비공개 게시물 댓글 좋아요는 본인만 조회 가능
+CREATE POLICY "공개 게시물 댓글 또는 본인 댓글 좋아요 조회" ON comment_likes FOR SELECT USING (
+  auth.uid() = user_id
+  OR EXISTS (
+    SELECT 1 FROM post_comments pc
+    JOIN posts p ON p.id = pc.post_id
+    WHERE pc.id = comment_likes.comment_id AND (p.is_public = true OR p.user_id = auth.uid())
+  )
+);
 CREATE POLICY "인증된 사용자만 댓글 좋아요" ON comment_likes FOR INSERT WITH CHECK (auth.uid() = user_id);
 CREATE POLICY "본인만 댓글 좋아요 취소" ON comment_likes FOR DELETE USING (auth.uid() = user_id);
 
