@@ -7,11 +7,12 @@ import { isSuspended } from '@src/lib/suspended-check'
 
 // ── 이메일 fire-and-forget 헬퍼 ──────────────────────────────────────────────
 async function sendBookingEmail(
-  req: NextRequest,
+  _req: NextRequest,
   opts: { booking_id: string; type: 'new_booking' | 'confirmed' | 'cancelled'; recipient_id: string }
 ): Promise<void> {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? `https://${req.headers.get('host')}`
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL
+    if (!baseUrl) return
     const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY ?? ''
     // 수신자 이메일 조회
     const { data: profile } = await (await import('@src/lib/commerce')).supabaseService
@@ -37,7 +38,7 @@ async function sendBookingEmail(
 
 // ── Fire-and-forget 알림 헬퍼 ─────────────────────────────────────────────────
 async function sendBookingNotification(
-  req: NextRequest,
+  _req: NextRequest,
   opts: {
     recipientId: string
     type: 'new_booking' | 'confirmed' | 'cancelled' | 'completed'
@@ -50,7 +51,8 @@ async function sendBookingNotification(
     const lang: Lang = opts.lang ?? 'ko'
     const titleKey = `notification.${opts.type}.title`
     const bodyKey  = `notification.${opts.type}.body`
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? `https://${req.headers.get('host')}`
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL
+    if (!baseUrl) return
     await fetch(`${baseUrl}/api/send-notification`, {
       method: 'POST',
       headers: { 'content-type': 'application/json', 'x-service-key': process.env.SUPABASE_SERVICE_ROLE_KEY ?? '' },
