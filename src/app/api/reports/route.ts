@@ -60,8 +60,14 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid report_type' }, { status: 400 })
     }
 
-    // reporter_id는 클라이언트 입력이 아닌 JWT 검증된 uid 사용
-    const safeReportData = { ...reportData, reporter_id: user.id }
+    // 허용 필드만 명시적으로 추출 — 관리자 전용 필드(reviewed_by, reviewed_at, resolution_notes 등) 삽입 차단
+    const safeReportData = {
+      reported_user_id: reportData.reported_user_id as string,
+      reported_content_id: reportData.reported_content_id as string | undefined,
+      report_type: reportData.report_type as string,
+      description: typeof reportData.description === 'string' ? reportData.description.slice(0, 2000) : undefined,
+      reporter_id: user.id,
+    }
 
     if (safeReportData.reported_user_id === user.id) {
       return NextResponse.json(
