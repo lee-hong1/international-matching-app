@@ -18,7 +18,7 @@ export async function POST(
   const { id: eventId } = await params
   // ── Rate limit ─────────────────────────────────────────────────────────
   const ip = req.headers.get('x-forwarded-for')?.split(',')[0].trim() ?? 'unknown'
-  const rl = await checkRateLimit(ip, 'payment')
+  const rl = await checkRateLimit(`sales-event-boost:${ip}`, 'payment')
   if (!rl.allowed) {
     const r = rateLimitResponse(rl.resetAt)
     return NextResponse.json(r.body, { status: r.status, headers: r.headers })

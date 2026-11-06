@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { isValidUuid } from '@src/lib/commerce'
 import { t, normalizeLang, type Lang } from '@src/lib/i18n'
+import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
 
 type NotificationType = 'new_booking' | 'confirmed' | 'cancelled'
 
@@ -32,6 +33,13 @@ function buildEmailHtml(type: NotificationType, lang: Lang, vars: Record<string,
  * 개인정보(이메일)는 로그에 출력하지 않는다.
  */
 export async function POST(req: NextRequest) {
+  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
+  const rl = await checkRateLimit(`booking-notification-email:${ip}`, 'general')
+  if (!rl.allowed) {
+    const r = rateLimitResponse(rl.resetAt)
+    return NextResponse.json(r.body, { status: r.status, headers: r.headers })
+  }
+
   // 내부 호출 인증 — service role key 헤더
   const authHeader = req.headers.get('x-service-key')
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
