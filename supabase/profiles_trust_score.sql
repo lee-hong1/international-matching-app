@@ -17,21 +17,26 @@ CREATE INDEX IF NOT EXISTS idx_profiles_trust
 
 -- ── RLS 정책 ──────────────────────────────────────────────────────────────────
 
--- trust_score/trust_badge는 authenticated 사용자 모두 조회 가능 (프로필 카드 표시)
+-- trust_score/trust_badge는 authenticated 사용자 조회 가능
+-- 단, 미성년자 프로필은 본인 외 차단 (age_verification.sql 정책과 일관성 유지)
+-- USING (TRUE) 금지: age_verification adult_users_only_visible 정책을 OR로 우회하게 됨
 CREATE POLICY "authenticated_read_trust_fields"
   ON profiles
   FOR SELECT
   TO authenticated
-  USING (TRUE);
+  USING (is_adult IS TRUE OR auth.uid() = id);
 
--- trust_score/trust_badge 직접 UPDATE는 service_role만 허용
--- (관리자 조작 또는 자동화 스크립트만 변경 가능)
--- 일반 사용자가 UPDATE 시도 시 RLS로 차단
+-- trust_score/trust_badge 직접 UPDATE 차단 (서브쿼리로 현재 값 고정)
+-- service_role은 RLS bypass이므로 함수/웹훅에서만 변경 가능
 CREATE POLICY "only_service_role_update_trust"
   ON profiles
   FOR UPDATE
-  USING (auth.uid() = id)                 -- 본인 프로필만 수정
-  WITH CHECK (auth.uid() = id);           -- service_role은 bypass하므로 별도 정책 불필요
+  USING (auth.uid() = id)
+  WITH CHECK (
+    auth.uid() = id
+    AND trust_score = (SELECT p.trust_score FROM profiles p WHERE p.id = auth.uid())
+    AND trust_badge = (SELECT p.trust_badge FROM profiles p WHERE p.id = auth.uid())
+  );
 
 -- ── 뱃지 자동 계산 함수 ────────────────────────────────────────────────────────
 -- trust_score 변경 시 trust_badge 자동 갱신 트리거
