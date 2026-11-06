@@ -46,6 +46,21 @@ export async function POST(req: NextRequest) {
   if (typeof is_approved !== 'boolean') {
     return NextResponse.json({ error: 'is_approved must be boolean' }, { status: 400 })
   }
+  if (verification_score !== undefined && verification_score !== null) {
+    if (typeof verification_score !== 'number' || !Number.isFinite(verification_score) || verification_score < 0 || verification_score > 1) {
+      return NextResponse.json({ error: 'verification_score must be a number between 0 and 1' }, { status: 400 })
+    }
+  }
+  if (rejection_reasons !== undefined && rejection_reasons !== null) {
+    if (JSON.stringify(rejection_reasons).length > 2000) {
+      return NextResponse.json({ error: 'rejection_reasons too large' }, { status: 400 })
+    }
+  }
+  if (analysis_data !== undefined && analysis_data !== null) {
+    if (JSON.stringify(analysis_data).length > 10000) {
+      return NextResponse.json({ error: 'analysis_data too large' }, { status: 400 })
+    }
+  }
 
   const { data, error } = await supabaseService
     .from('photo_verifications')

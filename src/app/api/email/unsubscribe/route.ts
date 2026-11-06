@@ -24,10 +24,15 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const { email, type } = await req.json()
+    const { email, type, token } = await req.json()
 
     if (!email || typeof email !== 'string' || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       return NextResponse.json({ error: 'Valid email is required' }, { status: 400 })
+    }
+
+    // 타인 구독 취소 방지: HMAC 토큰 필수 검증
+    if (!token || typeof token !== 'string' || !verifyUnsubToken(email, token)) {
+      return NextResponse.json({ error: 'Invalid or missing unsubscribe token' }, { status: 403 })
     }
 
     const VALID_UNSUB_TYPES = ['all', 'marketing', 'booking', 'system']
