@@ -62,20 +62,27 @@ export async function DELETE(
     return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
   }
 
+  if (await isSuspended(user.id)) {
+    return NextResponse.json({ error: 'Account suspended' }, { status: 403 })
+  }
+
   const { id: postId } = await params
   if (!isValidUuid(postId)) {
     return NextResponse.json({ error: 'Invalid post ID' }, { status: 400 })
   }
 
-  const { error } = await supabaseService
+  const { data: deleted, error } = await supabaseService
     .from('post_likes')
     .delete()
     .eq('post_id', postId)
     .eq('user_id', user.id)
+    .select('post_id')
 
   if (error) return NextResponse.json({ error: 'Failed to unlike post' }, { status: 500 })
 
-  await supabaseService.rpc('decrement_likes_count', { p_post_id: postId })
+  if (deleted && deleted.length > 0) {
+    await supabaseService.rpc('decrement_likes_count', { p_post_id: postId })
+  }
 
   return NextResponse.json({ liked: false })
 }

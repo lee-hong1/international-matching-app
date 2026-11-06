@@ -55,6 +55,16 @@ export async function POST(
       )
     }
 
+    if (typeof payment_key !== 'string' || payment_key.length > 200) {
+      return NextResponse.json({ error: 'Invalid payment_key' }, { status: 400 })
+    }
+    if (typeof order_id !== 'string' || order_id.length > 200) {
+      return NextResponse.json({ error: 'Invalid order_id' }, { status: 400 })
+    }
+    if (!Number.isInteger(boost_days) || (boost_days as number) < 1) {
+      return NextResponse.json({ error: 'boost_days must be a positive integer' }, { status: 400 })
+    }
+
     // payment_method는 선택 필드 — 미지정 시 'card' 기본값
     const resolvedMethod: PaymentMethod =
       payment_method && Object.keys(PAYMENT_METHODS).includes(payment_method)
