@@ -8,6 +8,13 @@ import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
  * 사진 AI 검증 결과를 서버 측에서 저장.
  */
 export async function POST(req: NextRequest) {
+  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
+  const rl = await checkRateLimit(`photo-verif-post:${ip}`, 'general')
+  if (!rl.allowed) {
+    const r = rateLimitResponse(rl.resetAt)
+    return NextResponse.json(r.body, { status: r.status, headers: r.headers })
+  }
+
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
   const provided = req.headers.get('x-service-key')
   if (!serviceKey || provided !== serviceKey) {

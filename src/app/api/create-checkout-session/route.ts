@@ -29,6 +29,19 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Account suspended' }, { status: 403 })
   }
 
+  // 청소년보호법: 결제는 성인 인증 필수
+  const { data: agvProfile } = await supabaseService
+    .from('profiles')
+    .select('is_adult')
+    .eq('id', user.id)
+    .single()
+  if (!agvProfile?.is_adult) {
+    return NextResponse.json(
+      { error: 'Age verification required', redirect: '/onboarding/verify-age' },
+      { status: 403 }
+    )
+  }
+
   let stripe: Stripe
   try {
     stripe = getStripe()

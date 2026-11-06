@@ -2,6 +2,7 @@ import { createHmac } from 'crypto'
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthUser } from '@src/lib/commerce'
 import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
+import { isSuspended } from '@src/lib/suspended-check'
 
 /**
  * GET /api/webrtc/turn-credentials
@@ -17,6 +18,10 @@ export async function GET(req: NextRequest) {
   const user = await getAuthUser(req)
   if (!user) {
     return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
+  }
+
+  if (await isSuspended(user.id)) {
+    return NextResponse.json({ error: 'Account suspended' }, { status: 403 })
   }
 
   // ── rate limit: payment window(5/min) 재활용 ─────────────────────────────

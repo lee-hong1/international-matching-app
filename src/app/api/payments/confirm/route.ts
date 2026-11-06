@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { calculateCommission } from '@/lib/payments'
 import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
 import { getAuthUser, supabaseService } from '@src/lib/commerce'
+import { isSuspended } from '@src/lib/suspended-check'
 
 // 토스페이먼츠 결제 승인 콜백 처리 + 수수료 분배 정산
 export async function POST(request: NextRequest) {
@@ -17,8 +18,21 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
   }
 
+  if (await isSuspended(user.id)) {
+    return NextResponse.json({ error: 'Account suspended' }, { status: 403 })
+  }
+
+  let paymentKey!: string, orderId!: string, amount!: number
   try {
-    const { paymentKey, orderId, amount } = await request.json()
+    const body = await request.json()
+    paymentKey = body.paymentKey
+    orderId = body.orderId
+    amount = body.amount
+  } catch {
+    return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 })
+  }
+
+  try {
     if (!paymentKey || !orderId || amount === undefined) {
       return NextResponse.json({ error: 'Required parameters missing' }, { status: 400 })
     }
