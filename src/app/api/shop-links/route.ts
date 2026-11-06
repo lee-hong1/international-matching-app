@@ -91,6 +91,17 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Maximum 20 active links allowed' }, { status: 409 })
     }
 
+    if (original_price !== undefined && original_price !== null) {
+      if (typeof original_price !== 'number' || !Number.isFinite(original_price) || original_price < 0) {
+        return NextResponse.json({ error: 'original_price must be a non-negative number' }, { status: 400 })
+      }
+    }
+    if (sale_price !== undefined && sale_price !== null) {
+      if (typeof sale_price !== 'number' || !Number.isFinite(sale_price) || sale_price < 0) {
+        return NextResponse.json({ error: 'sale_price must be a non-negative number' }, { status: 400 })
+      }
+    }
+
     const { data: link, error: insertErr } = await supabaseService
       .from('host_shop_links')
       .insert({

@@ -82,10 +82,15 @@ export async function POST(request: NextRequest) {
       body: JSON.stringify({ paymentKey, orderId, amount }),
     })
 
-    const tossData = await tossRes.json()
     if (!tossRes.ok) {
-      // 토스 에러 메시지는 내부 로그에만 기록 — 클라이언트에 직접 노출 금지
-      console.error('[payments/confirm] toss error:', tossData.code, tossData.message)
+      let tossCode = 'UNKNOWN'
+      try {
+        const tossData = await tossRes.json()
+        tossCode = tossData.code ?? 'UNKNOWN'
+        console.error('[payments/confirm] toss error:', tossCode, tossData.message)
+      } catch {
+        console.error('[payments/confirm] toss error: non-JSON response', tossRes.status)
+      }
       await supabaseService.from('payments').update({ payment_status: 'failed' }).eq('id', paymentRecord.id)
       return NextResponse.json({ error: 'Payment confirmation failed' }, { status: 400 })
     }
