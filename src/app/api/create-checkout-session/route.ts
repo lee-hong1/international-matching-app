@@ -110,8 +110,8 @@ export async function POST(req: NextRequest) {
         quantity: 1,
       }],
       mode: 'payment',
-      success_url: `${req.nextUrl.origin}/payment/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${req.nextUrl.origin}/premium`,
+      success_url: `${process.env.NEXT_PUBLIC_SITE_URL ?? `https://${req.headers.get('host')}`}/payment/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${process.env.NEXT_PUBLIC_SITE_URL ?? `https://${req.headers.get('host')}`}/premium`,
       metadata: { userId: user.id, planId },
     })
 

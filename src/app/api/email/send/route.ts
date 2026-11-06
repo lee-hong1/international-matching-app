@@ -32,6 +32,15 @@ export async function POST(req: NextRequest) {
     if (typeof to !== 'string' || !emailRegex.test(to) || to.length > 254) {
       return NextResponse.json({ error: 'Invalid email address' }, { status: 400 })
     }
+
+    // 스팸 릴레이 방지: to 주소가 플랫폼 등록 사용자여야 함
+    const { count: recipientCount } = await (await import('@src/lib/commerce')).supabaseService
+      .from('profiles')
+      .select('id', { count: 'exact', head: true })
+      .eq('email', to)
+    if (!recipientCount || recipientCount === 0) {
+      return NextResponse.json({ error: 'Recipient not found on platform' }, { status: 403 })
+    }
     // 콘텐츠 길이 제한 (DoS / 대용량 이메일 방지)
     if (typeof subject !== 'string' || subject.length > 200) {
       return NextResponse.json({ error: 'subject must be under 200 characters' }, { status: 400 })
