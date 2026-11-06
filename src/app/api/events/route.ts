@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getAuthUser, supabaseService, isValidUuid } from '@src/lib/commerce'
+import { getAuthUser, supabaseService, isValidUuid, hasForbiddenContent } from '@src/lib/commerce'
+import { detectExternalPlatform } from '@src/lib/chat-safety'
 import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
 import { isSuspended } from '@src/lib/suspended-check'
 
@@ -109,6 +110,12 @@ export async function POST(request: NextRequest) {
     }
     if (description && (typeof description !== 'string' || description.length > 2000)) {
       return NextResponse.json({ error: 'description must be under 2000 characters' }, { status: 400 })
+    }
+    if (hasForbiddenContent(title) || hasForbiddenContent(description ?? '')) {
+      return NextResponse.json({ error: 'Content contains prohibited keywords' }, { status: 400 })
+    }
+    if (detectExternalPlatform(title) || detectExternalPlatform(description ?? '')) {
+      return NextResponse.json({ error: 'External platform referral not allowed' }, { status: 400 })
     }
     if (customLocation && (typeof customLocation !== 'string' || customLocation.length > 500)) {
       return NextResponse.json({ error: 'customLocation must be under 500 characters' }, { status: 400 })

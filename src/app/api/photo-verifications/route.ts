@@ -1,3 +1,4 @@
+import { timingSafeEqual } from 'crypto'
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthUser, supabaseService, isValidUuid } from '@src/lib/commerce'
 import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
@@ -15,9 +16,11 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(r.body, { status: r.status, headers: r.headers })
   }
 
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY ?? ''
   const provided = req.headers.get('x-service-key')
-  if (!serviceKey || provided !== serviceKey) {
+  const bufA = Buffer.from(provided ?? '')
+  const bufB = Buffer.from(serviceKey)
+  if (!provided || bufA.length !== bufB.length || !timingSafeEqual(bufA, bufB)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
