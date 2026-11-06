@@ -125,6 +125,11 @@ export async function PATCH(
     return NextResponse.json({ error: 'Payment amount mismatch' }, { status: 400 })
   }
 
+  // 멱등성: 이미 결제 완료된 boost는 재처리 없이 성공 반환
+  if (boost.status === 'paid') {
+    return NextResponse.json({ success: true, expiresAt: boost.expires_at })
+  }
+
   // Confirm with Toss Payments
   const secretKey = process.env.TOSS_SECRET_KEY
   if (!secretKey) {

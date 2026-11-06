@@ -15,8 +15,10 @@ export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url)
   const eventType = searchParams.get('type')
   const hostId = searchParams.get('host_id')
-  const limit = Math.min(parseInt(searchParams.get('limit') ?? '20'), 100)
-  const offset = Math.min(Math.max(parseInt(searchParams.get('offset') ?? '0', 10), 0), 10000)
+  const rawLimit = parseInt(searchParams.get('limit') ?? '20', 10)
+  const limit = Math.min(Number.isFinite(rawLimit) && rawLimit > 0 ? rawLimit : 20, 100)
+  const rawOffset = parseInt(searchParams.get('offset') ?? '0', 10)
+  const offset = Math.min(Number.isFinite(rawOffset) && rawOffset >= 0 ? rawOffset : 0, 10000)
 
   let query = supabaseService
     .from('sales_events')
