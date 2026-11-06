@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { reportingService } from '@/lib/reporting'
 import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
-import { getAuthUser, supabaseService } from '@src/lib/commerce'
+import { getAuthUser, supabaseService, isValidUuid } from '@src/lib/commerce'
 
 // 사용자 차단 — blockerId는 JWT에서 추출 (IDOR 방지)
 export async function POST(req: NextRequest) {
@@ -20,9 +20,9 @@ export async function POST(req: NextRequest) {
   try {
     const { blockedUserId, reason } = await req.json()
 
-    if (!blockedUserId) {
+    if (!blockedUserId || !isValidUuid(blockedUserId)) {
       return NextResponse.json(
-        { error: 'Missing required fields' },
+        { error: 'Valid blockedUserId (UUID) is required' },
         { status: 400 }
       )
     }

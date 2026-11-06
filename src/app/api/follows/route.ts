@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
-import { getAuthUser, supabaseService } from '@src/lib/commerce'
+import { getAuthUser, supabaseService, isValidUuid } from '@src/lib/commerce'
+import { isSuspended } from '@src/lib/suspended-check'
 
 export async function GET(request: NextRequest) {
   const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
@@ -73,6 +74,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
   }
 
+  if (await isSuspended(user.id)) {
+    return NextResponse.json({ error: 'Account suspended' }, { status: 403 })
+  }
+
   let following_id: string
   try {
     const body = await request.json()
@@ -81,8 +86,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Invalid request body' }, { status: 400 })
   }
 
-  if (!following_id) {
-    return NextResponse.json({ error: 'following_id is required' }, { status: 400 })
+  if (!following_id || !isValidUuid(following_id)) {
+    return NextResponse.json({ error: 'Valid following_id (UUID) is required' }, { status: 400 })
   }
 
   if (following_id === user.id) {

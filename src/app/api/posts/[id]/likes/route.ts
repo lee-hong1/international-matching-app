@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
 import { isValidUuid, getAuthUser, supabaseService } from '@src/lib/commerce'
+import { isSuspended } from '@src/lib/suspended-check'
 
 // POST /api/posts/:id/likes — 좋아요 (멱등성: 이미 있으면 무시)
 export async function POST(
@@ -17,6 +18,10 @@ export async function POST(
   const user = await getAuthUser(request)
   if (!user) {
     return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
+  }
+
+  if (await isSuspended(user.id)) {
+    return NextResponse.json({ error: 'Account suspended' }, { status: 403 })
   }
 
   const { id: postId } = await params
