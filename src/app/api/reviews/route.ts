@@ -46,6 +46,9 @@ export async function GET(req: NextRequest) {
   }
 
   if (cursor) {
+    if (cursor.length > 512) {
+      return NextResponse.json({ error: 'Invalid cursor' }, { status: 400 })
+    }
     try {
       const { created_at, id } = JSON.parse(Buffer.from(cursor, 'base64').toString())
       // Injection 방지: cursor 값 형식 검증
@@ -117,8 +120,8 @@ export async function POST(req: NextRequest) {
   if (typeof rating !== 'number' || rating < 1 || rating > 5 || !Number.isInteger(rating)) {
     return NextResponse.json({ error: 'rating must be integer 1-5' }, { status: 400 })
   }
-  if (comment && comment.length > 1000) {
-    return NextResponse.json({ error: 'comment too long (max 1000)' }, { status: 400 })
+  if (comment !== undefined && comment !== null && (typeof comment !== 'string' || comment.length > 1000)) {
+    return NextResponse.json({ error: 'comment must be a string under 1000 characters' }, { status: 400 })
   }
   if (comment && detectExternalPlatform(comment)) {
     return NextResponse.json({ error: 'External platform referral not allowed' }, { status: 400 })

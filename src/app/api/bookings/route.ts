@@ -113,6 +113,9 @@ export async function GET(req: NextRequest) {
   let cursorCreatedAt: string | null = null
   let cursorId: string | null = null
   if (cursorParam) {
+    if (cursorParam.length > 512) {
+      return NextResponse.json({ error: 'Invalid cursor' }, { status: 400 })
+    }
     try {
       const decoded = Buffer.from(cursorParam, 'base64').toString('utf-8')
       const [ca, cid] = decoded.split('__')
@@ -253,6 +256,9 @@ export async function POST(req: NextRequest) {
 
   // ── 멱등성 키 ─────────────────────────────────────────────────────────────
   const idempotencyKey = req.headers.get('idempotency-key')
+  if (idempotencyKey && idempotencyKey.length > 200) {
+    return NextResponse.json({ error: 'idempotency-key too long' }, { status: 400 })
+  }
   if (idempotencyKey) {
     const { data: existing } = await supabaseService
       .from('bookings')
