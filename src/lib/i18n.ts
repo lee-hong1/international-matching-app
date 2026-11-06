@@ -401,7 +401,7 @@ const MESSAGES: Messages = {
   'signup.label_gender_female': { ko: '👩 여성', en: '👩 Female', ja: '👩 女性', zh: '👩 女性' },
   'signup.label_gender_male': { ko: '👨 남성', en: '👨 Male', ja: '👨 男性', zh: '👨 男性' },
   'signup.label_birthdate': { ko: '생년월일', en: 'Date of Birth', ja: '生年月日', zh: '出生日期' },
-  'signup.label_birthdate_hint': { ko: '만 18세 이상만 가입 가능합니다', en: 'Must be 18 or older', ja: '18歳以上のみ登録可能です', zh: '仅限18岁以上注册' },
+  'signup.label_birthdate_hint': { ko: '만 19세 이상만 가입 가능합니다', en: 'Must be 19 or older', ja: '19歳以上のみ登録可能です', zh: '仅限19岁以上注册' },
   'signup.label_country': { ko: '국가', en: 'Country', ja: '国', zh: '国家' },
   'signup.label_country_placeholder': { ko: '국가 선택', en: 'Select country', ja: '国を選択', zh: '选择国家' },
   'signup.label_bio': { ko: '자기소개', en: 'Bio', ja: '自己紹介', zh: '个人简介' },
