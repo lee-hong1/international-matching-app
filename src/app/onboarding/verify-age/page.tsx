@@ -3,7 +3,6 @@
 import { Suspense, useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 
-const ALLOWED_RETURN_PATHS = ['/host/register', '/host/dashboard', '/']
 
 const I18N = {
   ko: {
@@ -87,7 +86,7 @@ function VerifyAgeForm() {
   const age = calcAge(birthDate)
   const returnUrl = (() => {
     const r = searchParams.get('returnUrl') ?? ''
-    return ALLOWED_RETURN_PATHS.includes(r) ? r : '/'
+    return r.startsWith('/') && !r.startsWith('//') ? r : '/'
   })()
 
   async function handleSubmit(e: React.FormEvent) {

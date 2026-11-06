@@ -2,14 +2,20 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { authService } from '@/lib/auth'
 import { supabase } from '@/lib/supabase'
 import { t, detectLangFromNavigator } from '@src/lib/i18n'
 
 export default function LoginPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const lang = detectLangFromNavigator()
+
+  const returnUrl = (() => {
+    const r = searchParams.get('returnUrl') ?? ''
+    return r.startsWith('/') && !r.startsWith('//') ? r : ''
+  })()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
@@ -49,10 +55,9 @@ export default function LoginPage() {
             headers: { authorization: `Bearer ${token}` },
           })
           const { isAdmin } = await res.json()
-          router.push(isAdmin ? '/admin' : '/feed')
-        } else {
-          router.push('/feed')
+          if (isAdmin) { router.push('/admin'); return }
         }
+        router.push(returnUrl || '/feed')
       }
     } catch {
       setError(t('auth.error_login_error', lang))
