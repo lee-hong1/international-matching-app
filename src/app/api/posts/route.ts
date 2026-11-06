@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
-import { getAuthUser, supabaseService } from '@src/lib/commerce'
+import { getAuthUser, supabaseService, isValidUuid } from '@src/lib/commerce'
 import { detectExternalPlatform } from '@src/lib/chat-safety'
 import { isSuspended } from '@src/lib/suspended-check'
 
@@ -37,6 +37,9 @@ export async function GET(request: NextRequest) {
     .range(offset, offset + limit - 1)
 
   if (type === 'user' && userId) {
+    if (!isValidUuid(userId)) {
+      return NextResponse.json({ error: 'Invalid userId' }, { status: 400 })
+    }
     query = query.eq('user_id', userId)
   } else if (type === 'explore') {
     query = query.order('likes_count', { ascending: false })

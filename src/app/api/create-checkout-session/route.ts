@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
-import { getAuthUser, supabaseService } from '@src/lib/commerce'
+import { getAuthUser, supabaseService, isValidUuid } from '@src/lib/commerce'
 import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
 
 function getStripe(): Stripe {
@@ -36,6 +36,9 @@ export async function POST(req: NextRequest) {
 
     if (!planId) {
       return NextResponse.json({ error: 'planId is required' }, { status: 400 })
+    }
+    if (!isValidUuid(planId)) {
+      return NextResponse.json({ error: 'Invalid planId' }, { status: 400 })
     }
 
     // 사용자 정보 확인 (service role — 본인 email 조회)
