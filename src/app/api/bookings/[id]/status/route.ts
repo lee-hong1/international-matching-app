@@ -132,7 +132,7 @@ export async function PATCH(
   // ── 예약 조회 ─────────────────────────────────────────────────────────────
   const { data: booking, error: fetchErr } = await supabaseService
     .from('bookings')
-    .select('id, guest_id, host_id, status')
+    .select('id, guest_id, host_id, status, amount, currency')
     .eq('id', id)
     .single()
 
@@ -188,35 +188,22 @@ export async function PATCH(
   }
 
   // completed → 커미션 자동 생성 (fire-and-forget)
-  if (newStatus === 'completed') {
+  // booking.amount = 실제 결제 금액 (서비스 현재 가격이 아닌 예약 시점 금액 기준)
+  if (newStatus === 'completed' && booking.amount) {
     void (async () => {
       try {
-        const { data: service } = await supabaseService
-          .from('bookings')
-          .select('service_id')
-          .eq('id', id)
-          .single()
-        if (service?.service_id) {
-          const { data: svc } = await supabaseService
-            .from('services')
-            .select('price, currency')
-            .eq('id', service.service_id)
-            .single()
-          if (svc?.price) {
-            const baseUrl = process.env.NEXT_PUBLIC_SITE_URL
-            if (!baseUrl) return
-            const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY ?? ''
-            await fetch(`${baseUrl}/api/commissions`, {
-              method: 'POST',
-              headers: { 'content-type': 'application/json', 'x-service-key': serviceKey },
-              body: JSON.stringify({
-                booking_id: id,
-                gross_amount: Number(svc.price),
-                currency: svc.currency ?? 'KRW',
-              }),
-            })
-          }
-        }
+        const baseUrl = process.env.NEXT_PUBLIC_SITE_URL
+        if (!baseUrl) return
+        const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY ?? ''
+        await fetch(`${baseUrl}/api/commissions`, {
+          method: 'POST',
+          headers: { 'content-type': 'application/json', 'x-service-key': serviceKey },
+          body: JSON.stringify({
+            booking_id: id,
+            gross_amount: Number(booking.amount),
+            currency: booking.currency ?? 'KRW',
+          }),
+        })
       } catch (e) {
         // 커미션 실패는 상태 변경 성공에 영향 없음 (에러 코드만 로그)
         console.error('[bookings/status] commission trigger error:', (e as Error).message)
