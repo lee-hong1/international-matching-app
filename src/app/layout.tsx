@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { LanguageProvider } from "@/contexts/LanguageContext";
 
 export const metadata: Metadata = {
   title: "GlobalMatch - 국제 매칭 플랫폼",
@@ -32,9 +33,11 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body className="antialiased">
-        <AuthProvider>
-          {children}
-        </AuthProvider>
+        <LanguageProvider>
+          <AuthProvider>
+            {children}
+          </AuthProvider>
+        </LanguageProvider>
         {/* SW 등록 — 프로덕션 전용, 외부 스크립트 없이 inline */}
         <script
           dangerouslySetInnerHTML={{

@@ -10,6 +10,7 @@ import PostCard from '@/components/PostCard'
 import StoryBar from '@/components/StoryBar'
 import CreatePost from '@/components/CreatePost'
 import CreateStory from '@/components/CreateStory'
+import { LanguageSwitcher } from '@/components/LanguageSwitcher'
 
 export default function FeedPage() {
   const { user, loading } = useAuth()
@@ -77,6 +78,7 @@ export default function FeedPage() {
             FanWorld
           </Link>
           <div className="flex items-center gap-2">
+            <LanguageSwitcher />
             <button
               onClick={() => setShowCreatePost(true)}
               className="p-2 rounded-full hover:bg-gray-100 text-gray-700"

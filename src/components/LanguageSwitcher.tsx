@@ -1,12 +1,14 @@
 'use client'
 
 import { useState } from 'react'
+import { useLanguage } from '@/contexts/LanguageContext'
+import type { Locale } from '@/lib/i18n'
 
 const LANGS = [
-  { code: 'ko', label: '한국어' },
-  { code: 'en', label: 'English' },
-  { code: 'ja', label: '日本語' },
-  { code: 'zh', label: '中文' },
+  { code: 'ko' as Locale, label: '한국어' },
+  { code: 'en' as Locale, label: 'English' },
+  { code: 'ja' as Locale, label: '日本語' },
+  { code: 'zh' as Locale, label: '中文' },
 ]
 
 interface LanguageSwitcherProps {
@@ -14,12 +16,15 @@ interface LanguageSwitcherProps {
   onChange?: (lang: string) => void
 }
 
-export function LanguageSwitcher({ current = 'ko', onChange }: LanguageSwitcherProps) {
+export function LanguageSwitcher({ current, onChange }: LanguageSwitcherProps) {
+  const { locale, setLocale } = useLanguage()
+  const activeLang = current ?? locale
   const [open, setOpen] = useState(false)
-  const currentLang = LANGS.find((l) => l.code === current) ?? LANGS[0]
+  const currentLang = LANGS.find((l) => l.code === activeLang) ?? LANGS[0]
 
-  function select(code: string) {
+  function select(code: Locale) {
     setOpen(false)
+    setLocale(code)
     onChange?.(code)
   }
 
@@ -67,15 +72,15 @@ export function LanguageSwitcher({ current = 'ko', onChange }: LanguageSwitcherP
             <li
               key={l.code}
               role="option"
-              aria-selected={l.code === current}
+              aria-selected={l.code === activeLang}
               onClick={() => select(l.code)}
               style={{
                 padding: '0.5rem 0.75rem',
                 borderRadius: 6,
                 fontSize: '0.825rem',
                 cursor: 'pointer',
-                background: l.code === current ? '#f3f4f6' : 'transparent',
-                fontWeight: l.code === current ? 600 : 400,
+                background: l.code === activeLang ? '#f3f4f6' : 'transparent',
+                fontWeight: l.code === activeLang ? 600 : 400,
               }}
             >
               {l.label}
