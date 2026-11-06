@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
 import { getAuthUser } from '@src/lib/commerce'
+import { isSuspended } from '@src/lib/suspended-check'
 
 const SUPPORTED_LANGS = new Set(['ko', 'en', 'zh', 'ja', 'es', 'fr', 'de', 'it', 'pt', 'ar', 'ru', 'th', 'vi', 'id'])
 
@@ -18,6 +19,10 @@ export async function POST(request: NextRequest) {
   const user = await getAuthUser(request)
   if (!user) {
     return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
+  }
+
+  if (await isSuspended(user.id)) {
+    return NextResponse.json({ error: 'Account suspended' }, { status: 403 })
   }
 
   const apiKey = process.env.GOOGLE_TRANSLATE_API_KEY
