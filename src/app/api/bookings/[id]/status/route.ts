@@ -5,11 +5,12 @@ import { t, type Lang } from '@src/lib/i18n'
 import { isSuspended } from '@src/lib/suspended-check'
 
 async function sendBookingEmail(
-  req: NextRequest,
+  _req: NextRequest,
   opts: { booking_id: string; type: 'confirmed' | 'cancelled'; recipient_id: string }
 ): Promise<void> {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? `https://${req.headers.get('host')}`
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL
+    if (!baseUrl) return
     const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY ?? ''
     const { data: profile } = await supabaseService
       .from('profiles')
@@ -36,7 +37,7 @@ type BookingStatus = 'pending' | 'confirmed' | 'completed' | 'cancelled'
 type NotifiableStatus = 'confirmed' | 'cancelled' | 'completed'
 
 async function sendStatusNotification(
-  req: NextRequest,
+  _req: NextRequest,
   opts: {
     recipientId: string
     newStatus: NotifiableStatus
@@ -49,7 +50,8 @@ async function sendStatusNotification(
     const lang: Lang = opts.lang ?? 'ko'
     const titleKey = `notification.${opts.newStatus}.title`
     const bodyKey  = `notification.${opts.newStatus}.body`
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? `https://${req.headers.get('host')}`
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL
+    if (!baseUrl) return
     await fetch(`${baseUrl}/api/send-notification`, {
       method: 'POST',
       headers: { 'content-type': 'application/json', 'x-service-key': process.env.SUPABASE_SERVICE_ROLE_KEY ?? '' },
@@ -201,7 +203,8 @@ export async function PATCH(
             .eq('id', service.service_id)
             .single()
           if (svc?.price) {
-            const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? `https://${req.headers.get('host')}`
+            const baseUrl = process.env.NEXT_PUBLIC_SITE_URL
+            if (!baseUrl) return
             const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY ?? ''
             await fetch(`${baseUrl}/api/commissions`, {
               method: 'POST',
