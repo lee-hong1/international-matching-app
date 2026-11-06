@@ -119,6 +119,22 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Content violates platform rules' }, { status: 400 })
     }
 
+    if (original_price !== undefined && original_price !== null) {
+      if (typeof original_price !== 'number' || !Number.isFinite(original_price) || original_price < 0) {
+        return NextResponse.json({ error: 'original_price must be a non-negative number' }, { status: 400 })
+      }
+    }
+    if (event_price !== undefined && event_price !== null) {
+      if (typeof event_price !== 'number' || !Number.isFinite(event_price) || event_price < 0) {
+        return NextResponse.json({ error: 'event_price must be a non-negative number' }, { status: 400 })
+      }
+    }
+    if (min_participants !== undefined && min_participants !== null) {
+      if (!Number.isInteger(min_participants) || min_participants < 2 || min_participants > 10000) {
+        return NextResponse.json({ error: 'min_participants must be an integer between 2 and 10,000' }, { status: 400 })
+      }
+    }
+
     if (new Date(ends_at) <= new Date()) {
       return NextResponse.json({ error: 'ends_at must be a future date' }, { status: 400 })
     }
