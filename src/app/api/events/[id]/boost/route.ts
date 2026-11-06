@@ -51,6 +51,19 @@ export async function POST(
     return NextResponse.json({ error: 'Only the host can boost this event' }, { status: 403 })
   }
 
+  // 활성 부스트 중복 방지
+  const { data: activeBoost } = await supabaseService
+    .from('event_boosts')
+    .select('id, expires_at')
+    .eq('event_id', eventId)
+    .eq('status', 'paid')
+    .gt('expires_at', new Date().toISOString())
+    .maybeSingle()
+
+  if (activeBoost) {
+    return NextResponse.json({ error: 'Active boost already exists', expiresAt: activeBoost.expires_at }, { status: 409 })
+  }
+
   const tossOrderId = `boost-${eventId}-${Date.now()}`
 
   const { error: insertError } = await supabaseService.from('event_boosts').insert({
@@ -144,8 +157,14 @@ export async function PATCH(
   })
 
   if (!tossRes.ok) {
-    const tossData = await tossRes.json()
-    console.error('[event-boost/PATCH] toss error:', tossData.code, tossData.message)
+    let tossCode = 'UNKNOWN'
+    try {
+      const tossData = await tossRes.json()
+      tossCode = tossData.code ?? 'UNKNOWN'
+      console.error('[event-boost/PATCH] toss error:', tossCode, tossData.message)
+    } catch {
+      console.error('[event-boost/PATCH] toss error: non-JSON response', tossRes.status)
+    }
     return NextResponse.json({ error: 'Payment confirmation failed' }, { status: 400 })
   }
 
