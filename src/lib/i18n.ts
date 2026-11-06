@@ -667,6 +667,22 @@ const MESSAGES: Messages = {
   'post.add_comment': { ko: '게시', en: 'Post', ja: '投稿', zh: '发布' },
   'post.loading': { ko: '게시물 로딩 중...', en: 'Loading post...', ja: '投稿を読み込み中...', zh: '加载帖子中...' },
 
+  // ── 탐색(Explore) 페이지 ──────────────────────────────────────────────────
+  'explore.tab_posts': { ko: '게시물', en: 'Posts', ja: '投稿', zh: '帖子' },
+  'explore.tab_creators': { ko: '크리에이터', en: 'Creators', ja: 'クリエイター', zh: '创作者' },
+  'explore.search_placeholder': { ko: '검색...', en: 'Search...', ja: '検索...', zh: '搜索...' },
+  'explore.empty_posts': { ko: '게시물이 없습니다', en: 'No posts found', ja: '投稿が見つかりません', zh: '没有帖子' },
+  'explore.empty_creators': { ko: '크리에이터가 없습니다', en: 'No creators found', ja: 'クリエイターが見つかりません', zh: '没有创作者' },
+  'explore.cat_all': { ko: '전체', en: 'All', ja: 'すべて', zh: '全部' },
+  'explore.cat_lifestyle': { ko: '라이프스타일', en: 'Lifestyle', ja: 'ライフスタイル', zh: '生活方式' },
+  'explore.cat_beauty': { ko: '뷰티', en: 'Beauty', ja: 'ビューティー', zh: '美妆' },
+  'explore.cat_travel': { ko: '여행', en: 'Travel', ja: '旅行', zh: '旅游' },
+  'explore.cat_food': { ko: '푸드', en: 'Food', ja: 'フード', zh: '美食' },
+  'explore.cat_fitness': { ko: '피트니스', en: 'Fitness', ja: 'フィットネス', zh: '健身' },
+  'explore.cat_fashion': { ko: '패션', en: 'Fashion', ja: 'ファッション', zh: '时尚' },
+  'explore.cat_art': { ko: '아트', en: 'Art', ja: 'アート', zh: '艺术' },
+  'explore.cat_music': { ko: '음악', en: 'Music', ja: '音楽', zh: '音乐' },
+
   // ── 계정 정지 알림 ────────────────────────────────────────────────────────
   'suspension.title': { ko: '계정 임시 정지', en: 'Account Suspended', ja: 'アカウント一時停止', zh: '账号已暂停' },
   'suspension.reason_external': { ko: '외부 플랫폼 유도로 인한 임시 정지입니다.', en: 'Your account has been suspended for directing to external platforms.', ja: '外部プラットフォームへの誘導により一時停止されました。', zh: '由于引导至外部平台，您的账号已被暂停。' },

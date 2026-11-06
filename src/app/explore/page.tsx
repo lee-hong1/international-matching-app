@@ -8,6 +8,8 @@ import { useRouter } from 'next/navigation'
 import { postsService, type Post } from '@/lib/posts'
 import { supabase } from '@/lib/supabase'
 import FollowButton from '@/components/FollowButton'
+import { useLanguage } from '@/contexts/LanguageContext'
+import { t } from '@src/lib/i18n'
 
 interface Creator {
   id: string
@@ -24,21 +26,14 @@ interface Creator {
   is_following?: boolean
 }
 
-const CATEGORIES = [
-  { key: 'all', label: '전체' },
-  { key: 'lifestyle', label: '라이프스타일' },
-  { key: 'beauty', label: '뷰티' },
-  { key: 'travel', label: '여행' },
-  { key: 'food', label: '푸드' },
-  { key: 'fitness', label: '피트니스' },
-  { key: 'fashion', label: '패션' },
-  { key: 'art', label: '아트' },
-  { key: 'music', label: '음악' },
-]
+const CATEGORY_KEYS = ['all', 'lifestyle', 'beauty', 'travel', 'food', 'fitness', 'fashion', 'art', 'music'] as const
 
 export default function ExplorePage() {
   const { user, loading } = useAuth()
   const router = useRouter()
+  const { lang } = useLanguage()
+
+  const CATEGORIES = CATEGORY_KEYS.map((key) => ({ key, label: t(`explore.cat_${key}`, lang) }))
   const [posts, setPosts] = useState<Post[]>([])
   const [creators, setCreators] = useState<Creator[]>([])
   const [activeTab, setActiveTab] = useState<'posts' | 'creators'>('posts')
@@ -152,7 +147,7 @@ export default function ExplorePage() {
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="검색..."
+                placeholder={t('explore.search_placeholder', lang)}
                 className="flex-1 bg-transparent text-sm text-gray-900 placeholder-gray-400 outline-none"
               />
             </div>
@@ -164,13 +159,13 @@ export default function ExplorePage() {
               onClick={() => setActiveTab('posts')}
               className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${activeTab === 'posts' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500'}`}
             >
-              게시물
+              {t('explore.tab_posts', lang)}
             </button>
             <button
               onClick={() => setActiveTab('creators')}
               className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${activeTab === 'creators' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500'}`}
             >
-              크리에이터
+              {t('explore.tab_creators', lang)}
             </button>
           </div>
         </div>
@@ -220,7 +215,7 @@ export default function ExplorePage() {
           /* 게시물 그리드 */
           filteredPosts.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-20 text-center px-6">
-              <p className="text-gray-400 text-sm">게시물이 없습니다</p>
+              <p className="text-gray-400 text-sm">{t('explore.empty_posts', lang)}</p>
             </div>
           ) : (
             <div className="grid grid-cols-3 gap-0.5">
@@ -250,7 +245,7 @@ export default function ExplorePage() {
           <div className="p-4 space-y-3">
             {filteredCreators.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-16 text-center">
-                <p className="text-gray-400 text-sm">크리에이터가 없습니다</p>
+                <p className="text-gray-400 text-sm">{t('explore.empty_creators', lang)}</p>
               </div>
             ) : (
               filteredCreators
@@ -302,31 +297,31 @@ export default function ExplorePage() {
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
             </svg>
-            <span className="text-xs">홈</span>
+            <span className="text-xs">{t('nav.home', lang)}</span>
           </Link>
           <Link href="/explore" className="flex flex-col items-center gap-0.5 text-pink-500">
             <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
               <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" />
             </svg>
-            <span className="text-xs font-medium">탐색</span>
+            <span className="text-xs font-medium">{t('nav.explore', lang)}</span>
           </Link>
           <Link href="/events" className="flex flex-col items-center gap-0.5 text-gray-400 hover:text-gray-600">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
-            <span className="text-xs">모임</span>
+            <span className="text-xs">{t('nav.events', lang)}</span>
           </Link>
           <Link href="/discover" className="flex flex-col items-center gap-0.5 text-gray-400 hover:text-gray-600">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
             </svg>
-            <span className="text-xs">매칭</span>
+            <span className="text-xs">{t('nav.matching', lang)}</span>
           </Link>
           <Link href={`/creator/${user?.id}`} className="flex flex-col items-center gap-0.5 text-gray-400 hover:text-gray-600">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
             </svg>
-            <span className="text-xs">프로필</span>
+            <span className="text-xs">{t('nav.profile', lang)}</span>
           </Link>
         </div>
       </nav>
