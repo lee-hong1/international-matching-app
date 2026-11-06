@@ -158,30 +158,25 @@ export const postsService = {
 
     if (postError || !post) return { post: null, error: postError }
 
-    // 미디어 업로드
-    const mediaInserts = []
-    for (let i = 0; i < postData.mediaFiles.length; i++) {
-      const file = postData.mediaFiles[i]
-      const fileExt = file.name.split('.').pop()
-      const fileName = `${user.id}/${post.id}/${Date.now()}-${i}.${fileExt}`
-
-      const { data: uploadData, error: uploadError } = await supabase.storage
-        .from('post-media')
-        .upload(fileName, file)
-
-      if (uploadError) continue
-
-      const { data: { publicUrl } } = supabase.storage
-        .from('post-media')
-        .getPublicUrl(fileName)
-
-      mediaInserts.push({
-        post_id: post.id,
-        media_url: publicUrl,
-        media_type: file.type.startsWith('video/') ? 'video' : 'image',
-        order_index: i,
+    // 미디어 병렬 업로드 (순차→병렬로 최대 10x 빠름)
+    const uploadResults = await Promise.all(
+      postData.mediaFiles.map(async (file, i) => {
+        const fileExt = file.name.split('.').pop()
+        const fileName = `${user.id}/${post.id}/${Date.now()}-${i}.${fileExt}`
+        const { error: uploadError } = await supabase.storage
+          .from('post-media')
+          .upload(fileName, file)
+        if (uploadError) return null
+        const { data: { publicUrl } } = supabase.storage.from('post-media').getPublicUrl(fileName)
+        return {
+          post_id: post.id,
+          media_url: publicUrl,
+          media_type: file.type.startsWith('video/') ? 'video' : 'image',
+          order_index: i,
+        }
       })
-    }
+    )
+    const mediaInserts = uploadResults.filter(Boolean) as NonNullable<(typeof uploadResults)[number]>[]
 
     if (mediaInserts.length > 0) {
       await supabase.from('post_media').insert(mediaInserts)
