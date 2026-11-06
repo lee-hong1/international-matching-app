@@ -43,7 +43,11 @@ export async function POST(req: NextRequest) {
   if (!booking_id || !isValidUuid(booking_id)) {
     return NextResponse.json({ error: 'Invalid booking_id' }, { status: 400 })
   }
-  if (typeof gross_amount !== 'number' || gross_amount <= 0) {
+  const ALLOWED_CURRENCIES = ['KRW', 'USD', 'JPY', 'CNY', 'EUR']
+  if (currency !== undefined && !ALLOWED_CURRENCIES.includes(currency)) {
+    return NextResponse.json({ error: `currency must be one of ${ALLOWED_CURRENCIES.join(', ')}` }, { status: 400 })
+  }
+  if (typeof gross_amount !== 'number' || !Number.isFinite(gross_amount) || gross_amount <= 0) {
     return NextResponse.json({ error: 'Invalid gross_amount' }, { status: 400 })
   }
 

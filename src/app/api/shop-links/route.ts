@@ -63,8 +63,19 @@ export async function POST(req: NextRequest) {
   try {
     const { title, description, external_url, external_platform, images, original_price, sale_price, expires_at } = await req.json()
 
-    if (!title || !external_url) {
+    if (!title || typeof title !== 'string' || !external_url) {
       return NextResponse.json({ error: 'Required fields missing: title, external_url' }, { status: 400 })
+    }
+
+    const ALLOWED_PLATFORMS = ['coupang', 'naver', 'kakao', 'amazon', 'taobao', 'mercari', 'rakuten', 'other']
+    if (external_platform !== undefined && !ALLOWED_PLATFORMS.includes(external_platform)) {
+      return NextResponse.json({ error: `external_platform must be one of: ${ALLOWED_PLATFORMS.join(', ')}` }, { status: 400 })
+    }
+
+    if (images !== undefined && images !== null) {
+      if (!Array.isArray(images) || images.length > 10 || images.some((img: unknown) => typeof img !== 'string' || (img as string).length > 500)) {
+        return NextResponse.json({ error: 'images must be an array of up to 10 URL strings (max 500 chars each)' }, { status: 400 })
+      }
     }
 
     if (!isAllowedUrl(external_url)) {
