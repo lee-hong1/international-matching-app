@@ -2,17 +2,35 @@
 -- 연령 검증 — 청소년보호법 준수 (만 19세 미만 가입 차단)
 -- ============================================================
 
--- profiles 테이블에 birth_date 컬럼 추가 (없을 경우)
+-- profiles 테이블에 birth_date, is_adult 컬럼 추가 (없을 경우)
+-- CURRENT_DATE는 volatile이므로 GENERATED ALWAYS AS 불가 → 트리거로 처리
 ALTER TABLE profiles
   ADD COLUMN IF NOT EXISTS birth_date DATE,
-  ADD COLUMN IF NOT EXISTS is_adult BOOLEAN GENERATED ALWAYS AS (
-    birth_date IS NOT NULL AND (CURRENT_DATE - birth_date) >= 365 * 19
-  ) STORED;
+  ADD COLUMN IF NOT EXISTS is_adult BOOLEAN;
 
--- 미성년자 차단 CHECK 제약
+-- 미성년자 차단 CHECK 제약 (윤년 정확 계산: 19년 후 날짜 비교)
+ALTER TABLE profiles
+  DROP CONSTRAINT IF EXISTS chk_adult_only;
 ALTER TABLE profiles
   ADD CONSTRAINT chk_adult_only
-    CHECK (birth_date IS NULL OR (CURRENT_DATE - birth_date) >= 365 * 19);
+    CHECK (birth_date IS NULL OR birth_date + INTERVAL '19 years' <= CURRENT_DATE);
+
+-- is_adult 자동 계산 트리거 (INSERT/UPDATE 시 birth_date 기반으로 갱신)
+CREATE OR REPLACE FUNCTION compute_is_adult()
+RETURNS TRIGGER LANGUAGE plpgsql AS $$
+BEGIN
+  NEW.is_adult := (
+    NEW.birth_date IS NOT NULL
+    AND NEW.birth_date + INTERVAL '19 years' <= CURRENT_DATE
+  );
+  RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS trg_compute_is_adult ON profiles;
+CREATE TRIGGER trg_compute_is_adult
+  BEFORE INSERT OR UPDATE OF birth_date ON profiles
+  FOR EACH ROW EXECUTE FUNCTION compute_is_adult();
 
 -- 호스트 등록 시 성인 여부 재검증 (온보딩 완료 차단 트리거)
 CREATE OR REPLACE FUNCTION enforce_adult_on_host_register()
