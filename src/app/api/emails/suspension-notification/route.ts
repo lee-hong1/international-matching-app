@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseService, isValidUuid } from '@src/lib/commerce'
+import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
 
 /**
  * POST /api/emails/suspension-notification
@@ -7,6 +8,13 @@ import { supabaseService, isValidUuid } from '@src/lib/commerce'
  * 이메일 주소는 로그에 출력하지 않는다.
  */
 export async function POST(req: NextRequest) {
+  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
+  const rl = await checkRateLimit(`suspension-email:${ip}`, 'general')
+  if (!rl.allowed) {
+    const r = rateLimitResponse(rl.resetAt)
+    return NextResponse.json(r.body, { status: r.status, headers: r.headers })
+  }
+
   const authHeader = req.headers.get('x-service-key')
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
   if (!serviceKey || authHeader !== serviceKey) {

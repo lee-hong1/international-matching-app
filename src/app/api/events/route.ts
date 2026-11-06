@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
   const eventType = searchParams.get('type')
   const limit = Math.min(parseInt(searchParams.get('limit') ?? '20', 10), 50)
-  const offset = Math.max(parseInt(searchParams.get('offset') ?? '0', 10), 0)
+  const offset = Math.min(Math.max(parseInt(searchParams.get('offset') ?? '0', 10), 0), 10000)
 
   try {
     let query = supabaseService

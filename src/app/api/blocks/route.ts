@@ -52,6 +52,13 @@ export async function POST(req: NextRequest) {
 
 // 내 차단 목록 — JWT에서 userId 추출 (타인 차단 목록 조회 방지)
 export async function GET(req: NextRequest) {
+  const getIp = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
+  const getRl = await checkRateLimit(`blocks-get:${getIp}`, 'general')
+  if (!getRl.allowed) {
+    const r = rateLimitResponse(getRl.resetAt)
+    return NextResponse.json(r.body, { status: r.status, headers: r.headers })
+  }
+
   const user = await getAuthUser(req)
   if (!user) {
     return NextResponse.json({ error: 'Authentication required' }, { status: 401 })

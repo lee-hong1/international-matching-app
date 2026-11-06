@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getAuthUser, supabaseService, isValidUuid } from '@src/lib/commerce'
 import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
 
+
+
 const _rawRate = parseFloat(process.env.PLATFORM_COMMISSION_RATE ?? '')
 const PLATFORM_COMMISSION_RATE =
   isNaN(_rawRate) || _rawRate < 0 || _rawRate > 1 ? 0.15 : _rawRate
@@ -14,6 +16,14 @@ const PLATFORM_COMMISSION_RATE =
  * - 개인정보는 로그에 출력 금지
  */
 export async function POST(req: NextRequest) {
+  // ── Rate limit (내부 전용이지만 DoS 방지) ─────────────────────────────────
+  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
+  const rl = await checkRateLimit(`commissions-post:${ip}`, 'general')
+  if (!rl.allowed) {
+    const r = rateLimitResponse(rl.resetAt)
+    return NextResponse.json(r.body, { status: r.status, headers: r.headers })
+  }
+
   // ── 내부 인증 (service_role 키) ────────────────────────────────────────────
   const serviceKey = req.headers.get('x-service-key')
   if (!serviceKey || serviceKey !== process.env.SUPABASE_SERVICE_ROLE_KEY) {

@@ -15,7 +15,7 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
-  const rl = await checkRateLimit(ip, 'general')
+  const rl = await checkRateLimit(`services-id-get:${ip}`, 'general')
   if (!rl.allowed) {
     const r = rateLimitResponse(rl.resetAt)
     return NextResponse.json(r.body, { status: r.status, headers: r.headers })
@@ -49,7 +49,7 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
-  const rl = await checkRateLimit(ip, 'general')
+  const rl = await checkRateLimit(`services-id-patch:${ip}`, 'general')
   if (!rl.allowed) {
     const r = rateLimitResponse(rl.resetAt)
     return NextResponse.json(r.body, { status: r.status, headers: r.headers })

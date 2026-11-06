@@ -19,6 +19,13 @@ function isValidTimezone(tz: string): boolean {
  * 호스트 가용 시간 조회 (인증 사용자 접근 가능).
  */
 export async function GET(req: NextRequest) {
+  const getIp = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
+  const getRl = await checkRateLimit(`availability-get:${getIp}`, 'general')
+  if (!getRl.allowed) {
+    const r = rateLimitResponse(getRl.resetAt)
+    return NextResponse.json(r.body, { status: r.status, headers: r.headers })
+  }
+
   const user = await getAuthUser(req)
   if (!user) {
     return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
