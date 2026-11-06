@@ -75,7 +75,7 @@ export async function POST(req: NextRequest) {
   }
 
   // 사용자가 해당 채팅방의 참여자인지 검증 (IDOR 방지)
-  if (isValidUuid(roomId)) {
+  {
     const { data: room } = await supabaseService
       .from('chat_rooms')
       .select('user_id, host_id, match_id')
@@ -104,6 +104,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
   }
+
 
   const expiresAt = Math.floor(Date.now() / 1000) + TOKEN_EXPIRY_SEC
 

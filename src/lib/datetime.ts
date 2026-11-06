@@ -28,7 +28,9 @@ export function getUserTimezone(): string {
 
 export function formatRelativeTime(iso: string, locale: string): string {
   const resolvedLocale = LOCALE_MAP[locale] ?? locale
-  const diff = Date.now() - new Date(iso).getTime()
+  const ts = new Date(iso).getTime()
+  if (!Number.isFinite(ts)) return ''
+  const diff = Date.now() - ts
   const minutes = Math.floor(diff / 60000)
   const hours = Math.floor(minutes / 60)
   const days = Math.floor(hours / 24)
