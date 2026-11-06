@@ -160,7 +160,7 @@ export async function POST(request: NextRequest) {
         max_participants: maxParticipants,
         fee_per_person: feePerPerson ?? 0,
       })
-      .select()
+      .select('id, host_id, event_type, title, description, venue_type, venue_id, custom_location, event_datetime, max_participants, fee_per_person, status, created_at')
       .single()
 
     if (error || !event) {
