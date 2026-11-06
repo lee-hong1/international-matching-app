@@ -88,14 +88,28 @@ CREATE TRIGGER trg_host_reported
 -- 직접 쓰기는 service_role 만 가능.
 -- profiles 테이블의 UPDATE 정책 예시 (이미 있으면 중복 방지 DROP 후 재생성):
 
-DROP POLICY IF EXISTS "profiles: block trust_score direct update" ON profiles;
-CREATE POLICY "profiles: block trust_score direct update"
-  ON profiles
-  FOR UPDATE
-  TO authenticated
-  USING (id = auth.uid())
-  WITH CHECK (
-    -- 본인 프로필 수정은 허용하되 trust_score/trust_badge 직접 변경 차단은
-    -- 애플리케이션 레이어에서 보장. 트리거가 service_role 로 실행되므로 RLS 우회 가능.
-    true
-  );
+-- trust_score / trust_badge 직접 조작 차단 정책
+-- profiles_trust_score.sql 의 "only_service_role_update_trust" 와 함께 적용:
+--   RLS UPDATE 정책은 OR 결합이므로 WITH CHECK (true) 단 하나가 나머지를 무효화함.
+--   따라서 이 파일에서는 별도 정책 생성 대신 기존 정책을 재확인·강제하는 방식으로 변경.
+-- "only_service_role_update_trust" 가 이미 존재하면 중복 생성 방지.
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies
+    WHERE tablename = 'profiles'
+      AND policyname = 'only_service_role_update_trust'
+  ) THEN
+    EXECUTE $policy$
+      CREATE POLICY "only_service_role_update_trust"
+        ON profiles
+        FOR UPDATE
+        USING (auth.uid() = id)
+        WITH CHECK (
+          auth.uid() = id
+          AND trust_score = (SELECT p.trust_score FROM profiles p WHERE p.id = auth.uid())
+          AND trust_badge = (SELECT p.trust_badge FROM profiles p WHERE p.id = auth.uid())
+        )
+    $policy$;
+  END IF;
+END $$;

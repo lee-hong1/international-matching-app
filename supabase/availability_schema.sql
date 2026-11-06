@@ -46,27 +46,22 @@ $$;
 -- ── 가용 시간 체크 함수 ───────────────────────────────────────────────────────
 -- bookings POST에서 RPC로 호출: 해당 시간에 호스트 가용 슬롯이 있는지 확인.
 -- 없으면 FALSE (가용 시간 미등록 호스트는 항상 TRUE로 처리는 애플리케이션 레이어에서).
+-- p_booked_at: UTC 기준 예약 시각
+-- 각 슬롯의 timezone 기준으로 개별 변환하여 체크 (timezone 불일치 버그 수정).
 CREATE OR REPLACE FUNCTION check_availability_slot(
-  p_host_id UUID,
-  p_booked_at TIMESTAMPTZ,
-  p_timezone TEXT
+  p_host_id  UUID,
+  p_booked_at TIMESTAMPTZ
 ) RETURNS BOOLEAN LANGUAGE plpgsql STABLE SECURITY DEFINER SET search_path = public AS $$
-DECLARE
-  v_dow INTEGER;
-  v_time TIME;
 BEGIN
-  -- UTC → 호스트 타임존으로 변환
-  v_dow  := EXTRACT(DOW FROM p_booked_at AT TIME ZONE p_timezone)::INTEGER;
-  v_time := (p_booked_at AT TIME ZONE p_timezone)::TIME;
-
+  -- 슬롯마다 자신의 timezone으로 p_booked_at을 변환하여 비교
+  -- (호출자가 timezone을 넘기던 방식 제거: 슬롯 timezone 기준이 source of truth)
   RETURN EXISTS (
-    SELECT 1 FROM host_availability
-    WHERE host_id    = p_host_id
-      AND is_active  = true
-      AND day_of_week = v_dow
-      AND start_time <= v_time
-      AND end_time   >  v_time
-      AND timezone   = p_timezone
+    SELECT 1 FROM host_availability ha
+    WHERE ha.host_id    = p_host_id
+      AND ha.is_active  = true
+      AND EXTRACT(DOW FROM p_booked_at AT TIME ZONE ha.timezone)::INTEGER = ha.day_of_week
+      AND (p_booked_at AT TIME ZONE ha.timezone)::TIME >= ha.start_time
+      AND (p_booked_at AT TIME ZONE ha.timezone)::TIME <  ha.end_time
   );
 END;
 $$;

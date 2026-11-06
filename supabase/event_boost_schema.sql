@@ -30,9 +30,18 @@ CREATE POLICY "Host can create boost"
   ON event_boosts FOR INSERT
   WITH CHECK (host_id = auth.uid());
 
+-- 호스트는 pending 상태의 boost만 취소(cancelled) 가능.
+-- status='paid' 직접 조작 차단: 결제 완료는 service_role(웹훅)에서만 설정.
+-- amount/boost_hours/expires_at 도 불변 처리 (서비스 롤만 변경 가능).
 CREATE POLICY "Host can update own boost"
   ON event_boosts FOR UPDATE
-  USING (host_id = auth.uid());
+  USING (host_id = auth.uid() AND status = 'pending')
+  WITH CHECK (
+    host_id = auth.uid()
+    AND status = 'cancelled'
+    AND amount = (SELECT eb.amount FROM event_boosts eb WHERE eb.id = id)
+    AND boost_hours = (SELECT eb.boost_hours FROM event_boosts eb WHERE eb.id = id)
+  );
 
 -- Auto-expire featured flag
 CREATE OR REPLACE FUNCTION expire_event_boosts()
