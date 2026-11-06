@@ -22,8 +22,8 @@ export default function StoryBar({ onAddStory }: StoryBarProps) {
 
   useEffect(() => {
     fetch('/api/stories?limit=20')
-      .then((r) => (r.ok ? r.json() : []))
-      .then((data) => setStories(Array.isArray(data) ? data : []))
+      .then((r) => (r.ok ? r.json() : { stories: [] }))
+      .then((data) => setStories(Array.isArray(data?.stories) ? data.stories : []))
       .catch(() => {})
   }, [])
 

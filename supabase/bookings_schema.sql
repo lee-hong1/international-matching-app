@@ -67,10 +67,13 @@ CREATE POLICY "booking_select" ON bookings FOR SELECT
 CREATE POLICY "booking_insert" ON bookings FOR INSERT
   WITH CHECK (auth.uid() = guest_id);
 
--- 호스트: confirmed/cancelled 가능 (pending → confirmed, confirmed → cancelled)
+-- 호스트: confirmed/completed/cancelled 가능, amount 직접 변경 차단 (커미션 조작 방지)
 CREATE POLICY "booking_host_update" ON bookings FOR UPDATE
   USING (auth.uid() = host_id)
-  WITH CHECK (status IN ('confirmed','completed','cancelled'));
+  WITH CHECK (
+    status IN ('confirmed','completed','cancelled')
+    AND amount = (SELECT b.amount FROM bookings b WHERE b.id = id)
+  );
 
 -- 게스트: cancelled만 가능
 CREATE POLICY "booking_user_cancel" ON bookings FOR UPDATE

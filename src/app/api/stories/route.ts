@@ -50,6 +50,79 @@ export async function GET(request: NextRequest) {
   return NextResponse.json({ stories: data ?? [] })
 }
 
+export async function POST(request: NextRequest) {
+  const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
+  const rl = await checkRateLimit(`stories-create:${ip}`, 'general')
+  if (!rl.allowed) {
+    const r = rateLimitResponse(rl.resetAt)
+    return NextResponse.json(r.body, { status: r.status, headers: r.headers })
+  }
+
+  const user = await getAuthUser(request)
+  if (!user) {
+    return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
+  }
+
+  let formData: FormData
+  try {
+    formData = await request.formData()
+  } catch {
+    return NextResponse.json({ error: 'Invalid form data' }, { status: 400 })
+  }
+
+  const media = formData.get('media')
+  if (!media || !(media instanceof Blob)) {
+    return NextResponse.json({ error: 'media file is required' }, { status: 400 })
+  }
+
+  const MAX_SIZE = 50 * 1024 * 1024
+  if (media.size > MAX_SIZE) {
+    return NextResponse.json({ error: 'File size exceeds 50MB limit' }, { status: 400 })
+  }
+
+  const caption = formData.get('caption')
+  const captionStr = typeof caption === 'string' ? caption.slice(0, 200) : null
+
+  const isVideo = media.type.startsWith('video/')
+  const isImage = media.type.startsWith('image/')
+  if (!isVideo && !isImage) {
+    return NextResponse.json({ error: 'Only image or video files are allowed' }, { status: 400 })
+  }
+
+  const ext = media.type.split('/')[1]?.split(';')[0] ?? (isVideo ? 'mp4' : 'jpg')
+  const fileName = `${user.id}/${Date.now()}.${ext}`
+
+  const { error: uploadError } = await supabaseService.storage
+    .from('stories')
+    .upload(fileName, media, { contentType: media.type, upsert: false })
+
+  if (uploadError) {
+    console.error('[stories POST] storage upload error:', uploadError.message)
+    return NextResponse.json({ error: 'Failed to upload media' }, { status: 500 })
+  }
+
+  const { data: { publicUrl } } = supabaseService.storage.from('stories').getPublicUrl(fileName)
+
+  const { data: story, error: insertError } = await supabaseService
+    .from('stories')
+    .insert({
+      user_id: user.id,
+      media_url: publicUrl,
+      media_type: isVideo ? 'video' : 'image',
+      caption: captionStr,
+    })
+    .select('id, user_id, media_url, media_type, caption, expires_at, created_at')
+    .single()
+
+  if (insertError) {
+    console.error('[stories POST] insert error:', insertError.code)
+    await supabaseService.storage.from('stories').remove([fileName])
+    return NextResponse.json({ error: 'Failed to create story' }, { status: 500 })
+  }
+
+  return NextResponse.json({ story }, { status: 201 })
+}
+
 export async function DELETE(request: NextRequest) {
   const delIp = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
   const delRl = await checkRateLimit(`stories-delete:${delIp}`, 'general')
