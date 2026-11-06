@@ -658,7 +658,9 @@ export function normalizeLang(raw: string | null | undefined): Lang {
 
 /** Accept-Language 헤더에서 언어 감지 (서버사이드) */
 export function detectLangFromHeader(acceptLanguage: string | null): Lang {
-  return normalizeLang(acceptLanguage?.split(',')[0].trim())
+  // "zh;q=0.9, en" → "zh" (;q= 품질값 제거 후 정규화)
+  const first = acceptLanguage?.split(',')[0].trim().split(';')[0].trim()
+  return normalizeLang(first)
 }
 
 /** 클라이언트에서 사용: navigator.language 기반 */
