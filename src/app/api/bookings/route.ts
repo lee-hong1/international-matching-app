@@ -104,9 +104,11 @@ export async function GET(req: NextRequest) {
     try {
       const decoded = Buffer.from(cursorParam, 'base64').toString('utf-8')
       const [ca, cid] = decoded.split('__')
-      if (ca && cid && isValidUuid(cid)) {
+      if (ca && cid && isValidUuid(cid) && /^\d{4}-\d{2}-\d{2}T[\d:.+Z-]+$/.test(ca)) {
         cursorCreatedAt = ca
         cursorId = cid
+      } else if (ca || cid) {
+        return NextResponse.json({ error: 'Invalid cursor' }, { status: 400 })
       }
     } catch {
       return NextResponse.json({ error: 'Invalid cursor' }, { status: 400 })

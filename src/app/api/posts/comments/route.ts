@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
 import { isValidUuid, getAuthUser, supabaseService } from '@src/lib/commerce'
+import { isSuspended } from '@src/lib/suspended-check'
+import { detectExternalPlatform } from '@src/lib/chat-safety'
 
 // POST /api/posts/comments — 댓글 작성 (본인 user_id만 허용, IDOR 방지)
 export async function POST(request: NextRequest) {
@@ -16,6 +18,17 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
   }
 
+  if (await isSuspended(user.id)) {
+    return NextResponse.json({ error: 'Account suspended' }, { status: 403 })
+  }
+
+  // 청소년보호법: 성인 플랫폼 댓글 작성은 성인 인증 필수
+  const { data: commenterProfile } = await supabaseService
+    .from('profiles').select('is_adult').eq('id', user.id).single()
+  if (!commenterProfile?.is_adult) {
+    return NextResponse.json({ error: 'Age verification required', redirect: '/onboarding/verify-age' }, { status: 403 })
+  }
+
   const body = await request.json().catch(() => null)
   if (!body) return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 })
 
@@ -26,6 +39,9 @@ export async function POST(request: NextRequest) {
   }
   if (typeof content !== 'string' || content.trim().length === 0 || content.length > 500) {
     return NextResponse.json({ error: 'content must be 1–500 characters' }, { status: 400 })
+  }
+  if (detectExternalPlatform(content)) {
+    return NextResponse.json({ error: 'External platform references are not allowed in comments' }, { status: 400 })
   }
   if (parent_comment_id && !isValidUuid(parent_comment_id)) {
     return NextResponse.json({ error: 'Invalid parent_comment_id' }, { status: 400 })

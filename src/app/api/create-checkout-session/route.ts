@@ -3,9 +3,11 @@ import Stripe from 'stripe'
 import { getAuthUser, supabaseService } from '@src/lib/commerce'
 import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY ?? 'sk_test_placeholder', {
-  apiVersion: '2025-07-30.basil',
-})
+function getStripe(): Stripe {
+  const key = process.env.STRIPE_SECRET_KEY
+  if (!key) throw new Error('STRIPE_SECRET_KEY not configured')
+  return new Stripe(key, { apiVersion: '2025-07-30.basil' })
+}
 
 export async function POST(req: NextRequest) {
   // Rate limit — 결제 세션 생성 (payment 티어: 5/min)
@@ -20,6 +22,13 @@ export async function POST(req: NextRequest) {
   const user = await getAuthUser(req)
   if (!user) {
     return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
+  }
+
+  let stripe: Stripe
+  try {
+    stripe = getStripe()
+  } catch {
+    return NextResponse.json({ error: 'Payment service not configured' }, { status: 503 })
   }
 
   try {

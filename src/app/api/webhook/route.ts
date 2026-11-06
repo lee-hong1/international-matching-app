@@ -2,13 +2,18 @@ import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { supabaseService } from '@src/lib/commerce'
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY ?? 'sk_test_placeholder', {
-  apiVersion: '2025-07-30.basil',
-})
+const stripeKey = process.env.STRIPE_SECRET_KEY
+const stripe = stripeKey
+  ? new Stripe(stripeKey, { apiVersion: '2025-07-30.basil' })
+  : null
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET ?? ''
 
 export async function POST(req: NextRequest) {
+  if (!stripe || !webhookSecret) {
+    return NextResponse.json({ error: 'Payment service not configured' }, { status: 503 })
+  }
+
   try {
     const body = await req.text()
     const signature = req.headers.get('stripe-signature')!
