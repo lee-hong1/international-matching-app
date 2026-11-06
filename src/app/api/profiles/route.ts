@@ -20,9 +20,10 @@ export async function GET(req: NextRequest) {
   const user = await getAuthUser(req)
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
+  // birth_date는 애초에 조회 제외 (민감 정보, DB에서 전송 자체 차단)
   const { data, error } = await supabase
     .from('profiles')
-    .select('*')
+    .select('id, display_name, full_name, avatar_url, bio, country, city, preferred_lang, languages, interests, is_host, is_premium, is_adult, trust_score, trust_badge, created_at, updated_at')
     .eq('id', user.id)
     .single()
 
@@ -30,11 +31,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Profile not found' }, { status: 404 })
   }
 
-  // birth_date는 응답에서 제외 (민감 정보)
-  const { birth_date: _bd, ...safeProfile } = data as Record<string, unknown>
-  void _bd
-
-  return NextResponse.json(safeProfile)
+  return NextResponse.json(data)
 }
 
 // PATCH /api/profiles/me — 프로필 수정
@@ -148,9 +145,15 @@ export async function PATCH(req: NextRequest) {
     .single()
 
   if (error) {
+    // RLS WITH CHECK 실패 (42501): 허용되지 않는 필드 조작 시도
+    if (error.code === '42501') {
+      return NextResponse.json({ error: 'Forbidden: cannot update restricted fields' }, { status: 403 })
+    }
+    console.error('[profiles/PATCH] update error:', error.code)
     return NextResponse.json({ error: 'Update failed' }, { status: 500 })
   }
 
+  // birth_date는 select 목록에서 미포함 처리 (PATCH도 select 컬럼 명시 필요 시 아래 활용)
   const { birth_date: _bd, ...safeProfile } = data as Record<string, unknown>
   void _bd
 
