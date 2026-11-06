@@ -45,6 +45,7 @@ export async function GET(req: NextRequest) {
     .eq('is_active', true)
     .order('day_of_week')
     .order('start_time')
+    .limit(50)
 
   if (error) {
     return NextResponse.json({ error: 'Failed to fetch availability' }, { status: 500 })

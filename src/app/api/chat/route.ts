@@ -212,6 +212,9 @@ export async function GET(req: NextRequest) {
     .limit(50)
 
   if (cursor) {
+    if (cursor.length > 512) {
+      return NextResponse.json({ error: 'Invalid cursor' }, { status: 400 })
+    }
     try {
       const { created_at, id } = JSON.parse(Buffer.from(cursor, 'base64').toString())
       // Injection 방지: cursor 값 형식 검증

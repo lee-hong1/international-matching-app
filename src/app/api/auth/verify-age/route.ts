@@ -9,6 +9,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseService, getAuthUser } from '@src/lib/commerce'
 import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
+import { isSuspended } from '@src/lib/suspended-check'
 
 const MIN_AGE_YEARS = 19
 const MS_PER_YEAR = 365.25 * 24 * 60 * 60 * 1000
@@ -34,6 +35,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
   }
 
+  if (await isSuspended(user.id)) {
+    return NextResponse.json({ error: 'Account suspended' }, { status: 403 })
+  }
+
   let birth_date: string
   try {
     const body = await req.json()
@@ -54,6 +59,11 @@ export async function POST(req: NextRequest) {
 
   // 미래 날짜 차단
   if (parsedBirth >= new Date()) {
+    return NextResponse.json({ error: 'Invalid birth date' }, { status: 400 })
+  }
+
+  // 최대 나이 제한 (150세) — 비정상 날짜 차단
+  if (Date.now() - parsedBirth.getTime() > 150 * MS_PER_YEAR) {
     return NextResponse.json({ error: 'Invalid birth date' }, { status: 400 })
   }
 
