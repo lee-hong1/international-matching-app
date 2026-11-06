@@ -90,6 +90,32 @@ export async function PATCH(req: NextRequest) {
     }
   }
 
+  if ('bio' in updates) {
+    const bio = updates.bio
+    if (bio !== null && (typeof bio !== 'string' || bio.length > 500)) {
+      return NextResponse.json({ error: 'bio must be under 500 characters' }, { status: 400 })
+    }
+  }
+
+  if ('city' in updates) {
+    const city = updates.city
+    if (city !== null && (typeof city !== 'string' || city.length > 100)) {
+      return NextResponse.json({ error: 'city must be under 100 characters' }, { status: 400 })
+    }
+  }
+
+  if ('avatar_url' in updates) {
+    const url = updates.avatar_url
+    if (url !== null) {
+      if (typeof url !== 'string' || url.length > 2048) {
+        return NextResponse.json({ error: 'Invalid avatar_url' }, { status: 400 })
+      }
+      if (!/^https?:\/\//i.test(url)) {
+        return NextResponse.json({ error: 'avatar_url must be a valid URL' }, { status: 400 })
+      }
+    }
+  }
+
   if (Object.keys(updates).length === 0) {
     return NextResponse.json({ error: 'No valid fields to update' }, { status: 400 })
   }

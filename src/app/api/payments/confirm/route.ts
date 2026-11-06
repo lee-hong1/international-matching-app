@@ -1,16 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { calculateCommission } from '@/lib/payments'
 import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
-import { supabase } from '@/lib/supabase'
-import { supabaseService } from '@src/lib/commerce'
-
-async function getAuthUser(request: NextRequest) {
-  const authHeader = request.headers.get('authorization')
-  if (!authHeader) return null
-  const token = authHeader.replace('Bearer ', '')
-  const { data: { user } } = await supabase.auth.getUser(token)
-  return user
-}
+import { getAuthUser, supabaseService } from '@src/lib/commerce'
 
 // 토스페이먼츠 결제 승인 콜백 처리 + 수수료 분배 정산
 export async function POST(request: NextRequest) {
@@ -30,6 +21,15 @@ export async function POST(request: NextRequest) {
     const { paymentKey, orderId, amount } = await request.json()
     if (!paymentKey || !orderId || amount === undefined) {
       return NextResponse.json({ error: 'Required parameters missing' }, { status: 400 })
+    }
+    if (typeof paymentKey !== 'string' || paymentKey.length > 200) {
+      return NextResponse.json({ error: 'Invalid paymentKey' }, { status: 400 })
+    }
+    if (typeof orderId !== 'string' || orderId.length > 200) {
+      return NextResponse.json({ error: 'Invalid orderId' }, { status: 400 })
+    }
+    if (typeof amount !== 'number' || !Number.isFinite(amount) || amount <= 0) {
+      return NextResponse.json({ error: 'amount must be a positive number' }, { status: 400 })
     }
 
     // 본인 결제 레코드 조회 (user_id 필터로 IDOR 차단)
