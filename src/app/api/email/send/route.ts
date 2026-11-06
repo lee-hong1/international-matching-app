@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
 import { getAuthUser } from '@src/lib/commerce'
+import { isSuspended } from '@src/lib/suspended-check'
 
-// 이메일 전송 API (실제 구현에서는 SendGrid, AWS SES, Mailgun 등 사용)
+// ⚠️ SECURITY: 이 엔드포인트를 실제 이메일 서비스에 연결하기 전에
+//    임의 HTML 허용 → 플랫폼 내 phishing 벡터. 반드시 미리정의 템플릿 방식으로 교체 필요.
+//    또는 x-service-key 내부 인증으로 전환하거나 to 필드를 본인 이메일로만 제한할 것.
 export async function POST(req: NextRequest) {
   const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
   const rl = await checkRateLimit(`email-send:${ip}`, 'general')
@@ -15,6 +18,10 @@ export async function POST(req: NextRequest) {
   const user = await getAuthUser(req)
   if (!user) {
     return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
+  }
+
+  if (await isSuspended(user.id)) {
+    return NextResponse.json({ error: 'Account suspended' }, { status: 403 })
   }
 
   try {
