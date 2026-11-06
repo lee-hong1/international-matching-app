@@ -7,7 +7,8 @@ import Script from 'next/script'
 import { useAuth } from '@/contexts/AuthContext'
 import { useRouter, useParams } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
-import { eventsService, EVENT_TYPE_LABELS, type EventItem } from '@/lib/events'
+import { eventsService, type EventItem } from '@/lib/events'
+import { t as i18nT, type Lang } from '@src/lib/i18n'
 import { TOSS_CLIENT_KEY } from '@/lib/payments'
 import { LanguageProvider, useLanguage } from '@/contexts/LanguageContext'
 import { LanguageSwitcher } from '@/components/LanguageSwitcher'
@@ -192,7 +193,7 @@ function EventDetailContent() {
         <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
           <div className="flex items-center gap-2 mb-2">
             <span className="px-2 py-0.5 bg-pink-100 text-pink-600 text-xs font-semibold rounded-full">
-              {EVENT_TYPE_LABELS[event.event_type]}
+              {i18nT(`events.type.${event.event_type}`, locale as Lang)}
             </span>
             {event.venue_type === 'partner' && (
               <span className="px-2 py-0.5 bg-purple-100 text-purple-600 text-xs font-semibold rounded-full">

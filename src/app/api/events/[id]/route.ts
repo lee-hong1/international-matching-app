@@ -26,7 +26,9 @@ export async function GET(
   const { data, error } = await supabaseService
     .from('events')
     .select(`
-      *,
+      id, host_id, event_type, title, description, venue_type, venue_id, custom_location,
+      event_datetime, max_participants, fee_per_person, status, is_featured, boost_expires_at,
+      participants_count, created_at, updated_at,
       profiles!events_host_id_fkey (id, full_name, avatar_url),
       partner_venues (id, name, category, address, image_url, discount_price, capacity)
     `)
