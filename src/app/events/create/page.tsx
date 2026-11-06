@@ -6,13 +6,16 @@ import Image from 'next/image'
 import { useAuth } from '@/contexts/AuthContext'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
-import { eventsService, EVENT_TYPE_LABELS, type EventType, type VenueType, type PartnerVenue } from '@/lib/events'
+import { eventsService, type EventType, type VenueType, type PartnerVenue } from '@/lib/events'
+import { useLanguage } from '@/contexts/LanguageContext'
+import { t } from '@src/lib/i18n'
 
 const EVENT_TYPES: EventType[] = ['drink', 'meal', 'party']
 
 export default function CreateEventPage() {
   const { user, loading } = useAuth()
   const router = useRouter()
+  const { lang } = useLanguage()
   const [checkingPremium, setCheckingPremium] = useState(true)
   const [isPremium, setIsPremium] = useState(false)
   const [venues, setVenues] = useState<PartnerVenue[]>([])
@@ -113,10 +116,10 @@ export default function CreateEventPage() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 10-8 0v4h8z" />
             </svg>
           </div>
-          <h3 className="font-semibold text-gray-900 mb-2">유료 회원만 이용 가능합니다</h3>
-          <p className="text-sm text-gray-500 mb-4">모임 만들기는 프리미엄 멤버십 가입 후 이용할 수 있어요.</p>
+          <h3 className="font-semibold text-gray-900 mb-2">{t('events.create.premium_required', lang)}</h3>
+          <p className="text-sm text-gray-500 mb-4">{t('events.create.premium_hint', lang)}</p>
           <Link href="/premium" className="inline-block px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-600 text-white text-sm font-semibold rounded-xl">
-            프리미엄 알아보기
+            {t('events.create.premium_cta', lang)}
           </Link>
         </div>
       </div>
@@ -132,7 +135,7 @@ export default function CreateEventPage() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
             </svg>
           </button>
-          <h1 className="text-lg font-bold text-gray-900">모임 만들기</h1>
+          <h1 className="text-lg font-bold text-gray-900">{t('events.create.page_title', lang)}</h1>
         </div>
       </header>
 
@@ -140,7 +143,7 @@ export default function CreateEventPage() {
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* 모임 유형 */}
           <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
-            <label className="block text-sm font-semibold text-gray-900 mb-3">모임 유형</label>
+            <label className="block text-sm font-semibold text-gray-900 mb-3">{t('events.create.type_label', lang)}</label>
             <div className="grid grid-cols-3 gap-2">
               {EVENT_TYPES.map((type) => (
                 <button
@@ -153,7 +156,7 @@ export default function CreateEventPage() {
                       : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                   }`}
                 >
-                  {EVENT_TYPE_LABELS[type]}
+                  {t(`events.type.${type}`, lang)}
                 </button>
               ))}
             </div>
@@ -162,22 +165,22 @@ export default function CreateEventPage() {
           {/* 제목/설명 */}
           <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 space-y-3">
             <div>
-              <label className="block text-sm font-semibold text-gray-900 mb-1.5">제목</label>
+              <label className="block text-sm font-semibold text-gray-900 mb-1.5">{t('events.create.title_label', lang)}</label>
               <input
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                placeholder="예) 강남에서 가볍게 한잔 하실 분!"
+                placeholder={t('events.create.title_placeholder', lang)}
                 className="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-900 placeholder-gray-400 outline-none focus:border-pink-400"
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-900 mb-1.5">설명 (선택)</label>
+              <label className="block text-sm font-semibold text-gray-900 mb-1.5">{t('events.create.desc_label', lang)}</label>
               <textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 rows={3}
-                placeholder="모임에 대한 설명을 적어주세요"
+                placeholder={t('events.create.desc_placeholder', lang)}
                 className="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-900 placeholder-gray-400 outline-none focus:border-pink-400 resize-none"
               />
             </div>
@@ -185,27 +188,27 @@ export default function CreateEventPage() {
 
           {/* 장소 */}
           <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 space-y-3">
-            <label className="block text-sm font-semibold text-gray-900 mb-1.5">모임 장소</label>
+            <label className="block text-sm font-semibold text-gray-900 mb-1.5">{t('events.create.venue_label', lang)}</label>
             <div className="flex gap-1 bg-gray-100 rounded-xl p-1">
               <button
                 type="button"
                 onClick={() => setVenueType('partner')}
                 className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${venueType === 'partner' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500'}`}
               >
-                제휴 매장
+                {t('events.create.venue_partner', lang)}
               </button>
               <button
                 type="button"
                 onClick={() => setVenueType('custom')}
                 className={`flex-1 py-2 text-sm font-medium rounded-lg transition-all ${venueType === 'custom' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500'}`}
               >
-                직접 입력
+                {t('events.create.venue_custom', lang)}
               </button>
             </div>
 
             {venueType === 'partner' ? (
               venues.length === 0 ? (
-                <p className="text-sm text-gray-400 py-2">이용 가능한 제휴 매장이 없습니다</p>
+                <p className="text-sm text-gray-400 py-2">{t('events.create.no_venues', lang)}</p>
               ) : (
                 <div className="space-y-2">
                   {venues.map((venue) => (
@@ -229,7 +232,7 @@ export default function CreateEventPage() {
                         <p className="text-xs text-gray-500 truncate">{venue.address}</p>
                         {venue.discount_price != null && (
                           <p className="text-xs text-pink-500 font-medium mt-0.5">
-                            제휴 할인가 {venue.discount_price.toLocaleString()}원
+                            {t('events.create.venue_discount', lang, { price: venue.discount_price.toLocaleString() })}
                           </p>
                         )}
                       </div>
@@ -242,7 +245,7 @@ export default function CreateEventPage() {
                 type="text"
                 value={customLocation}
                 onChange={(e) => setCustomLocation(e.target.value)}
-                placeholder="예) 강남역 11번 출구 OO카페"
+                placeholder={t('events.create.location_placeholder', lang)}
                 className="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-900 placeholder-gray-400 outline-none focus:border-pink-400"
               />
             )}
@@ -251,7 +254,7 @@ export default function CreateEventPage() {
           {/* 일정/인원/참가비 */}
           <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 space-y-3">
             <div>
-              <label className="block text-sm font-semibold text-gray-900 mb-1.5">모임 일시</label>
+              <label className="block text-sm font-semibold text-gray-900 mb-1.5">{t('events.create.datetime_label', lang)}</label>
               <input
                 type="datetime-local"
                 value={eventDatetime}
@@ -260,7 +263,7 @@ export default function CreateEventPage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-900 mb-1.5">모집 인원</label>
+              <label className="block text-sm font-semibold text-gray-900 mb-1.5">{t('events.create.participants_label', lang)}</label>
               <input
                 type="number"
                 min={1}
@@ -270,7 +273,7 @@ export default function CreateEventPage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-900 mb-1.5">참가비 (원, 무료는 0)</label>
+              <label className="block text-sm font-semibold text-gray-900 mb-1.5">{t('events.create.fee_label', lang)}</label>
               <input
                 type="number"
                 min={0}
@@ -279,7 +282,7 @@ export default function CreateEventPage() {
                 onChange={(e) => setFeePerPerson(Math.max(0, parseInt(e.target.value) || 0))}
                 className="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-900 outline-none focus:border-pink-400"
               />
-              <p className="text-xs text-gray-400 mt-1">참가비에서 플랫폼 수수료가 차감된 금액이 호스트에게 정산됩니다.</p>
+              <p className="text-xs text-gray-400 mt-1">{t('events.create.fee_hint', lang)}</p>
             </div>
           </div>
 
@@ -292,7 +295,7 @@ export default function CreateEventPage() {
             disabled={submitting}
             className="w-full py-3 bg-gradient-to-r from-pink-500 to-purple-600 text-white font-semibold rounded-xl disabled:opacity-50"
           >
-            {submitting ? '생성 중...' : '모임 만들기'}
+            {submitting ? t('events.create.submitting', lang) : t('events.create.submit', lang)}
           </button>
         </form>
       </main>
