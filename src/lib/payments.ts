@@ -99,3 +99,28 @@ export async function verifyTossPayment(
 export function makeIdempotencyKey(resource: string, ...parts: string[]): string {
   return [resource, ...parts].join('_')
 }
+
+export interface CommissionBreakdown {
+  platformFeeAmount: number
+  venueCommissionAmount: number
+  hostPayoutAmount: number
+}
+
+/**
+ * 결제 금액에서 플랫폼 수수료 + 파트너 베뉴 커미션을 계산하고
+ * 호스트 정산 금액을 반환한다.
+ *
+ * @param amount - 총 결제 금액 (원 단위 정수)
+ * @param platformFeeRate - 플랫폼 수수료율 (기본 15%)
+ * @param venueCommissionRate - 파트너 베뉴 커미션율 (파트너 베뉴 없으면 0)
+ */
+export function calculateCommission(
+  amount: number,
+  platformFeeRate: number,
+  venueCommissionRate: number,
+): CommissionBreakdown {
+  const platformFeeAmount = Math.round(amount * platformFeeRate / 100)
+  const venueCommissionAmount = Math.round(amount * venueCommissionRate / 100)
+  const hostPayoutAmount = amount - platformFeeAmount - venueCommissionAmount
+  return { platformFeeAmount, venueCommissionAmount, hostPayoutAmount }
+}

@@ -80,6 +80,12 @@ function memSlidingWindow(
   const now = Date.now()
   const bucket = memStore.get(key) ?? { timestamps: [] }
   bucket.timestamps = bucket.timestamps.filter(t => t > now - windowMs)
+
+  // 윈도우 만료 후 첫 접근: 빈 버킷을 Map에서 제거 → 메모리 누수 방지
+  if (bucket.timestamps.length === 0) {
+    memStore.delete(key)
+  }
+
   bucket.timestamps.push(now)
   memStore.set(key, bucket)
 
