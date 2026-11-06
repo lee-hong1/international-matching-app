@@ -121,6 +121,12 @@ export async function POST(request: NextRequest) {
     if (!Number.isInteger(parsedMax) || parsedMax < 2 || parsedMax > MAX_PARTICIPANTS_LIMIT) {
       return NextResponse.json({ error: `maxParticipants must be between 2 and ${MAX_PARTICIPANTS_LIMIT}` }, { status: 400 })
     }
+    // feePerPerson 검증: 0 이상 양수, 상한선 1,000,000 (통화 단위)
+    if (feePerPerson !== undefined && feePerPerson !== null) {
+      if (typeof feePerPerson !== 'number' || !Number.isFinite(feePerPerson) || feePerPerson < 0 || feePerPerson > 1_000_000) {
+        return NextResponse.json({ error: 'feePerPerson must be a number between 0 and 1,000,000' }, { status: 400 })
+      }
+    }
 
     // 프리미엄 회원 검증
     const { data: profile } = await supabaseService
@@ -143,7 +149,7 @@ export async function POST(request: NextRequest) {
         venue_type: venueType,
         venue_id: venueType === 'partner' ? venueId : null,
         custom_location: venueType === 'custom' ? customLocation : null,
-        event_datetime: eventDatetime,
+        event_datetime: parsedDatetime.toISOString(),
         max_participants: maxParticipants,
         fee_per_person: feePerPerson ?? 0,
       })

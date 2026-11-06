@@ -46,8 +46,14 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'birth_date format: YYYY-MM-DD' }, { status: 400 })
   }
 
+  // 유효한 날짜 범위 체크 (99월 등 Invalid Date 방지)
+  const parsedBirth = new Date(birth_date)
+  if (isNaN(parsedBirth.getTime())) {
+    return NextResponse.json({ error: 'birth_date is not a valid date' }, { status: 400 })
+  }
+
   // 미래 날짜 차단
-  if (new Date(birth_date) >= new Date()) {
+  if (parsedBirth >= new Date()) {
     return NextResponse.json({ error: 'Invalid birth date' }, { status: 400 })
   }
 

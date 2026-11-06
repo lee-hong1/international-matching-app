@@ -101,6 +101,13 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Invalid request body' }, { status: 400 })
   }
 
+  if (caption && caption.length > 2000) {
+    return NextResponse.json({ error: 'caption must be under 2000 characters' }, { status: 400 })
+  }
+  if (location && (typeof location !== 'string' || location.length > 300)) {
+    return NextResponse.json({ error: 'location must be under 300 characters' }, { status: 400 })
+  }
+
   // 수익 누수 방지: 포스트 캡션에 외부 플랫폼 유도 금지
   if (caption && detectExternalPlatform(caption)) {
     return NextResponse.json({ error: 'External platform references are not allowed' }, { status: 400 })
