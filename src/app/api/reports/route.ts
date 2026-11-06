@@ -126,8 +126,8 @@ export async function GET(req: NextRequest) {
       status: rawStatus && ALLOWED_STATUS.includes(rawStatus) ? rawStatus as any : undefined,
       priority: rawPriority && ALLOWED_PRIORITY.includes(rawPriority) ? rawPriority as any : undefined,
       report_type: rawReportType && ALLOWED_REPORT_TYPES.includes(rawReportType) ? rawReportType as any : undefined,
-      page: Math.max(parseInt(searchParams.get('page') || '1'), 1),
-      limit: Math.min(parseInt(searchParams.get('limit') || '20'), 100),
+      page: Math.max(Number.isFinite(parseInt(searchParams.get('page') || '1', 10)) ? parseInt(searchParams.get('page') || '1', 10) : 1, 1),
+      limit: (() => { const r = parseInt(searchParams.get('limit') || '20', 10); return Math.min(Number.isFinite(r) && r > 0 ? r : 20, 100) })(),
     }
 
     const { reports, total } = await reportingService.searchReports(query)

@@ -21,7 +21,8 @@ export async function GET(req: NextRequest) {
 
   const { searchParams } = new URL(req.url)
   const cursor = searchParams.get('cursor')
-  const limit = Math.min(Number(searchParams.get('limit') ?? '20'), 50)
+  const rawLimit = parseInt(searchParams.get('limit') ?? '20', 10)
+  const limit = Math.min(Number.isFinite(rawLimit) && rawLimit > 0 ? rawLimit : 20, 50)
   const unreadOnly = searchParams.get('unread') === 'true'
 
   let query = supabaseService
