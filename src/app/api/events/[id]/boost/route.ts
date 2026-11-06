@@ -119,7 +119,7 @@ export async function PATCH(
     return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 })
   }
 
-  if (!paymentKey || typeof paymentKey !== 'string' || !orderId || typeof orderId !== 'string' || typeof amount !== 'number' || amount <= 0) {
+  if (!paymentKey || typeof paymentKey !== 'string' || paymentKey.length > 200 || !orderId || typeof orderId !== 'string' || orderId.length > 200 || typeof amount !== 'number' || !Number.isFinite(amount) || amount <= 0) {
     return NextResponse.json({ error: 'Required parameters missing or invalid' }, { status: 400 })
   }
 
@@ -170,16 +170,25 @@ export async function PATCH(
 
   const expiresAt = new Date(Date.now() + BOOST_HOURS * 60 * 60 * 1000).toISOString()
 
-  await supabaseService.from('event_boosts').update({
+  const { error: boostUpdateErr } = await supabaseService.from('event_boosts').update({
     toss_payment_key: paymentKey,
     status: 'paid',
     expires_at: expiresAt,
   }).eq('id', boost.id)
 
-  await supabaseService.from('events').update({
+  if (boostUpdateErr) {
+    console.error('[event-boost/PATCH] boost update failed:', boostUpdateErr.code, 'boost_id:', boost.id)
+    return NextResponse.json({ error: 'Failed to record boost payment' }, { status: 500 })
+  }
+
+  const { error: eventUpdateErr } = await supabaseService.from('events').update({
     is_featured: true,
     boost_expires_at: expiresAt,
   }).eq('id', eventId)
+
+  if (eventUpdateErr) {
+    console.error('[event-boost/PATCH] event update failed:', eventUpdateErr.code)
+  }
 
   return NextResponse.json({ success: true, expiresAt })
 }
