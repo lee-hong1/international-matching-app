@@ -55,6 +55,11 @@ export async function PATCH(
   if (!['suspend', 'unsuspend'].includes(action)) {
     return NextResponse.json({ error: 'action must be "suspend" or "unsuspend"' }, { status: 400 })
   }
+  if (body.reason !== undefined && body.reason !== null) {
+    if (typeof body.reason !== 'string' || body.reason.length > 1000) {
+      return NextResponse.json({ error: 'reason must be a string under 1000 characters' }, { status: 400 })
+    }
+  }
 
   // ── 프로필 존재 확인 ────────────────────────────────────────────────────
   const { data: existing, error: fetchErr } = await supabaseService

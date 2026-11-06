@@ -101,7 +101,7 @@ export async function POST(request: NextRequest) {
     const platformFeeRate = event?.platform_fee_rate ?? 15
     const breakdown = calculateCommission(amount, platformFeeRate, venueCommissionRate)
 
-    await supabaseService
+    const { error: payUpdateErr } = await supabaseService
       .from('payments')
       .update({
         payment_status: 'completed',
@@ -112,11 +112,20 @@ export async function POST(request: NextRequest) {
       })
       .eq('id', paymentRecord.id)
 
+    if (payUpdateErr) {
+      console.error('[payments/confirm] payment record update failed:', payUpdateErr.code, 'payment_id:', paymentRecord.id)
+      return NextResponse.json({ error: 'Failed to record payment completion' }, { status: 500 })
+    }
+
     // 참가 신청 상태를 승인으로 전환
-    await supabaseService
+    const { error: participantErr } = await supabaseService
       .from('event_participants')
       .update({ status: 'approved' })
       .eq('payment_id', paymentRecord.id)
+
+    if (participantErr) {
+      console.error('[payments/confirm] participant status update failed:', participantErr.code)
+    }
 
     // 수수료 정산 원장 기록
     const ledgerEntries: any[] = [
@@ -131,7 +140,10 @@ export async function POST(request: NextRequest) {
         amount: breakdown.venueCommissionAmount,
       })
     }
-    await supabaseService.from('commission_ledger').insert(ledgerEntries)
+    const { error: ledgerErr } = await supabaseService.from('commission_ledger').insert(ledgerEntries)
+    if (ledgerErr) {
+      console.error('[payments/confirm] ledger insert failed:', ledgerErr.code)
+    }
 
     return NextResponse.json({ success: true, breakdown })
   } catch (err) {
