@@ -352,7 +352,7 @@ export async function POST(req: NextRequest) {
       .rpc('check_availability_slot', {
         p_host_id: host_id,
         p_booked_at: bookedAtIso,
-        p_timezone: validatedTz,
+        // p_timezone 제거: 함수가 각 슬롯의 ha.timezone 기준으로 직접 변환
       })
     if (!availErr && inSlot === false) {
       return NextResponse.json(
