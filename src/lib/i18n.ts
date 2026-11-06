@@ -654,6 +654,12 @@ const MESSAGES: Messages = {
   'common.save': { ko: '저장', en: 'Save', ja: '保存', zh: '保存' },
   'common.close': { ko: '닫기', en: 'Close', ja: '閉じる', zh: '关闭' },
   'common.loading': { ko: '로딩 중...', en: 'Loading...', ja: '読み込み中...', zh: '加载中...' },
+  'common.other': { ko: '기타', en: 'Other', ja: 'その他', zh: '其他' },
+  'common.message': { ko: '메시지', en: 'Message', ja: 'メッセージ', zh: '消息' },
+  'common.info': { ko: '정보', en: 'Info', ja: '情報', zh: '信息' },
+  'common.about': { ko: '소개', en: 'About', ja: '自己紹介', zh: '关于' },
+  'common.location': { ko: '거주지', en: 'Location', ja: '居住地', zh: '所在地' },
+  'common.interests': { ko: '관심사', en: 'Interests', ja: '興味', zh: '兴趣' },
 
   // ── 게시물 상세 ───────────────────────────────────────────────────────────
   'post.title': { ko: '게시물', en: 'Post', ja: '投稿', zh: '帖子' },
@@ -682,6 +688,17 @@ const MESSAGES: Messages = {
   'explore.cat_fashion': { ko: '패션', en: 'Fashion', ja: 'ファッション', zh: '时尚' },
   'explore.cat_art': { ko: '아트', en: 'Art', ja: 'アート', zh: '艺术' },
   'explore.cat_music': { ko: '음악', en: 'Music', ja: '音楽', zh: '音乐' },
+
+  // ── 크리에이터 프로필 페이지 ──────────────────────────────────────────────
+  'creator.posts': { ko: '게시물', en: 'Posts', ja: '投稿', zh: '帖子' },
+  'creator.followers': { ko: '팔로워', en: 'Followers', ja: 'フォロワー', zh: '粉丝' },
+  'creator.following': { ko: '팔로잉', en: 'Following', ja: 'フォロー中', zh: '关注' },
+  'creator.edit_profile': { ko: '프로필 편집', en: 'Edit Profile', ja: 'プロフィール編集', zh: '编辑资料' },
+  'creator.add_post': { ko: '게시물 추가', en: 'Add Post', ja: '投稿を追加', zh: '添加帖子' },
+  'creator.empty_posts': { ko: '아직 게시물이 없습니다', en: 'No posts yet', ja: 'まだ投稿がありません', zh: '还没有帖子' },
+  'creator.first_post': { ko: '첫 게시물 올리기', en: 'Share your first post', ja: '最初の投稿をシェア', zh: '分享第一篇帖子' },
+  'creator.not_found': { ko: '프로필을 찾을 수 없습니다', en: 'Profile not found', ja: 'プロフィールが見つかりません', zh: '找不到资料' },
+  'creator.post_detail': { ko: '게시물', en: 'Post', ja: '投稿', zh: '帖子' },
 
   // ── 계정 정지 알림 ────────────────────────────────────────────────────────
   'suspension.title': { ko: '계정 임시 정지', en: 'Account Suspended', ja: 'アカウント一時停止', zh: '账号已暂停' },

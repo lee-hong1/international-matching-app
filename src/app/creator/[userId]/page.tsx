@@ -10,6 +10,8 @@ import { followsService, type FollowStats } from '@/lib/follows'
 import { supabase } from '@/lib/supabase'
 import FollowButton from '@/components/FollowButton'
 import CreatePost from '@/components/CreatePost'
+import { useLanguage } from '@/contexts/LanguageContext'
+import { t } from '@src/lib/i18n'
 
 interface CreatorProfile {
   id: string
@@ -29,22 +31,23 @@ interface CreatorProfile {
   } | null
 }
 
-const CATEGORY_LABELS: Record<string, string> = {
-  lifestyle: '라이프스타일',
-  beauty: '뷰티',
-  travel: '여행',
-  food: '푸드',
-  fitness: '피트니스',
-  fashion: '패션',
-  art: '아트',
-  music: '음악',
-  other: '기타',
-}
-
 export default function CreatorProfilePage() {
   const { userId } = useParams<{ userId: string }>()
   const { user } = useAuth()
   const router = useRouter()
+  const { lang } = useLanguage()
+
+  const CATEGORY_LABELS: Record<string, string> = {
+    lifestyle: t('explore.cat_lifestyle', lang),
+    beauty: t('explore.cat_beauty', lang),
+    travel: t('explore.cat_travel', lang),
+    food: t('explore.cat_food', lang),
+    fitness: t('explore.cat_fitness', lang),
+    fashion: t('explore.cat_fashion', lang),
+    art: t('explore.cat_art', lang),
+    music: t('explore.cat_music', lang),
+    other: t('common.other', lang),
+  }
 
   const [profile, setProfile] = useState<CreatorProfile | null>(null)
   const [posts, setPosts] = useState<Post[]>([])
@@ -110,7 +113,7 @@ export default function CreatorProfilePage() {
   if (!profile) {
     return (
       <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center gap-4">
-        <p className="text-gray-500">프로필을 찾을 수 없습니다</p>
+        <p className="text-gray-500">{t('creator.not_found', lang)}</p>
         <Link href="/feed" className="text-pink-500 font-semibold">피드로 돌아가기</Link>
       </div>
     )
@@ -170,15 +173,15 @@ export default function CreatorProfilePage() {
             <div className="flex-1 flex justify-around pt-2">
               <div className="text-center">
                 <p className="text-xl font-bold text-gray-900">{postsCount.toLocaleString()}</p>
-                <p className="text-xs text-gray-500 mt-0.5">게시물</p>
+                <p className="text-xs text-gray-500 mt-0.5">{t('creator.posts', lang)}</p>
               </div>
               <div className="text-center cursor-pointer hover:opacity-70">
                 <p className="text-xl font-bold text-gray-900">{followStats.followers_count.toLocaleString()}</p>
-                <p className="text-xs text-gray-500 mt-0.5">팔로워</p>
+                <p className="text-xs text-gray-500 mt-0.5">{t('creator.followers', lang)}</p>
               </div>
               <div className="text-center cursor-pointer hover:opacity-70">
                 <p className="text-xl font-bold text-gray-900">{followStats.following_count.toLocaleString()}</p>
-                <p className="text-xs text-gray-500 mt-0.5">팔로잉</p>
+                <p className="text-xs text-gray-500 mt-0.5">{t('creator.following', lang)}</p>
               </div>
             </div>
           </div>
@@ -240,13 +243,13 @@ export default function CreatorProfilePage() {
                   href="/profile/edit"
                   className="flex-1 py-2 border border-gray-200 text-gray-700 text-sm font-semibold rounded-xl text-center hover:bg-gray-50"
                 >
-                  프로필 편집
+                  {t('creator.edit_profile', lang)}
                 </Link>
                 <button
                   onClick={() => setShowCreatePost(true)}
                   className="flex-1 py-2 bg-gradient-to-r from-pink-500 to-purple-600 text-white text-sm font-semibold rounded-xl hover:from-pink-600 hover:to-purple-700"
                 >
-                  게시물 추가
+                  {t('creator.add_post', lang)}
                 </button>
               </>
             ) : (
@@ -263,7 +266,7 @@ export default function CreatorProfilePage() {
                   href="/messages"
                   className="px-4 py-2 border border-gray-200 text-gray-700 text-sm font-semibold rounded-xl hover:bg-gray-50 text-center"
                 >
-                  메시지
+                  {t('common.message', lang)}
                 </Link>
               </>
             )}
@@ -280,7 +283,7 @@ export default function CreatorProfilePage() {
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
               </svg>
-              게시물
+              {t('creator.posts', lang)}
             </div>
           </button>
           <button
@@ -291,7 +294,7 @@ export default function CreatorProfilePage() {
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              정보
+              {t('common.info', lang)}
             </div>
           </button>
         </div>
@@ -312,13 +315,13 @@ export default function CreatorProfilePage() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
                 </div>
-                <p className="font-semibold text-gray-700 mb-1">아직 게시물이 없습니다</p>
+                <p className="font-semibold text-gray-700 mb-1">{t('creator.empty_posts', lang)}</p>
                 {isOwner && (
                   <button
                     onClick={() => setShowCreatePost(true)}
                     className="mt-3 text-sm text-pink-500 font-semibold"
                   >
-                    첫 게시물 올리기
+                    {t('creator.first_post', lang)}
                   </button>
                 )}
               </div>
@@ -381,19 +384,19 @@ export default function CreatorProfilePage() {
           <div className="bg-white p-6 space-y-4">
             {profile.bio && (
               <div>
-                <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1.5">소개</h3>
+                <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1.5">{t('common.about', lang)}</h3>
                 <p className="text-sm text-gray-700 leading-relaxed">{profile.bio}</p>
               </div>
             )}
             {profile.country && (
               <div>
-                <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1.5">거주지</h3>
+                <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1.5">{t('common.location', lang)}</h3>
                 <p className="text-sm text-gray-700">{profile.country}</p>
               </div>
             )}
             {profile.interests && profile.interests.length > 0 && (
               <div>
-                <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">관심사</h3>
+                <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">{t('common.interests', lang)}</h3>
                 <div className="flex flex-wrap gap-2">
                   {profile.interests.map((interest) => (
                     <span key={interest} className="text-sm bg-gradient-to-r from-pink-50 to-purple-50 text-purple-700 px-3 py-1 rounded-full border border-purple-100">
@@ -411,7 +414,7 @@ export default function CreatorProfilePage() {
           <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4" onClick={() => setSelectedPost(null)}>
             <div className="bg-white rounded-2xl w-full max-w-sm overflow-hidden" onClick={(e) => e.stopPropagation()}>
               <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
-                <h3 className="font-semibold text-gray-900 text-sm">게시물</h3>
+                <h3 className="font-semibold text-gray-900 text-sm">{t('creator.post_detail', lang)}</h3>
                 <button onClick={() => setSelectedPost(null)} className="p-1 text-gray-500">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
