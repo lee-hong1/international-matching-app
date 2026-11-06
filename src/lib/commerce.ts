@@ -33,8 +33,13 @@ export function isValidUuid(id: string): boolean {
 export async function getAuthUser(req: NextRequest) {
   const token = req.headers.get('authorization')?.replace('Bearer ', '')
   if (!token) return null
-  const { data: { user } } = await supabaseService.auth.getUser(token)
-  return user
+  try {
+    const { data: { user }, error } = await supabaseService.auth.getUser(token)
+    if (error) return null
+    return user
+  } catch {
+    return null
+  }
 }
 
 // ── i18n error messages ──────────────────────────────────────────────────────

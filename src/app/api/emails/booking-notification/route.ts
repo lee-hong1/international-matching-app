@@ -5,6 +5,15 @@ import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
 
 type NotificationType = 'new_booking' | 'confirmed' | 'cancelled'
 
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;')
+}
+
 interface EmailPayload {
   to_email: string
   type: NotificationType
@@ -14,15 +23,16 @@ interface EmailPayload {
 }
 
 function buildEmailHtml(type: NotificationType, lang: Lang, vars: Record<string, string>): string {
+  const safeVars = Object.fromEntries(Object.entries(vars).map(([k, v]) => [k, escapeHtml(v)]))
   const title = t(`notification.${type}.title`, lang)
-  const body = t(`notification.${type}.body`, lang, vars)
+  const body = t(`notification.${type}.body`, lang, safeVars)
   return `<!DOCTYPE html>
-<html lang="${lang}">
-<head><meta charset="utf-8"><title>${title}</title></head>
+<html lang="${escapeHtml(lang)}">
+<head><meta charset="utf-8"><title>${escapeHtml(title)}</title></head>
 <body style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:24px">
-  <h2 style="color:#e91e63">${title}</h2>
+  <h2 style="color:#e91e63">${escapeHtml(title)}</h2>
   <p style="font-size:16px;color:#333">${body}</p>
-  <p style="font-size:12px;color:#999;margin-top:32px">GlobalMatch · booking #${vars.booking_id ?? ''}</p>
+  <p style="font-size:12px;color:#999;margin-top:32px">GlobalMatch · booking #${escapeHtml(vars.booking_id ?? '')}</p>
 </body>
 </html>`
 }
