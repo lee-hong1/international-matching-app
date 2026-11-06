@@ -116,7 +116,7 @@ export async function POST(request: NextRequest) {
   const { data: post, error: postError } = await supabaseService
     .from('posts')
     .insert({ user_id: user.id, caption, location, is_public: isPublic })
-    .select()
+    .select('id, user_id, caption, location, is_public, created_at')
     .single()
 
   if (postError || !post) {
