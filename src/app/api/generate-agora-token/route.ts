@@ -1,11 +1,11 @@
-import { createHmac, randomBytes } from 'crypto'
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthUser, supabaseService, isValidUuid } from '@src/lib/commerce'
 import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
 import { isSuspended } from '@src/lib/suspended-check'
+import { RtcTokenBuilder, RtcRole } from 'agora-token'
 
 /**
- * Agora AccessToken2 생성 — RFC 완전 구현
+ * Agora AccessToken2 생성 — 공식 agora-token SDK 사용
  * https://docs.agora.io/en/video-calling/get-started/authentication-workflow
  *
  * 필요 환경 변수 (서버 전용):
@@ -16,27 +16,6 @@ import { isSuspended } from '@src/lib/suspended-check'
  */
 
 const TOKEN_EXPIRY_SEC = 86400 // 24시간
-
-function buildAgoraToken(
-  appId: string,
-  appCertificate: string,
-  channelName: string,
-  uid: string,
-  expiresAt: number
-): string {
-  const salt = randomBytes(4).readUInt32BE(0)
-  const ts = expiresAt
-
-  // Agora SimpleTokenBuilder — HMAC-SHA256 기반 서명
-  const content = appId + channelName + uid + salt.toString() + ts.toString()
-  const signature = createHmac('sha256', appCertificate).update(content).digest('hex')
-
-  const tokenData = Buffer.from(
-    JSON.stringify({ appId, channelName, uid, salt, ts, signature })
-  ).toString('base64url')
-
-  return `007${tokenData}`
-}
 
 export async function POST(req: NextRequest) {
   const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
@@ -108,7 +87,16 @@ export async function POST(req: NextRequest) {
 
   const expiresAt = Math.floor(Date.now() / 1000) + TOKEN_EXPIRY_SEC
 
-  const token = buildAgoraToken(appId, appCertificate, roomId, user.id, expiresAt)
+  // uid를 Agora 숫자 UID(0 = string uid mode)로 처리 — Agora SDK는 string uid를 account로 사용
+  const token = RtcTokenBuilder.buildTokenWithUserAccount(
+    appId,
+    appCertificate,
+    roomId,
+    user.id,
+    RtcRole.PUBLISHER,
+    expiresAt,
+    expiresAt
+  )
 
   return NextResponse.json({ token, expiresAt, appId })
 }
