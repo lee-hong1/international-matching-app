@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { getAuthUser, supabaseService, isValidUuid } from '@src/lib/commerce'
 import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
+import { isSuspended } from '@src/lib/suspended-check'
 
 function getStripe(): Stripe {
   const key = process.env.STRIPE_SECRET_KEY
@@ -22,6 +23,10 @@ export async function POST(req: NextRequest) {
   const user = await getAuthUser(req)
   if (!user) {
     return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
+  }
+
+  if (await isSuspended(user.id)) {
+    return NextResponse.json({ error: 'Account suspended' }, { status: 403 })
   }
 
   let stripe: Stripe
@@ -87,7 +92,7 @@ export async function POST(req: NextRequest) {
             name: plan.name,
             description: `${plan.duration_months}개월 구독`,
           },
-          unit_amount: Number(plan.price),
+          unit_amount: Math.round(Number(plan.price)),
         },
         quantity: 1,
       }],

@@ -2,6 +2,7 @@ import { createHmac, randomBytes } from 'crypto'
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthUser, supabaseService, isValidUuid } from '@src/lib/commerce'
 import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
+import { isSuspended } from '@src/lib/suspended-check'
 
 /**
  * Agora AccessToken2 생성 — RFC 완전 구현
@@ -48,6 +49,10 @@ export async function POST(req: NextRequest) {
   const user = await getAuthUser(req)
   if (!user) {
     return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
+  }
+
+  if (await isSuspended(user.id)) {
+    return NextResponse.json({ error: 'Account suspended' }, { status: 403 })
   }
 
   const appId = process.env.AGORA_APP_ID
