@@ -32,7 +32,8 @@ export async function GET(
 
   try {
     const { searchParams } = new URL(req.url)
-    const days = Math.min(parseInt(searchParams.get('days') ?? '30', 10), 365)
+    const rawDays = parseInt(searchParams.get('days') ?? '30', 10)
+    const days = Math.min(Number.isFinite(rawDays) && rawDays > 0 ? rawDays : 30, 365)
 
     const since = new Date(Date.now() - days * 86400 * 1000).toISOString()
     const { data, error } = await supabaseService
