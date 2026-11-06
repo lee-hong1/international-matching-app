@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthUser, supabaseService } from '@src/lib/commerce'
 import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
+import { isSuspended } from '@src/lib/suspended-check'
 
 export async function GET(request: NextRequest) {
   const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
@@ -57,6 +58,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
   }
 
+  if (await isSuspended(user.id)) {
+    return NextResponse.json({ error: 'Account suspended' }, { status: 403 })
+  }
+
   // 청소년보호법: 이벤트 생성은 성인 인증 필수
   const { data: eventCreatorProfile } = await supabaseService
     .from('profiles').select('is_adult').eq('id', user.id).single()
@@ -110,7 +115,8 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (error || !event) {
-      return NextResponse.json({ error: error?.message ?? 'Failed to create event' }, { status: 500 })
+      console.error('[events/POST] insert error:', error?.code)
+      return NextResponse.json({ error: 'Failed to create event' }, { status: 500 })
     }
 
     // 팔로워에게 알림 발송

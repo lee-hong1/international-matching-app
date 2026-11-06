@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
 import { isValidUuid, supabaseService } from '@src/lib/commerce'
+import { isSuspended } from '@src/lib/suspended-check'
 
 async function getAuthUser(request: NextRequest) {
   const authHeader = request.headers.get('authorization')
@@ -25,6 +26,10 @@ export async function POST(
   const user = await getAuthUser(request)
   if (!user) {
     return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
+  }
+
+  if (await isSuspended(user.id)) {
+    return NextResponse.json({ error: 'Account suspended' }, { status: 403 })
   }
 
   const { id: eventId } = await params

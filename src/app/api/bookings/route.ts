@@ -3,6 +3,7 @@ import { getAuthUser, supabaseService, isValidUuid } from '@src/lib/commerce'
 import { formatBookingTime } from '@src/lib/datetime'
 import { detectLangFromHeader, t, type Lang } from '@src/lib/i18n'
 import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
+import { isSuspended } from '@src/lib/suspended-check'
 
 // ── 이메일 fire-and-forget 헬퍼 ──────────────────────────────────────────────
 async function sendBookingEmail(
@@ -220,6 +221,10 @@ export async function POST(req: NextRequest) {
   const user = await getAuthUser(req)
   if (!user) {
     return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
+  }
+
+  if (await isSuspended(user.id)) {
+    return NextResponse.json({ error: 'Account suspended' }, { status: 403 })
   }
 
   // ── 성인 인증 필수 (청소년보호법) ────────────────────────────────────────
