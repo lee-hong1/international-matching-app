@@ -113,12 +113,18 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     }
 
     // 결제 내역 저장 (멱등성: provider_payment_id UNIQUE → 중복 무시)
+    // KRW/JPY 등 zero-decimal currency: Stripe amount = 실제 금액 (100으로 나누지 않음)
+    const ZERO_DECIMAL_CURRENCIES = ['KRW', 'JPY', 'BIF', 'CLP', 'GNF', 'ISK', 'KMF', 'MGA', 'PYG', 'RWF', 'UGX', 'VND', 'VUV', 'XAF', 'XOF', 'XPF']
+    const sessionCurrency = (session.currency ?? 'krw').toUpperCase()
+    const paidAmount = ZERO_DECIMAL_CURRENCIES.includes(sessionCurrency)
+      ? (session.amount_total ?? 0)
+      : Math.round((session.amount_total ?? 0) / 100)
     const { error: paymentError } = await supabaseService
       .from('payments')
       .insert({
         user_id: userId,
-        amount: (session.amount_total ?? 0) / 100,
-        currency: 'KRW',
+        amount: paidAmount,
+        currency: sessionCurrency,
         payment_method: 'stripe',
         payment_status: 'completed',
         payment_provider: 'stripe',
