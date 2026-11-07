@@ -16,8 +16,8 @@ export async function GET(request: NextRequest) {
   }
 
   const adminEmails = (process.env.ADMIN_EMAILS ?? '')
-    .split(',').map((e) => e.trim()).filter(Boolean)
+    .split(',').map((e) => e.trim().toLowerCase()).filter(Boolean)
 
-  const isAdmin = adminEmails.includes(user.email ?? '')
+  const isAdmin = adminEmails.includes((user.email ?? '').toLowerCase())
   return NextResponse.json({ isAdmin })
 }
