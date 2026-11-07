@@ -36,7 +36,7 @@ export async function GET(req: NextRequest) {
       .select('id, email, full_name, country, gender, verification_status, is_premium, created_at, last_active', { count: 'exact' })
 
     if (search) {
-      const safeSearch = search.replace(/[,()]/g, '').slice(0, 100)
+      const safeSearch = search.replace(/[%_\\,()]/g, '\\$&').slice(0, 100)
       if (safeSearch) {
         query = query.or(`full_name.ilike.%${safeSearch}%,email.ilike.%${safeSearch}%`)
       }

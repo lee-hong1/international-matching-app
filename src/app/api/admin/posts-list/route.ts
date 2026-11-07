@@ -37,7 +37,7 @@ export async function GET(req: NextRequest) {
       .order('created_at', { ascending: false })
 
     if (search) {
-      const safeSearch = search.replace(/[,()]/g, '').slice(0, 100)
+      const safeSearch = search.replace(/[%_\\,()]/g, '\\$&').slice(0, 100)
       if (safeSearch) query = query.ilike('caption', `%${safeSearch}%`)
     }
 
