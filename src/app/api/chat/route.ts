@@ -60,7 +60,7 @@ export async function POST(req: NextRequest) {
   // ── 정지된 계정 차단 ─────────────────────────────────────────────────────
   const { data: profile, error: profileErr } = await supabaseService
     .from('profiles')
-    .select('is_suspended, violation_count, is_adult')
+    .select('is_suspended, violation_count, is_adult, preferred_lang')
     .eq('id', user.id)
     .single()
 
@@ -109,6 +109,19 @@ export async function POST(req: NextRequest) {
       const baseUrl = getBaseUrl()
       if (baseUrl) {
         const svcKey = process.env.SUPABASE_SERVICE_ROLE_KEY ?? ''
+        const notifLang = profile?.preferred_lang ?? 'en'
+        const SUSPEND_TITLES: Record<string, string> = {
+          ko: '계정 임시 정지',
+          en: 'Account Suspended',
+          ja: 'アカウント一時停止',
+          zh: '账号暂停',
+        }
+        const SUSPEND_BODIES: Record<string, string> = {
+          ko: '외부 플랫폼 유도로 인한 임시 정지입니다.',
+          en: 'Account suspended for directing to external platforms.',
+          ja: '外部プラットフォームへの誘導により一時停止されました。',
+          zh: '由于引导至外部平台，您的账号已被暂停。',
+        }
         // FCM 정지 알림 fire-and-forget (법적 고지 의무)
         void fetch(`${baseUrl}/api/send-notification`, {
           method: 'POST',
@@ -116,8 +129,8 @@ export async function POST(req: NextRequest) {
           body: JSON.stringify({
             userId: user.id,
             payload: {
-              title: '계정 임시 정지 / Account Suspended',
-              body: '외부 플랫폼 유도로 인한 임시 정지입니다. / Account suspended for directing to external platforms.',
+              title: SUSPEND_TITLES[notifLang] ?? SUSPEND_TITLES.en,
+              body: SUSPEND_BODIES[notifLang] ?? SUSPEND_BODIES.en,
               data: { type: 'suspension', reason: 'external_platform' },
             },
           }),
