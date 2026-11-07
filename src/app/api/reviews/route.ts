@@ -42,7 +42,8 @@ export async function GET(req: NextRequest) {
   if (hostId) {
     query = query.eq('reviewee_id', hostId).eq('is_public', true)
   } else if (reviewerId) {
-    query = query.eq('reviewer_id', reviewerId)
+    // is_public 필터: 관리자가 모더레이션으로 비공개 처리한 리뷰가 노출되지 않도록 방어
+    query = query.eq('reviewer_id', reviewerId).eq('is_public', true)
   }
 
   if (cursor) {

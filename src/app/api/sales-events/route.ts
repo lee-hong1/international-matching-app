@@ -102,7 +102,8 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    const VALID_PLATFORMS = ['coupang', 'naver', 'kakao', 'instagram', 'youtube', 'other']
+    // youtube 제거: youtube.com은 ALLOWED_DOMAINS에 없어서 isAllowedUrl에서 항상 거부됨 → 혼란 방지
+    const VALID_PLATFORMS = ['coupang', 'naver', 'kakao', 'instagram', 'other']
     if (external_platform && !VALID_PLATFORMS.includes(external_platform)) {
       return NextResponse.json({ error: `external_platform must be one of: ${VALID_PLATFORMS.join(', ')}` }, { status: 400 })
     }
