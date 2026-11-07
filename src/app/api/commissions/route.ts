@@ -87,6 +87,7 @@ export async function POST(req: NextRequest) {
       commission_amount,
       net_amount,
       currency,
+      status: 'settled',
     })
     .select('id, net_amount, commission_amount, created_at')
     .single()
