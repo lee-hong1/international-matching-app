@@ -1037,6 +1037,20 @@ const MESSAGES: Messages = {
   'help.contact_us':      { ko: '문의하기',                  en: 'Contact Us',                         ja: 'お問い合わせ',            zh: '联系我们' },
   'help.contact_desc':    { ko: '직접 답변이 필요하시면 지원팀에 문의하세요.', en: 'Need a direct answer? Reach out to our support team.', ja: '直接回答が必要な場合は、サポートチームにお問い合わせください。', zh: '需要直接解答？请联系我们的支持团队。' },
   'help.contact_btn':     { ko: '지원팀 문의',               en: 'Contact Support',                    ja: 'サポートに問い合わせる',  zh: '联系支持' },
+
+  // ── 예약 취소·환불 정책 고지 (전자상거래법 §13·§17) ─────────────────────────
+  'book.refund_policy_title': {
+    ko: '취소 및 환불 정책',
+    en: 'Cancellation & Refund Policy',
+    ja: 'キャンセル・返金ポリシー',
+    zh: '取消与退款政策',
+  },
+  'book.refund_policy_body': {
+    ko: '예약 24시간 전까지 취소 시 전액 환불. 당일 취소는 50% 환불. 호스트 귀책으로 취소될 경우 전액 환불. 디지털 서비스 특성상 서비스 이용 후에는 환불이 제한될 수 있습니다. 분쟁 시 GlobalMatch 고객센터에 문의하시면 중재해 드립니다.',
+    en: 'Full refund for cancellations 24+ hours before the booking. 50% refund for same-day cancellations. Full refund if the host cancels. Due to the nature of digital services, refunds may be limited after service delivery. Contact GlobalMatch support for dispute resolution.',
+    ja: '予約24時間以上前のキャンセルは全額返金。当日キャンセルは50%返金。ホスト都合のキャンセルは全額返金。デジタルサービスの性質上、サービス提供後の返金は制限される場合があります。紛争時はサポートへお問い合わせください。',
+    zh: '预约24小时前取消全额退款。当天取消退款50%。如因主机取消，全额退款。由于数字服务的特性，服务交付后退款可能受限。如有争议，请联系GlobalMatch客服调解。',
+  },
 }
 
 /** 언어 코드를 지원 언어로 정규화 */

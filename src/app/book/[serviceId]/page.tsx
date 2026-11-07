@@ -247,6 +247,14 @@ function BookingForm({ serviceId }: { serviceId: string }) {
 
         {error && <p style={{ color: '#dc2626', marginTop: 8, fontSize: '0.9rem' }}>{error}</p>}
 
+        {/* 전자상거래법 §13·§17 고지: 취소/환불 정책 — 결제 전 명시 의무 */}
+        <div style={{ marginTop: 16, padding: '12px 14px', background: '#f9fafb', borderRadius: 8, border: '1px solid #e5e7eb', fontSize: '0.8rem', color: '#6b7280', lineHeight: 1.6 }}>
+          <strong style={{ color: '#374151', display: 'block', marginBottom: 4 }}>
+            {t('book.refund_policy_title', lang)}
+          </strong>
+          {t('book.refund_policy_body', lang)}
+        </div>
+
         <button
           onClick={submitBooking}
           disabled={loading || !selectedDate || !selectedTime || !!dateHasNoSlots}
