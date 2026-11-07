@@ -889,7 +889,7 @@ const MESSAGES: Messages = {
   'premium.status_inactive': { ko: '비활성', en: 'Inactive', ja: '無効', zh: '未激活' },
   'premium.headline_prefix': { ko: '프리미엄으로 ', en: 'Meet ', ja: 'プレミアムで', zh: '用高级版，' },
   'premium.headline_highlight': { ko: '더 많은 인연', en: 'More Connections', ja: 'より多くの出会い', zh: '结识更多缘分' },
-  'premium.headline_suffix': { ko: '을 만나세요', en: ' with Premium', ja: 'を見つけよう', zh: '' },
+  'premium.headline_suffix': { ko: '을 만나세요', en: ' with Premium', ja: 'を見つけよう', zh: '用高级会员相识' },
   'premium.subheadline': { ko: '프리미엄 기능으로 더 빠르고 효과적으로 특별한 사람을 만날 수 있습니다', en: 'Find someone special faster and more effectively with Premium features', ja: 'プレミアム機能でより早く効果的に特別な人を見つけましょう', zh: '使用高级功能，更快更有效地找到特别的人' },
   'premium.most_popular': { ko: '가장 인기있는 플랜', en: 'Most Popular', ja: '最も人気のプラン', zh: '最受欢迎' },
   'premium.savings_badge': { ko: '{savings}% 절약', en: '{savings}% Off', ja: '{savings}% 節約', zh: '节省{savings}%' },
