@@ -58,7 +58,10 @@ export default function CreatePost({ onClose, onPostCreated }: CreatePostProps) 
       mediaFiles: files,
     } as CreatePostData)
     setSubmitting(false)
-    if (postError || !post) { setError('게시물 등록에 실패했습니다. 다시 시도해주세요.'); return }
+    if (postError || !post) {
+      setError(postError instanceof Error ? postError.message : '게시물 등록에 실패했습니다. 다시 시도해주세요.')
+      return
+    }
     onPostCreated(post)
   }
 
