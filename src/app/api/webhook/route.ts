@@ -123,7 +123,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
         payment_status: 'completed',
         payment_provider: 'stripe',
         provider_payment_id: session.payment_intent as string,
-        description: `${plan.name} 구독 결제`
+        description: `${plan.name} Subscription Payment`
       })
 
     if (paymentError && paymentError.code !== '23505') {
@@ -147,7 +147,15 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
 }
 
 async function handlePaymentSucceeded(paymentIntent: Stripe.PaymentIntent) {
-  console.log('Payment succeeded:', paymentIntent.id)
+  const { error } = await supabaseService
+    .from('payments')
+    .update({ payment_status: 'completed' })
+    .eq('provider_payment_id', paymentIntent.id)
+    .eq('payment_status', 'pending')
+
+  if (error) {
+    console.error('[webhook] Error updating payment status on success:', error.code)
+  }
 }
 
 async function handlePaymentFailed(paymentIntent: Stripe.PaymentIntent) {
