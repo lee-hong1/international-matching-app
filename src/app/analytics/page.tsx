@@ -2,8 +2,11 @@
 
 import React, { useState, useEffect } from 'react'
 import { PlatformStatistics, CountryStats } from '@/lib/analytics'
+import { useLanguage } from '@/contexts/LanguageContext'
+import { t } from '@src/lib/i18n'
 
 export default function AnalyticsPage() {
+  const { locale: lang } = useLanguage()
   const [platformStats, setPlatformStats] = useState<PlatformStatistics | null>(null)
   const [countryStats, setCountryStats] = useState<CountryStats[]>([])
   const [loading, setLoading] = useState(true)
@@ -82,9 +85,9 @@ export default function AnalyticsPage() {
           <div className="border-b border-gray-200">
             <nav className="-mb-px flex space-x-8">
               {[
-                { key: 'overview', label: '전체 개요' },
-                { key: 'countries', label: '국가별 통계' },
-                { key: 'trends', label: '트렌드 분석' }
+                { key: 'overview', label: t('analytics.tab_overview', lang) },
+                { key: 'countries', label: t('analytics.tab_countries', lang) },
+                { key: 'trends', label: t('analytics.tab_trends', lang) }
               ].map((tab) => (
                 <button
                   key={tab.key}

@@ -681,6 +681,7 @@ const MESSAGES: Messages = {
   'common.about': { ko: '소개', en: 'About', ja: '自己紹介', zh: '关于' },
   'common.location': { ko: '거주지', en: 'Location', ja: '居住地', zh: '所在地' },
   'common.interests': { ko: '관심사', en: 'Interests', ja: '興味', zh: '兴趣' },
+  'common.min': { ko: '분', en: ' min', ja: '分', zh: '分钟' },
 
   // ── 게시물 상세 ───────────────────────────────────────────────────────────
   'post.title': { ko: '게시물', en: 'Post', ja: '投稿', zh: '帖子' },
@@ -816,6 +817,11 @@ const MESSAGES: Messages = {
   'payment.success_desc': { ko: '신청이 승인되었습니다.', en: 'Your application has been approved.', ja: '申請が承認されました。', zh: '您的申请已获批准。' },
   'payment.failed_title': { ko: '결제 실패', en: 'Payment failed', ja: '決済失敗', zh: '付款失败' },
   'payment.invalid_info': { ko: '결제 정보가 올바르지 않습니다', en: 'Invalid payment information', ja: '決済情報が正しくありません', zh: '支付信息不正确' },
+
+  // ── 애널리틱스 ───────────────────────────────────────────────────────────────
+  'analytics.tab_overview': { ko: '전체 개요', en: 'Overview', ja: '全体概要', zh: '总览' },
+  'analytics.tab_countries': { ko: '국가별 통계', en: 'By Country', ja: '国別統計', zh: '按国家统计' },
+  'analytics.tab_trends': { ko: '트렌드 분석', en: 'Trends', ja: 'トレンド分析', zh: '趋势分析' },
 
   // ── 이메일 수신 거부 ─────────────────────────────────────────────────────────
   'unsubscribe.success_title': { ko: '수신 거부 완료', en: 'Unsubscribed', ja: '配信停止完了', zh: '取消订阅成功' },

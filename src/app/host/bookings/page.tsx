@@ -127,7 +127,7 @@ export default function HostBookingsPage() {
                       {b.services?.title ?? '—'}
                       {b.services?.duration_minutes && (
                         <span style={{ color: '#777', fontWeight: 400, fontSize: '0.85rem' }}>
-                          {' '}· {b.services.duration_minutes}{lang === 'ko' ? '분' : lang === 'ja' ? '分' : ' min'}
+                          {' '}· {b.services.duration_minutes}{t('common.min', lang)}
                         </span>
                       )}
                     </p>
