@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { t, type Lang } from '@src/lib/i18n'
 
 interface ReviewFormProps {
@@ -10,6 +11,7 @@ interface ReviewFormProps {
 }
 
 export default function ReviewForm({ bookingId, lang = 'ko', onSuccess }: ReviewFormProps) {
+  const router = useRouter()
   const [rating, setRating] = useState(0)
   const [hoverRating, setHoverRating] = useState(0)
   const [comment, setComment] = useState('')
@@ -33,6 +35,7 @@ export default function ReviewForm({ bookingId, lang = 'ko', onSuccess }: Review
 
       if (!res.ok) {
         const err = await res.json()
+        if (err.redirect) { router.push(err.redirect); return }
         throw new Error(err.error ?? 'error')
       }
 

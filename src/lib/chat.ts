@@ -126,7 +126,11 @@ export const chatService = {
       },
       body: JSON.stringify({ room_id: roomId, content }),
     })
-    if (!res.ok) return null
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}))
+      if (err.redirect) throw Object.assign(new Error(err.error ?? 'forbidden'), { redirect: err.redirect as string })
+      return null
+    }
     const json = await res.json()
     return json.data ?? null
   },
