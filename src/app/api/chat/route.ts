@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getAuthUser, supabaseService, isValidUuid } from '@src/lib/commerce'
+import { getAuthUser, supabaseService, isValidUuid, hasForbiddenContent } from '@src/lib/commerce'
 import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
 import { detectExternalPlatform } from '@src/lib/chat-safety'
 import { isSuspended } from '@src/lib/suspended-check'
@@ -89,6 +89,11 @@ export async function POST(req: NextRequest) {
 
   if (roomErr || !room) {
     return NextResponse.json({ error: 'Chat room not found or access denied' }, { status: 404 })
+  }
+
+  // ── 금지 키워드 검사 ────────────────────────────────────────────────────
+  if (hasForbiddenContent(content)) {
+    return NextResponse.json({ error: 'Message contains prohibited content' }, { status: 400 })
   }
 
   // ── 외부 플랫폼 유도 감지 ──────────────────────────────────────────────
