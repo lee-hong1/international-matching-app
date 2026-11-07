@@ -1,6 +1,6 @@
 import { createHmac } from 'crypto'
 import { NextRequest, NextResponse } from 'next/server'
-import { getAuthUser } from '@src/lib/commerce'
+import { getAuthUser, supabaseService } from '@src/lib/commerce'
 import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
 import { isSuspended } from '@src/lib/suspended-check'
 
@@ -22,6 +22,16 @@ export async function GET(req: NextRequest) {
 
   if (await isSuspended(user.id)) {
     return NextResponse.json({ error: 'Account suspended' }, { status: 403 })
+  }
+
+  // 청소년보호법: 영상통화 TURN 크리덴셜은 성인 인증 필수
+  const { data: turnUserProfile } = await supabaseService
+    .from('profiles').select('is_adult').eq('id', user.id).single()
+  if (!turnUserProfile?.is_adult) {
+    return NextResponse.json(
+      { error: 'Age verification required', redirect: '/onboarding/verify-age' },
+      { status: 403 }
+    )
   }
 
   // ── rate limit: payment window(5/min) 재활용 ─────────────────────────────
