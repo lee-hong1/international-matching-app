@@ -132,7 +132,7 @@ export async function PATCH(
   // ── 예약 조회 ─────────────────────────────────────────────────────────────
   const { data: booking, error: fetchErr } = await supabaseService
     .from('bookings')
-    .select('id, guest_id, host_id, status, amount, currency')
+    .select('id, guest_id, host_id, status, amount, currency, payment_intent_id, payment_status')
     .eq('id', id)
     .single()
 
@@ -220,9 +220,9 @@ export async function PATCH(
     })()
   }
 
-  // cancelled → 커미션 환불 (이미 completed로 커미션이 생성된 경우는 없으므로
-  // confirmed→cancelled 전이 시에만 해당. booking_commissions 행 삭제)
+  // cancelled → 커미션 환불 + Stripe 환불 처리
   if (newStatus === 'cancelled') {
+    // 1) 커미션 행 삭제 (confirmed→cancelled 시 선행 커미션 없음, 방어 삭제)
     void (async () => {
       try {
         await supabaseService
@@ -233,6 +233,46 @@ export async function PATCH(
         console.error('[bookings/status] commission reversal error:', (e as Error).message)
       }
     })()
+
+    // 2) Stripe 환불 (payment_intent_id가 있고 paid 상태인 경우만)
+    // 취소 주체: 호스트 취소 → 전액 환불, 사용자 취소 → 정책에 따라 부분 환불
+    const stripeKey = process.env.STRIPE_SECRET_KEY
+    const paymentIntentId = (booking as any).payment_intent_id as string | null
+    const paymentStatus = (booking as any).payment_status as string | null
+    if (stripeKey && paymentIntentId && paymentStatus === 'paid') {
+      void (async () => {
+        try {
+          const { default: Stripe } = await import('stripe')
+          const stripe = new Stripe(stripeKey, { apiVersion: '2025-07-30.basil' })
+          const amount = booking.amount ? Number(booking.amount) : 0
+          // 호스트 취소: 전액 환불 / 사용자 취소: 24h+ 전 전액, 당일 50%
+          let refundAmount: number | undefined
+          if (isHost) {
+            refundAmount = undefined // 전액 환불 (amount 미지정 = 전액)
+          } else {
+            const bookedAtMs = new Date((booking as any).booked_at ?? Date.now()).getTime()
+            const hoursUntil = (bookedAtMs - Date.now()) / 36e5
+            refundAmount = hoursUntil >= 24
+              ? undefined // 전액
+              : Math.round(amount * 50) // 50% (Stripe는 소수점 단위 통화 처리 주의)
+          }
+          const refundParams: Parameters<typeof stripe.refunds.create>[0] = {
+            payment_intent: paymentIntentId,
+          }
+          if (refundAmount !== undefined) refundParams.amount = refundAmount
+          await stripe.refunds.create(refundParams)
+
+          // payment_status 갱신
+          const finalStatus = refundAmount === undefined ? 'refunded' : 'partially_refunded'
+          await supabaseService
+            .from('bookings')
+            .update({ payment_status: finalStatus })
+            .eq('id', id)
+        } catch (e) {
+          console.error('[bookings/status] stripe refund error:', (e as Error).message)
+        }
+      })()
+    }
   }
 
   // Fire-and-forget 알림
