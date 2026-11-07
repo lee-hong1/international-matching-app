@@ -161,11 +161,12 @@ async function handlePaymentSucceeded(paymentIntent: Stripe.PaymentIntent) {
 async function handlePaymentFailed(paymentIntent: Stripe.PaymentIntent) {
   console.log('Payment failed:', paymentIntent.id)
 
-  // 결제 실패 상태 업데이트
+  // pending 상태인 결제만 failed로 전환 (completed 덮어쓰기 방지)
   const { error } = await supabaseService
     .from('payments')
     .update({ payment_status: 'failed' })
     .eq('provider_payment_id', paymentIntent.id)
+    .eq('payment_status', 'pending')
 
   if (error) {
     console.error('Error updating payment status:', error.code)
@@ -210,14 +211,22 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
       console.error('Error updating subscription status:', subscriptionError.code)
     }
 
-    // 프리미엄 상태 제거
-    const { error: profileError } = await supabaseService
-      .from('profiles')
-      .update({ is_premium: false })
-      .eq('id', userId)
+    // 다른 활성 구독이 없을 때만 프리미엄 상태 제거
+    const { count: activeCount } = await supabaseService
+      .from('user_subscriptions')
+      .select('id', { count: 'exact', head: true })
+      .eq('user_id', userId)
+      .eq('status', 'active')
 
-    if (profileError) {
-      console.error('Error removing premium status:', profileError.code)
+    if ((activeCount ?? 0) === 0) {
+      const { error: profileError } = await supabaseService
+        .from('profiles')
+        .update({ is_premium: false })
+        .eq('id', userId)
+
+      if (profileError) {
+        console.error('Error removing premium status:', profileError.code)
+      }
     }
   }
 }

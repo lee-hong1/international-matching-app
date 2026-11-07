@@ -135,6 +135,7 @@ export async function GET(req: NextRequest) {
     .eq('host_id', user.id)
     .eq('status', 'settled')
     .gte('created_at', monthStart)
+    .limit(10000)
 
   if (monthErr) {
     console.error('[commissions GET] monthly error:', monthErr.code)
