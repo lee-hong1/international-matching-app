@@ -13,13 +13,13 @@ const ALLOWED_PRIORITY = ['low', 'medium', 'high', 'critical']
 
 async function isAdmin(userId: string): Promise<boolean> {
   const adminEmails = (process.env.ADMIN_EMAILS ?? '')
-    .split(',').map(e => e.trim()).filter(Boolean)
+    .split(',').map(e => e.trim().toLowerCase()).filter(Boolean)
   const { data } = await supabaseService
     .from('profiles')
     .select('email')
     .eq('id', userId)
     .single()
-  return data?.email ? adminEmails.includes(data.email) : false
+  return data?.email ? adminEmails.includes(data.email.toLowerCase()) : false
 }
 
 // 신고 생성 — reporter_id는 JWT에서 추출 (IDOR 방지)
