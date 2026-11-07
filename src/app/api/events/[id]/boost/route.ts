@@ -165,7 +165,10 @@ export async function PATCH(
     } catch {
       console.error('[event-boost/PATCH] toss error: non-JSON response', tossRes.status)
     }
-    return NextResponse.json({ error: 'Payment confirmation failed' }, { status: 400 })
+    // ALREADY_PROCESSED_PAYMENT: Toss already charged (DB update failed on prior attempt) → proceed to DB sync
+    if (tossCode !== 'ALREADY_PROCESSED_PAYMENT') {
+      return NextResponse.json({ error: 'Payment confirmation failed' }, { status: 400 })
+    }
   }
 
   const expiresAt = new Date(Date.now() + BOOST_HOURS * 60 * 60 * 1000).toISOString()

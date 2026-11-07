@@ -57,12 +57,13 @@ export async function GET(req: NextRequest) {
       supabaseService.from('messages').select('id', { count: 'exact', head: true }),
       supabaseService.from('messages').select('id', { count: 'exact', head: true }).gte('created_at', todayIso),
       supabaseService.from('profiles').select('id', { count: 'exact', head: true }).eq('is_premium', true),
-      supabaseService.from('payments').select('amount').eq('payment_status', 'completed').gte('created_at', start30dAgo).limit(50000),
-      supabaseService.from('payments').select('amount').eq('payment_status', 'completed').limit(50000),
+      supabaseService.from('payments').select('amount.sum()').eq('payment_status', 'completed').gte('created_at', start30dAgo).maybeSingle(),
+      supabaseService.from('payments').select('amount.sum()').eq('payment_status', 'completed').maybeSingle(),
     ])
 
-    const revenueMonth = (revenueMonthResult.data ?? []).reduce((sum: number, p: any) => sum + Number(p.amount ?? 0), 0)
-    const revenueTotal = (revenueTotalResult.data ?? []).reduce((sum: number, p: any) => sum + Number(p.amount ?? 0), 0)
+    // PostgREST aggregate returns { sum: value } — avoids 50K row fetch and silent undercount
+    const revenueMonth = Number((revenueMonthResult.data as unknown as { sum?: number } | null)?.sum ?? 0)
+    const revenueTotal = Number((revenueTotalResult.data as unknown as { sum?: number } | null)?.sum ?? 0)
 
     // 전환율: 프리미엄 / 전체 (division-by-zero guard)
     const totalU = totalUsers ?? 0

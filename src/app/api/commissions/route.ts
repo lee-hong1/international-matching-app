@@ -129,14 +129,14 @@ export async function GET(req: NextRequest) {
   const now = new Date()
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString()
 
-  // ── 이번 달 커미션 합계 ────────────────────────────────────────────────────
-  const { data: monthly, error: monthErr } = await supabaseService
+  // ── 이번 달 커미션 합계 (PostgREST aggregate — 행 수 제한 없음) ──────────
+  const { data: monthlyAgg, error: monthErr } = await supabaseService
     .from('booking_commissions')
-    .select('net_amount')
+    .select('net_amount.sum()')
     .eq('host_id', user.id)
     .eq('status', 'settled')
     .gte('created_at', monthStart)
-    .limit(10000)
+    .maybeSingle()
 
   if (monthErr) {
     console.error('[commissions GET] monthly error:', monthErr.code)
@@ -155,10 +155,8 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Failed to fetch commission count' }, { status: 500 })
   }
 
-  const monthly_net = (monthly ?? []).reduce(
-    (sum, row) => sum + Number(row.net_amount),
-    0
-  )
+  // PostgREST aggregate returns { sum: value }
+  const monthly_net = Number((monthlyAgg as unknown as { sum?: number } | null)?.sum ?? 0)
 
   return NextResponse.json({
     data: {
