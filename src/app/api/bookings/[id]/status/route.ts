@@ -259,11 +259,10 @@ export async function PATCH(
               ? undefined // 전액
               : Math.round(amount * 0.5) // 50% 환불 (Stripe: 최소 통화 단위 기준)
           }
-          const refundParams: Parameters<typeof stripe.refunds.create>[0] = {
+          await stripe.refunds.create({
             payment_intent: paymentIntentId,
-          }
-          if (refundAmount !== undefined) refundParams.amount = refundAmount
-          await stripe.refunds.create(refundParams)
+            ...(refundAmount !== undefined ? { amount: refundAmount } : {}),
+          } as Parameters<typeof stripe.refunds.create>[0])
 
           // payment_status 갱신
           const finalStatus = refundAmount === undefined ? 'refunded' : 'partially_refunded'

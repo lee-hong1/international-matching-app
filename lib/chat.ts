@@ -5,6 +5,7 @@ export interface ChatRoom {
   match_id: string
   created_at: string
   last_message_at: string
+  unread_count?: number
   partner?: {
     id: string
     full_name: string

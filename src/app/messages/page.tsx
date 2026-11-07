@@ -192,7 +192,7 @@ export default function MessagesPage() {
 
                         {room.last_message && (
                           <p className="text-sm text-gray-600 truncate mt-1">
-                            {room.last_message}
+                            {room.last_message.content}
                           </p>
                         )}
                       </div>

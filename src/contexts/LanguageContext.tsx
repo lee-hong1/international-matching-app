@@ -6,7 +6,7 @@ import { type Locale, t as translate, type TranslationKeys } from '@/lib/i18n'
 type LanguageContextType = {
   locale: Locale
   setLocale: (l: Locale) => void
-  t: (key: keyof TranslationKeys) => string
+  t: (key: string) => string
 }
 
 const LanguageContext = createContext<LanguageContextType>({
@@ -41,7 +41,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     try { localStorage.setItem('locale', l) } catch {}
   }
 
-  const t = (key: keyof TranslationKeys) => translate(locale, key)
+  const t = (key: string) => translate(key, locale)
 
   return (
     <LanguageContext.Provider value={{ locale, setLocale, t }}>
