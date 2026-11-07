@@ -44,6 +44,7 @@ export const chatService = {
       .from('chat_rooms')
       .select(`
         id, booking_id, user_id, host_id, created_at,
+        user_last_read_at, host_last_read_at,
         messages(content, created_at, sender_id)
       `)
       .or(`user_id.eq.${userId},host_id.eq.${userId}`)
@@ -58,6 +59,8 @@ export const chatService = {
       user_id: string
       host_id: string
       created_at: string
+      user_last_read_at: string | null
+      host_last_read_at: string | null
       messages?: Array<{ content: string; created_at: string; sender_id: string }>
     }
 
@@ -99,7 +102,16 @@ export const chatService = {
           : undefined,
         last_message: sortedMsgs[0]?.content,
         last_message_at: sortedMsgs[0]?.created_at,
-        unread_count: (row.messages ?? []).filter(m => m.sender_id !== userId).length,
+        // 본인의 last_read_at 이후에 상대방이 보낸 메시지만 미읽음으로 카운트
+        unread_count: (() => {
+          const myLastRead = row.user_id === userId
+            ? row.user_last_read_at
+            : row.host_last_read_at
+          return (row.messages ?? []).filter(m =>
+            m.sender_id !== userId &&
+            (!myLastRead || new Date(m.created_at) > new Date(myLastRead))
+          ).length
+        })(),
       }
     })
   },
@@ -138,11 +150,10 @@ export const chatService = {
     return json.data ?? null
   },
 
-  async markMessagesAsRead(roomId: string, userId: string): Promise<void> {
-    // Supabase Realtime으로 실시간 처리 — 별도 read-receipt 테이블 없음.
-    // 향후 read_receipts 테이블 추가 시 여기서 UPDATE.
-    void roomId
-    void userId
+  async markMessagesAsRead(roomId: string, _userId: string): Promise<void> {
+    // DB RPC: chat_rooms.user_last_read_at 또는 host_last_read_at 갱신
+    // auth.uid()는 RPC 내부에서 직접 추출 (인자 없이 안전)
+    await supabase.rpc('mark_chat_room_read', { p_room_id: roomId })
   },
 
   subscribeToMessages(
