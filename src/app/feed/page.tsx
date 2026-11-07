@@ -12,7 +12,7 @@ import CreatePost from '@/components/CreatePost'
 import CreateStory from '@/components/CreateStory'
 import { LanguageSwitcher } from '@/components/LanguageSwitcher'
 import { useLanguage } from '@/contexts/LanguageContext'
-import { t } from '@/lib/i18n'
+import { t } from '@src/lib/i18n'
 
 export default function FeedPage() {
   const { user, loading } = useAuth()
@@ -85,13 +85,13 @@ export default function FeedPage() {
             <button
               onClick={() => setShowCreatePost(true)}
               className="p-2 rounded-full hover:bg-gray-100 text-gray-700"
-              title="새 게시물"
+              title={t('feed.create_post', locale)}
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
               </svg>
             </button>
-            <Link href="/messages" className="p-2 rounded-full hover:bg-gray-100 text-gray-700" title="메시지">
+            <Link href="/messages" className="p-2 rounded-full hover:bg-gray-100 text-gray-700" title={t('nav.messages', locale)}>
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
               </svg>
