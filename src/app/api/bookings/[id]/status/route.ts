@@ -174,6 +174,11 @@ export async function PATCH(
     return NextResponse.json({ error: 'Only host can mark booking as completed' }, { status: 403 })
   }
 
+  // completed 전환 시 결제 금액 필수 (수익 누수 방지: 외부 현금 거래 후 무수수료 완료 차단)
+  if (newStatus === 'completed' && (!booking.amount || Number(booking.amount) <= 0)) {
+    return NextResponse.json({ error: 'Payment must be completed before marking booking as done' }, { status: 400 })
+  }
+
   // ── 상태 업데이트 ─────────────────────────────────────────────────────────
   const { data: updated, error: updateErr } = await supabaseService
     .from('bookings')

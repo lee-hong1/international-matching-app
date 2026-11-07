@@ -362,6 +362,22 @@ export async function POST(req: NextRequest) {
     }
   }
 
+  // ── 서비스 금액 조회 (수익 누수 방지: DB 가격을 amount로 고정) ─────────────
+  let serviceAmount: number | null = null
+  let serviceCurrency = 'KRW'
+  if (service_id) {
+    const { data: svc } = await supabaseService
+      .from('services')
+      .select('price, currency')
+      .eq('id', service_id)
+      .eq('host_id', host_id)
+      .single()
+    if (svc) {
+      serviceAmount = Number(svc.price)
+      serviceCurrency = svc.currency ?? 'KRW'
+    }
+  }
+
   // ── 예약 생성 ─────────────────────────────────────────────────────────────
   const finalKey = idempotencyKey ?? `booking_${user.id}_${host_id}_${bookedAtIso}`
   const { data: booking, error } = await supabaseService
@@ -375,6 +391,8 @@ export async function POST(req: NextRequest) {
       notes: notes ?? null,
       status: 'pending',
       idempotency_key: finalKey,
+      amount: serviceAmount,
+      currency: serviceAmount ? serviceCurrency : null,
     })
     .select('id, status, booked_at, host_id, guest_id, created_at')
     .single()
