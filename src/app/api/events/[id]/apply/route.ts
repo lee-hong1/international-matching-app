@@ -121,6 +121,9 @@ export async function POST(
     .single()
 
   if (participantError) {
+    // 고아 payment 정리 (participant 생성 실패 시 pending payment 레코드 제거)
+    await supabaseService.from('payments').delete().eq('id', payment.id)
+
     if (participantError.message?.includes('EVENT_FULL') || participantError.code === 'P0001') {
       return NextResponse.json({ error: 'Event is fully booked' }, { status: 409 })
     }

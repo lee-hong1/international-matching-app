@@ -177,7 +177,7 @@ export async function POST(request: NextRequest) {
       .eq('following_id', user.id)
 
     if (followers && followers.length > 0) {
-      await supabaseService.from('event_notifications').insert(
+      void supabaseService.from('event_notifications').insert(
         followers.map((f) => ({ event_id: event.id, recipient_id: f.follower_id }))
       )
     }
