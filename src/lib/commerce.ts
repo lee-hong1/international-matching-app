@@ -10,7 +10,8 @@ export const ALLOWED_DOMAINS = [
   'smartstore.naver.com', 'brand.naver.com', 'shopping.naver.com',
   'coupang.com', 'kakao.com', 'kakaostore.com', 'gift.kakao.com',
   '29cm.co.kr', 'musinsa.com', 'ably.team', 'zigzag.kr',
-  'instagram.com', 'linktr.ee', 'ohou.se', 'idus.com',
+  // linktr.ee 제거: 링크 집합 사이트 → WhatsApp/Telegram/KakaoTalk 등 외부 연락처 우회 가능 (수익 누수)
+  'instagram.com', 'ohou.se', 'idus.com',
 ]
 
 const ALLOWED_PROTOCOLS = new Set(['https:'])

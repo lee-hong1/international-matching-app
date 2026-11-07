@@ -16,10 +16,17 @@ RETURNS TABLE (
   last_sender_id     uuid,
   unread_count       bigint
 )
-LANGUAGE sql
+LANGUAGE plpgsql
 STABLE
 SECURITY DEFINER
 AS $$
+BEGIN
+  -- IDOR 방지: SECURITY DEFINER 함수이므로 호출자 본인 UUID만 허용
+  IF auth.uid() IS DISTINCT FROM p_user_id THEN
+    RAISE EXCEPTION 'Forbidden' USING ERRCODE = '42501';
+  END IF;
+
+  RETURN QUERY
   WITH room_data AS (
     SELECT
       cr.id,
@@ -77,9 +84,10 @@ AS $$
   FROM room_data rd
   LEFT JOIN latest_msg lm ON lm.room_id = rd.id
   LEFT JOIN unread_counts uc ON uc.room_id = rd.id
-  ORDER BY rd.created_at DESC
+  ORDER BY rd.created_at DESC;
+END;
 $$;
 
--- 인증된 사용자만 호출 가능 (본인 채팅방만 — SECURITY DEFINER + WHERE 조건)
+-- 인증된 사용자만 호출 가능 (본인 채팅방만 — SECURITY DEFINER + auth.uid() 검증)
 REVOKE ALL ON FUNCTION get_chat_room_summaries(uuid) FROM PUBLIC;
 GRANT EXECUTE ON FUNCTION get_chat_room_summaries(uuid) TO authenticated;
