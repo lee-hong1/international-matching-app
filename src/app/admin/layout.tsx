@@ -61,6 +61,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       if (!ok) { router.push('/feed'); return }
       setIsAdmin(true)
       setChecking(false)
+    }).catch(() => {
+      router.push('/feed')
     })
   }, [user, loading, router])
 

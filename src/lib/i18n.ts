@@ -811,6 +811,11 @@ const MESSAGES: Messages = {
   'payment.cancelled': { ko: '결제가 취소되었습니다', en: 'Payment Cancelled', ja: '決済がキャンセルされました', zh: '支付已取消' },
   'payment.not_proceeded': { ko: '결제가 진행되지 않았습니다.', en: 'Payment was not completed.', ja: '決済が完了しませんでした。', zh: '支付未完成。' },
   'payment.back_to_event': { ko: '모임으로 돌아가기', en: 'Back to Event', ja: 'イベントに戻る', zh: '返回活动' },
+  'payment.confirming': { ko: '결제 확인 중...', en: 'Confirming payment...', ja: '決済を確認中...', zh: '正在确认付款...' },
+  'payment.success_title': { ko: '결제 완료', en: 'Payment complete', ja: '決済完了', zh: '付款完成' },
+  'payment.success_desc': { ko: '신청이 승인되었습니다.', en: 'Your application has been approved.', ja: '申請が承認されました。', zh: '您的申请已获批准。' },
+  'payment.failed_title': { ko: '결제 실패', en: 'Payment failed', ja: '決済失敗', zh: '付款失败' },
+  'payment.invalid_info': { ko: '결제 정보가 올바르지 않습니다', en: 'Invalid payment information', ja: '決済情報が正しくありません', zh: '支付信息不正确' },
 
   // ── 이메일 수신 거부 ─────────────────────────────────────────────────────────
   'unsubscribe.success_title': { ko: '수신 거부 완료', en: 'Unsubscribed', ja: '配信停止完了', zh: '取消订阅成功' },
