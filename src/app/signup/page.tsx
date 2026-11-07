@@ -7,21 +7,23 @@ import { authService } from '@/lib/auth'
 import { supabase } from '@/lib/supabase'
 import { t, detectLangFromNavigator } from '@src/lib/i18n'
 
-const COUNTRIES = [
-  '한국', '미국', '캐나다', '영국', '독일', '프랑스', '이탈리아', '스페인',
-  '러시아', '우크라이나', '폴란드', '체코', '슬로바키아', '헝가리', '루마니아',
-  '브라질', '아르헨티나', '콜롬비아', '칠레', '페루',
-  '일본', '중국', '대만', '베트남', '태국', '필리핀', '인도네시아', '말레이시아',
-  '인도', '파키스탄', '방글라데시',
-  '터키', '이스라엘', '사우디아라비아', '이란',
-  '남아프리카공화국', '나이지리아', '케냐', '이집트',
-  '호주', '뉴질랜드', '멕시코', '기타',
-]
+const COUNTRY_CODES = [
+  'KR', 'US', 'CA', 'GB', 'DE', 'FR', 'IT', 'ES',
+  'RU', 'UA', 'PL', 'CZ', 'SK', 'HU', 'RO',
+  'BR', 'AR', 'CO', 'CL', 'PE',
+  'JP', 'CN', 'TW', 'VN', 'TH', 'PH', 'ID', 'MY',
+  'IN', 'PK', 'BD',
+  'TR', 'IL', 'SA', 'IR',
+  'ZA', 'NG', 'KE', 'EG',
+  'AU', 'NZ', 'MX', 'OTHER',
+] as const
 
-const INTERESTS = [
-  '여행', '음악', '영화', '독서', '요리', '운동', '사진', '패션',
-  '뷰티', '댄스', '아트', '게임', '반려동물', '자연', '쇼핑', '카페',
-]
+const INTEREST_KEYS = [
+  'travel', 'music', 'movies', 'reading', 'cooking', 'sports', 'photography', 'fashion',
+  'beauty', 'dance', 'art', 'gaming', 'pets', 'nature', 'shopping', 'cafe',
+] as const
+
+const LOCALE_BCP47: Record<string, string> = { ko: 'ko-KR', en: 'en-US', ja: 'ja-JP', zh: 'zh-CN' }
 
 interface FormData {
   email: string
@@ -397,7 +399,15 @@ export default function SignUpPage() {
                   className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-pink-400 bg-gray-50/50"
                 >
                   <option value="">{t('signup.label_country_placeholder', lang)}</option>
-                  {COUNTRIES.map((c) => <option key={c} value={c}>{c}</option>)}
+                  {COUNTRY_CODES.map((code) => {
+                    const bcp47 = LOCALE_BCP47[lang] ?? 'en-US'
+                    const label = code === 'OTHER'
+                      ? t('signup.country_other', lang)
+                      : (typeof Intl !== 'undefined' && Intl.DisplayNames
+                          ? new Intl.DisplayNames([bcp47], { type: 'region' }).of(code) ?? code
+                          : code)
+                    return <option key={code} value={code}>{label}</option>
+                  })}
                 </select>
               </div>
 
@@ -462,18 +472,18 @@ export default function SignUpPage() {
                   {t('signup.label_interests', lang)} <span className="text-gray-400 font-normal">{t('signup.label_interests_max', lang)}</span>
                 </label>
                 <div className="flex flex-wrap gap-2">
-                  {INTERESTS.map((interest) => (
+                  {INTEREST_KEYS.map((key) => (
                     <button
-                      key={interest}
+                      key={key}
                       type="button"
-                      onClick={() => toggleInterest(interest)}
+                      onClick={() => toggleInterest(key)}
                       className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
-                        form.interests.includes(interest)
+                        form.interests.includes(key)
                           ? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white shadow-sm'
                           : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                       }`}
                     >
-                      {interest}
+                      {t(`signup.interest.${key}`, lang)}
                     </button>
                   ))}
                 </div>

@@ -361,6 +361,7 @@ const MESSAGES: Messages = {
   'auth.error_login_error': { ko: '로그인 중 오류가 발생했습니다.', en: 'An error occurred during login.', ja: 'ログイン中にエラーが発生しました。', zh: '登录时发生错误。' },
   'auth.error_social_failed': { ko: '소셜 로그인에 실패했습니다.', en: 'Social login failed.', ja: 'ソーシャルログインに失敗しました。', zh: '社交登录失败。' },
   'auth.error_social_error': { ko: '소셜 로그인 중 오류가 발생했습니다.', en: 'An error occurred during social login.', ja: 'ソーシャルログイン中にエラーが発生しました。', zh: '社交登录时发生错误。' },
+  'auth.tagline': { ko: '당신만의 팬을 만나보세요', en: 'Meet your personal fans', ja: 'あなただけのファンに会いましょう', zh: '与您的粉丝相遇' },
 
   // ── 회원가입 ──────────────────────────────────────────────────────────────
   'signup.title': { ko: '회원가입', en: 'Sign Up', ja: '新規登録', zh: '注册' },
@@ -418,6 +419,23 @@ const MESSAGES: Messages = {
   'signup.login_link': { ko: '로그인', en: 'Log in', ja: 'ログイン', zh: '登录' },
   'signup.password_strength': { ko: '강도:', en: 'Strength:', ja: '強度:', zh: '强度:' },
   'signup.submitting': { ko: '가입 중...', en: 'Signing up...', ja: '登録中...', zh: '注册中...' },
+  'signup.country_other': { ko: '기타', en: 'Other', ja: 'その他', zh: '其他' },
+  'signup.interest.travel': { ko: '여행', en: 'Travel', ja: '旅行', zh: '旅游' },
+  'signup.interest.music': { ko: '음악', en: 'Music', ja: '音楽', zh: '音乐' },
+  'signup.interest.movies': { ko: '영화', en: 'Movies', ja: '映画', zh: '电影' },
+  'signup.interest.reading': { ko: '독서', en: 'Reading', ja: '読書', zh: '阅读' },
+  'signup.interest.cooking': { ko: '요리', en: 'Cooking', ja: '料理', zh: '烹饪' },
+  'signup.interest.sports': { ko: '운동', en: 'Sports', ja: 'スポーツ', zh: '运动' },
+  'signup.interest.photography': { ko: '사진', en: 'Photography', ja: '写真', zh: '摄影' },
+  'signup.interest.fashion': { ko: '패션', en: 'Fashion', ja: 'ファッション', zh: '时尚' },
+  'signup.interest.beauty': { ko: '뷰티', en: 'Beauty', ja: '美容', zh: '美妆' },
+  'signup.interest.dance': { ko: '댄스', en: 'Dance', ja: 'ダンス', zh: '舞蹈' },
+  'signup.interest.art': { ko: '아트', en: 'Art', ja: 'アート', zh: '艺术' },
+  'signup.interest.gaming': { ko: '게임', en: 'Gaming', ja: 'ゲーム', zh: '游戏' },
+  'signup.interest.pets': { ko: '반려동물', en: 'Pets', ja: 'ペット', zh: '宠物' },
+  'signup.interest.nature': { ko: '자연', en: 'Nature', ja: '自然', zh: '自然' },
+  'signup.interest.shopping': { ko: '쇼핑', en: 'Shopping', ja: 'ショッピング', zh: '购物' },
+  'signup.interest.cafe': { ko: '카페', en: 'Café', ja: 'カフェ', zh: '咖啡馆' },
 
   // ── 알림 메시지 (FCM push 본문) ──────────────────────────────────────────
   'notification.new_booking.title': {
