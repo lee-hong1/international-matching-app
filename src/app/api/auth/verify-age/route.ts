@@ -98,6 +98,12 @@ export async function POST(req: NextRequest) {
     .update({ is_adult: true })
     .eq('id', user.id)
 
+  // JWT app_metadata 업데이트 — 미들웨어 fast-path 체크 활성화
+  // DB 조회 없이 JWT 클레임만으로 is_adult 확인 가능 (성능 최적화)
+  await supabaseService.auth.admin.updateUserById(user.id, {
+    app_metadata: { is_adult: true },
+  }).catch(() => null) // 실패해도 프로필 업데이트는 완료된 상태
+
   // 통과 로그 (생년월일 비저장)
   await supabaseService
     .from('age_verification_logs')

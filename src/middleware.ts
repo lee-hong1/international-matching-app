@@ -226,7 +226,14 @@ async function handleHostPageRoute(request: NextRequest): Promise<NextResponse> 
 }
 
 // 정지 계정이 직접 URL로 접근 차단해야 하는 페이지 경로 목록
-const PROTECTED_PAGE_PATHS = ['/feed', '/discover', '/bookings', '/book', '/host', '/profile', '/messages', '/dashboard', '/analytics', '/events/create']
+// 청소년보호법: 성인 플랫폼 모든 콘텐츠 페이지는 미인증 접근 금지
+const PROTECTED_PAGE_PATHS = [
+  '/feed', '/discover', '/bookings', '/book', '/host', '/profile', '/messages', '/dashboard', '/analytics',
+  '/events',    // 이벤트 목록/상세 — 성인 콘텐츠 포함 가능
+  '/explore',   // 크리에이터 탐색 — 성인 플랫폼
+  '/matches',   // 상호 팔로우 — 연애/만남 목적
+  '/creator',   // 크리에이터 프로필 — 성인 콘텐츠 포함 가능
+]
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
@@ -268,6 +275,17 @@ export async function middleware(request: NextRequest) {
     return handleHostApiRoute(request)
   }
 
+  // 성인 플랫폼 콘텐츠 페이지: 미인증 미성년자 차단 (청소년보호법)
+  // JWT fast-path는 app_metadata.is_adult 미존재 가능 → DB 체크 필수
+  if (
+    pathname.startsWith('/explore') ||
+    pathname.startsWith('/matches') ||
+    pathname.startsWith('/creator') ||
+    pathname.startsWith('/events')
+  ) {
+    return handleHostPageRoute(request)
+  }
+
   // 호스트 페이지 라우트: 미인증 시 /onboarding/verify-age 리디렉션
   if (pathname.startsWith('/host')) {
     return handleHostPageRoute(request)
@@ -293,7 +311,10 @@ export const config = {
     '/messages', '/messages/:path*',
     '/dashboard', '/dashboard/:path*',
     '/analytics', '/analytics/:path*',
-    '/events/create',
+    '/events', '/events/:path*',   // 청소년보호법: 이벤트 전체 경로
+    '/explore', '/explore/:path*', // 청소년보호법: 탐색 페이지
+    '/matches', '/matches/:path*', // 청소년보호법: 매칭 페이지
+    '/creator', '/creator/:path*', // 청소년보호법: 크리에이터 프로필
     '/suspended',
     '/login',
     '/signup',
