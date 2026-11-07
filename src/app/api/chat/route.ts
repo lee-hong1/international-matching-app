@@ -93,19 +93,29 @@ export async function POST(req: NextRequest) {
 
   // ── 외부 플랫폼 유도 감지 ──────────────────────────────────────────────
   if (detectExternalPlatform(content)) {
-    // TODO: replace with supabaseService.rpc('increment_violation_count', { p_user_id: user.id })
-    // once supabase/violation_count_atomic.sql migration is applied.
-    // Current approach has a read-modify-write race (parallel requests may undercount).
-    const currentCount = (profile?.violation_count ?? 0) + 1
-    const willSuspend = currentCount >= 3
+    const { data: rpcResult, error: rpcErr } = await supabaseService
+      .rpc('increment_violation_count', { p_user_id: user.id })
 
-    await supabaseService
-      .from('profiles')
-      .update({
-        violation_count: currentCount,
-        ...(willSuspend ? { is_suspended: true } : {}),
-      })
-      .eq('id', user.id)
+    let currentCount: number
+    let willSuspend: boolean
+
+    if (!rpcErr && rpcResult?.[0]) {
+      // atomic path: violation_count_atomic.sql migration 적용된 환경
+      currentCount = rpcResult[0].new_count as number
+      willSuspend = rpcResult[0].is_suspended as boolean
+    } else {
+      // fallback: migration 미적용 환경용 — 레이스 컨디션 허용
+      const freshCount = (profile?.violation_count ?? 0) + 1
+      currentCount = freshCount
+      willSuspend = freshCount >= 3
+      await supabaseService
+        .from('profiles')
+        .update({
+          violation_count: freshCount,
+          ...(willSuspend ? { is_suspended: true } : {}),
+        })
+        .eq('id', user.id)
+    }
 
     if (willSuspend) {
       const baseUrl = getBaseUrl()

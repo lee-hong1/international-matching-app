@@ -394,6 +394,7 @@ export async function POST(req: NextRequest) {
       host_id,
       service_id: service_id ?? null,
       booked_at: bookedAtIso,
+      duration_minutes: duration,
       timezone: validatedTz,
       notes: notes ?? null,
       status: 'pending',
