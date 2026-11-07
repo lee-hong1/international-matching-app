@@ -4,6 +4,7 @@ import { formatBookingTime } from '@src/lib/datetime'
 import { detectLangFromHeader, t, type Lang } from '@src/lib/i18n'
 import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
 import { isSuspended } from '@src/lib/suspended-check'
+import { detectExternalPlatform } from '@src/lib/chat-safety'
 
 // ── 이메일 fire-and-forget 헬퍼 ──────────────────────────────────────────────
 async function sendBookingEmail(
@@ -295,6 +296,9 @@ export async function POST(req: NextRequest) {
   if (notes !== undefined && notes !== null) {
     if (typeof notes !== 'string' || notes.length > 1000) {
       return NextResponse.json({ error: 'notes must be a string under 1000 characters' }, { status: 400 })
+    }
+    if (detectExternalPlatform(notes)) {
+      return NextResponse.json({ error: 'External platform references are not allowed in booking notes' }, { status: 400 })
     }
   }
 
