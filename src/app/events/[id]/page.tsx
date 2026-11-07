@@ -51,6 +51,7 @@ function EventDetailContent() {
   const [error, setError] = useState('')
 
   const STATUS_LABELS: Record<string, string> = {
+    pending: t('detail_pending'),
     pending_payment: t('detail_pending'),
     approved: t('detail_approved'),
     rejected: t('detail_rejected'),
@@ -158,7 +159,7 @@ function EventDetailContent() {
   if (!event) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <p className="text-gray-500 text-sm">모임을 찾을 수 없습니다</p>
+        <p className="text-gray-500 text-sm">{t('events.not_found')}</p>
       </div>
     )
   }

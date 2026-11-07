@@ -599,6 +599,9 @@ const MESSAGES: Messages = {
   'host.bookings.notes': { ko: '메모', en: 'Notes', ja: 'メモ', zh: '备注' },
   'host.bookings.load_more': { ko: '더 보기', en: 'Load more', ja: 'もっと見る', zh: '加载更多' },
 
+  // ── 이벤트 ───────────────────────────────────────────────────────────────
+  'events.not_found': { ko: '모임을 찾을 수 없습니다', en: 'Event not found', ja: 'イベントが見つかりません', zh: '找不到活动' },
+
   // ── 서비스 상세 ──────────────────────────────────────────────────────────
   'services.not_found': { ko: '서비스를 찾을 수 없습니다', en: 'Service not found', ja: 'サービスが見つかりません', zh: '未找到服务' },
   'services.price': { ko: '가격', en: 'Price', ja: '価格', zh: '价格' },
