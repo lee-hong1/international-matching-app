@@ -209,7 +209,7 @@ export default function CreatorProfilePage() {
             <p className="text-sm text-gray-700 leading-relaxed mb-3">{profile.bio}</p>
           )}
 
-          {profile.creator_profiles?.website_url && (
+          {profile.creator_profiles?.website_url && /^https?:\/\//i.test(profile.creator_profiles.website_url) && (
             <a
               href={profile.creator_profiles.website_url}
               target="_blank"

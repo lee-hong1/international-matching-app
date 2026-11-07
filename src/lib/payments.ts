@@ -119,8 +119,15 @@ export function calculateCommission(
   platformFeeRate: number,
   venueCommissionRate: number,
 ): CommissionBreakdown {
-  const platformFeeAmount = Math.round(amount * platformFeeRate / 100)
-  const venueCommissionAmount = Math.round(amount * venueCommissionRate / 100)
+  // 비정상 요율 방어: NaN/Infinity/음수 → 0으로 보정
+  const safeRate = (r: number) => (Number.isFinite(r) && r >= 0 && r <= 100) ? r : 0
+  const safePlatformRate = safeRate(platformFeeRate)
+  const safeVenueRate = safeRate(venueCommissionRate)
+  // 합산 100% 초과 방지 — 호스트 정산액이 음수가 되지 않도록 비례 조정
+  const totalRate = safePlatformRate + safeVenueRate
+  const scale = totalRate > 100 ? 100 / totalRate : 1
+  const platformFeeAmount = Math.round(amount * safePlatformRate * scale / 100)
+  const venueCommissionAmount = Math.round(amount * safeVenueRate * scale / 100)
   const hostPayoutAmount = amount - platformFeeAmount - venueCommissionAmount
   return { platformFeeAmount, venueCommissionAmount, hostPayoutAmount }
 }
