@@ -28,6 +28,7 @@ export interface ChatRoom {
   partner?: ChatPartner
   last_message?: string
   last_message_at?: string
+  unread_count?: number
 }
 
 async function getAuthToken(): Promise<string | null> {
@@ -43,10 +44,11 @@ export const chatService = {
       .from('chat_rooms')
       .select(`
         id, booking_id, user_id, host_id, created_at,
-        messages(content, created_at)
+        messages(content, created_at, sender_id)
       `)
       .or(`user_id.eq.${userId},host_id.eq.${userId}`)
       .order('created_at', { ascending: false })
+      .limit(50)
 
     if (error || !data) return []
 
@@ -56,7 +58,7 @@ export const chatService = {
       user_id: string
       host_id: string
       created_at: string
-      messages?: Array<{ content: string; created_at: string }>
+      messages?: Array<{ content: string; created_at: string; sender_id: string }>
     }
 
     const rows = data as RawRoom[]
@@ -97,6 +99,7 @@ export const chatService = {
           : undefined,
         last_message: sortedMsgs[0]?.content,
         last_message_at: sortedMsgs[0]?.created_at,
+        unread_count: (row.messages ?? []).filter(m => m.sender_id !== userId).length,
       }
     })
   },

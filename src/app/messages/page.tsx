@@ -183,6 +183,11 @@ export default function MessagesPage() {
                               📍 {room.partner?.country}
                             </p>
                           </div>
+                          {(room.unread_count ?? 0) > 0 && (
+                            <span className="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-purple-600 rounded-full">
+                              {room.unread_count! > 99 ? '99+' : room.unread_count}
+                            </span>
+                          )}
                         </div>
 
                         {room.last_message && (
