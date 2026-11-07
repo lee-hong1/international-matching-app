@@ -1,0 +1,48 @@
+-- Atomic enforcement of per-host slot and service limits via DB triggers.
+-- Replaces the TOCTOU count-then-insert patterns in the availability and services APIs.
+
+CREATE OR REPLACE FUNCTION enforce_availability_slot_limit()
+RETURNS TRIGGER LANGUAGE plpgsql AS $$
+DECLARE
+  slot_count INT;
+BEGIN
+  SELECT COUNT(*) INTO slot_count
+    FROM host_availability
+   WHERE host_id = NEW.host_id
+     AND is_active = TRUE;
+
+  IF slot_count >= 20 THEN
+    RAISE EXCEPTION 'SLOT_LIMIT_EXCEEDED';
+  END IF;
+  RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS trg_enforce_availability_slot_limit ON host_availability;
+CREATE TRIGGER trg_enforce_availability_slot_limit
+  BEFORE INSERT ON host_availability
+  FOR EACH ROW EXECUTE FUNCTION enforce_availability_slot_limit();
+
+-- ── 서비스 수 제한: 호스트당 최대 50개 ───────────────────────────────────────
+
+CREATE OR REPLACE FUNCTION enforce_service_limit()
+RETURNS TRIGGER LANGUAGE plpgsql AS $$
+DECLARE
+  svc_count INT;
+BEGIN
+  SELECT COUNT(*) INTO svc_count
+    FROM services
+   WHERE host_id = NEW.host_id
+     AND is_active = TRUE;
+
+  IF svc_count >= 50 THEN
+    RAISE EXCEPTION 'SERVICE_LIMIT_EXCEEDED';
+  END IF;
+  RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS trg_enforce_service_limit ON services;
+CREATE TRIGGER trg_enforce_service_limit
+  BEFORE INSERT ON services
+  FOR EACH ROW EXECUTE FUNCTION enforce_service_limit();

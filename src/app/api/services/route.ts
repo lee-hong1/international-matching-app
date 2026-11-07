@@ -166,6 +166,9 @@ export async function POST(req: NextRequest) {
     .single()
 
   if (error) {
+    if (error.message?.includes('SERVICE_LIMIT_EXCEEDED')) {
+      return NextResponse.json({ error: 'Maximum 50 active services per host' }, { status: 400 })
+    }
     return NextResponse.json({ error: 'Failed to create service' }, { status: 500 })
   }
 

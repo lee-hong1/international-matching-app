@@ -133,6 +133,9 @@ export async function POST(req: NextRequest) {
     if (error.code === '23505') {
       return NextResponse.json({ error: 'Availability slot already exists for this time' }, { status: 409 })
     }
+    if (error.message?.includes('SLOT_LIMIT_EXCEEDED')) {
+      return NextResponse.json({ error: 'Maximum 20 availability slots allowed' }, { status: 400 })
+    }
     return NextResponse.json({ error: 'Failed to create availability slot' }, { status: 500 })
   }
 
