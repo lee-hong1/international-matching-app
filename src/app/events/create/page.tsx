@@ -58,19 +58,19 @@ export default function CreateEventPage() {
     setError('')
 
     if (!title.trim()) {
-      setError('Title is required')
+      setError(t('event.create.error_title_required', lang))
       return
     }
     if (!eventDatetime) {
-      setError('Please select a date and time')
+      setError(t('event.create.error_datetime_required', lang))
       return
     }
     if (venueType === 'partner' && !venueId) {
-      setError('Please select a partner venue')
+      setError(t('event.create.error_partner_venue_required', lang))
       return
     }
     if (venueType === 'custom' && !customLocation.trim()) {
-      setError('Please enter a location')
+      setError(t('event.create.error_location_required', lang))
       return
     }
 

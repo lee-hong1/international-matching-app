@@ -28,6 +28,8 @@ export type TranslationKeys = {
   create_max_persons: string; create_fee: string; create_fee_desc: string; create_submit: string
   create_submitting: string; create_premium_only: string; create_premium_desc: string; create_premium_btn: string
   create_no_venues: string
+  create_error_title_required: string; create_error_datetime_required: string
+  create_error_partner_venue_required: string; create_error_location_required: string
   detail_host: string; detail_apply: string; detail_applying: string; detail_pay_apply: string
   detail_my_status: string; detail_pending: string; detail_approved: string; detail_rejected: string
   detail_cancelled: string; detail_participants: string; detail_no_participants: string
@@ -145,6 +147,7 @@ const ko: TranslationKeys = {
   create_premium_only: '유료 회원만 이용 가능합니다',
   create_premium_desc: '모임 만들기는 프리미엄 멤버십 가입 후 이용할 수 있어요.',
   create_premium_btn: '프리미엄 알아보기', create_no_venues: '이용 가능한 제휴 매장이 없습니다',
+  create_error_title_required: '제목을 입력해 주세요.', create_error_datetime_required: '날짜와 시간을 선택해 주세요.', create_error_partner_venue_required: '제휴 매장을 선택해 주세요.', create_error_location_required: '장소를 입력해 주세요.',
   detail_host: '호스트', detail_apply: '참가 신청하기', detail_applying: '처리 중...',
   detail_pay_apply: '원 결제하고 참가 신청', detail_my_status: '신청 상태',
   detail_pending: '승인 대기', detail_approved: '승인됨', detail_rejected: '거절됨', detail_cancelled: '취소됨',
@@ -260,6 +263,7 @@ const en: TranslationKeys = {
   create_premium_only: 'Premium members only',
   create_premium_desc: 'Please upgrade to Premium to create events.',
   create_premium_btn: 'Learn about Premium', create_no_venues: 'No partner venues available',
+  create_error_title_required: 'Title is required.', create_error_datetime_required: 'Please select a date and time.', create_error_partner_venue_required: 'Please select a partner venue.', create_error_location_required: 'Please enter a location.',
   detail_host: 'Host', detail_apply: 'Apply to Join', detail_applying: 'Processing...',
   detail_pay_apply: 'Pay & Apply', detail_my_status: 'Application Status',
   detail_pending: 'Pending', detail_approved: 'Approved', detail_rejected: 'Rejected', detail_cancelled: 'Cancelled',
@@ -375,6 +379,7 @@ const zh: TranslationKeys = {
   create_premium_only: '仅限付费会员',
   create_premium_desc: '请升级至高级会员后创建活动。',
   create_premium_btn: '了解高级会员', create_no_venues: '暂无可用合作场所',
+  create_error_title_required: '请输入标题。', create_error_datetime_required: '请选择日期和时间。', create_error_partner_venue_required: '请选择合作场所。', create_error_location_required: '请输入地点。',
   detail_host: '主办人', detail_apply: '申请参加', detail_applying: '处理中...',
   detail_pay_apply: '韩元 付款并申请', detail_my_status: '申请状态',
   detail_pending: '待审核', detail_approved: '已通过', detail_rejected: '已拒绝', detail_cancelled: '已取消',
@@ -490,6 +495,7 @@ const ja: TranslationKeys = {
   create_premium_only: '有料会員のみ利用可能',
   create_premium_desc: 'イベント作成はプレミアム会員登録後にご利用いただけます。',
   create_premium_btn: 'プレミアムを見る', create_no_venues: '利用可能な提携店舗がありません',
+  create_error_title_required: 'タイトルを入力してください。', create_error_datetime_required: '日時を選択してください。', create_error_partner_venue_required: '提携店舗を選択してください。', create_error_location_required: '場所を入力してください。',
   detail_host: 'ホスト', detail_apply: '参加申し込み', detail_applying: '処理中...',
   detail_pay_apply: 'ウォン 支払って申し込む', detail_my_status: '申し込み状況',
   detail_pending: '審査待ち', detail_approved: '承認済み', detail_rejected: '却下', detail_cancelled: 'キャンセル',

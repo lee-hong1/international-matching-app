@@ -818,6 +818,10 @@ const MESSAGES: Messages = {
   'payment.failed_title': { ko: '결제 실패', en: 'Payment failed', ja: '決済失敗', zh: '付款失败' },
   'payment.invalid_info': { ko: '결제 정보가 올바르지 않습니다', en: 'Invalid payment information', ja: '決済情報が正しくありません', zh: '支付信息不正确' },
   'payment.already_processing': { ko: '결제가 처리 중입니다. 잠시 후 다시 시도해 주세요.', en: 'Payment is being processed. Please try again shortly.', ja: '決済処理中です。しばらく後でもう一度お試しください。', zh: '付款正在处理中，请稍后重试。' },
+  'event.create.error_title_required': { ko: '제목을 입력해 주세요.', en: 'Title is required.', ja: 'タイトルを入力してください。', zh: '请输入标题。' },
+  'event.create.error_datetime_required': { ko: '날짜와 시간을 선택해 주세요.', en: 'Please select a date and time.', ja: '日時を選択してください。', zh: '请选择日期和时间。' },
+  'event.create.error_partner_venue_required': { ko: '제휴 매장을 선택해 주세요.', en: 'Please select a partner venue.', ja: '提携店舗を選択してください。', zh: '请选择合作场所。' },
+  'event.create.error_location_required': { ko: '장소를 입력해 주세요.', en: 'Please enter a location.', ja: '場所を入力してください。', zh: '请输入地点。' },
 
   // ── 애널리틱스 ───────────────────────────────────────────────────────────────
   'analytics.tab_overview': { ko: '전체 개요', en: 'Overview', ja: '全体概要', zh: '总览' },
