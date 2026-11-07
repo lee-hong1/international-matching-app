@@ -4,9 +4,9 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 
 export const metadata: Metadata = {
-  title: "GlobalMatch - 국제 매칭 플랫폼",
-  description: "전 세계의 특별한 인연을 만나는 신뢰할 수 있는 국제 매칭 서비스",
-  keywords: "국제연애, 매칭, 데이팅, 외국인친구, 글로벌매칭",
+  title: "GlobalMatch - International Matching Platform | 국제 매칭 플랫폼",
+  description: "Meet special connections from around the world. Trusted international matching service connecting Korea, Japan, and China. 전 세계의 특별한 인연을 만나는 신뢰할 수 있는 국제 매칭 서비스.",
+  keywords: "international dating, matching, global match, Korea Japan China dating, 국제연애, 매칭, 데이팅, 外国人との出会い, 国际交友",
   authors: [{ name: "GlobalMatch Team" }],
   manifest: "/manifest.json",
   appleWebApp: {
