@@ -65,24 +65,23 @@ export default function CreatorProfilePage() {
 
     async function loadData() {
       setLoadingProfile(true)
-      const { data } = await supabase
-        .from('profiles')
-        .select(`
-          id, full_name, avatar_url, bio, country, interests, verification_status,
-          creator_profiles (display_name, category, website_url, posts_count, followers_count, following_count)
-        `)
-        .eq('id', userId)
-        .single()
-
-      if (data) setProfile(data as unknown as CreatorProfile)
-      setLoadingProfile(false)
-
-      const stats = await followsService.getFollowStats(userId)
-      setFollowStats(stats)
-
       setLoadingPosts(true)
-      const userPosts = await postsService.getUserPosts(userId)
+      const [profileRes, stats, userPosts] = await Promise.all([
+        supabase
+          .from('profiles')
+          .select(`
+            id, full_name, avatar_url, bio, country, interests, verification_status,
+            creator_profiles (display_name, category, website_url, posts_count, followers_count, following_count)
+          `)
+          .eq('id', userId)
+          .single(),
+        followsService.getFollowStats(userId),
+        postsService.getUserPosts(userId),
+      ])
+      if (profileRes.data) setProfile(profileRes.data as unknown as CreatorProfile)
+      setFollowStats(stats)
       setPosts(userPosts)
+      setLoadingProfile(false)
       setLoadingPosts(false)
     }
 
