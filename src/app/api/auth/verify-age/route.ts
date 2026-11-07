@@ -92,6 +92,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Age verification failed' }, { status: 500 })
   }
 
+  // DB 트리거가 없을 경우를 대비: is_adult를 명시적으로도 업데이트
+  await supabaseService
+    .from('profiles')
+    .update({ is_adult: true })
+    .eq('id', user.id)
+
   // 통과 로그 (생년월일 비저장)
   await supabaseService
     .from('age_verification_logs')
