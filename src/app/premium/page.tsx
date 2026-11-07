@@ -4,10 +4,13 @@ import React, { useState, useEffect } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import { useRouter } from 'next/navigation'
 import { paymentService, SubscriptionPlan, UserSubscription } from '@/lib/stripe'
+import { useLanguage } from '@/contexts/LanguageContext'
+import { t } from '@src/lib/i18n'
 
 export default function PremiumPage() {
   const { user, loading } = useAuth()
   const router = useRouter()
+  const { locale: lang } = useLanguage()
   const [plans, setPlans] = useState<SubscriptionPlan[]>([])
   const [currentSubscription, setCurrentSubscription] = useState<UserSubscription | null>(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -59,11 +62,17 @@ export default function PremiumPage() {
   }
 
   const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('ko-KR').format(price)
+    const locale = lang === 'ko' ? 'ko-KR' : lang === 'ja' ? 'ja-JP' : lang === 'zh' ? 'zh-CN' : 'en-US'
+    return new Intl.NumberFormat(locale).format(price)
   }
 
   const calculateMonthlyPrice = (price: number, months: number) => {
     return Math.floor(price / months)
+  }
+
+  const formatExpiryDate = (dateStr: string) => {
+    const locale = lang === 'ko' ? 'ko-KR' : lang === 'ja' ? 'ja-JP' : lang === 'zh' ? 'zh-CN' : 'en-US'
+    return new Date(dateStr).toLocaleDateString(locale)
   }
 
   if (loading || isLoading) {
@@ -78,6 +87,24 @@ export default function PremiumPage() {
     return null
   }
 
+  const featureRows = [
+    { key: 'daily_likes', free: t('premium.feat_daily_likes_free', lang), premium: t('premium.feat_unlimited', lang) },
+    { key: 'super_like',  free: t('premium.feat_super_like_free', lang),  premium: t('premium.feat_unlimited', lang) },
+    { key: 'filter',      free: t('premium.feat_basic', lang),             premium: t('premium.feat_advanced', lang) },
+    { key: 'translation', free: '❌',                                      premium: '✅' },
+    { key: 'read_receipt',free: '❌',                                      premium: '✅' },
+    { key: 'priority',    free: '❌',                                      premium: '✅' },
+    { key: 'ads',         free: t('premium.feat_ads_free', lang),          premium: t('premium.feat_ads_premium', lang) },
+    { key: 'support',     free: t('premium.feat_basic', lang),             premium: t('premium.feat_support_premium', lang) },
+  ]
+
+  const faqItems = [
+    { q: t('premium.faq_cancel_q', lang),  a: t('premium.faq_cancel_a', lang) },
+    { q: t('premium.faq_payment_q', lang), a: t('premium.faq_payment_a', lang) },
+    { q: t('premium.faq_refund_q', lang),  a: t('premium.faq_refund_a', lang) },
+    { q: t('premium.faq_instant_q', lang), a: t('premium.faq_instant_a', lang) },
+  ]
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50">
       {/* 헤더 */}
@@ -85,7 +112,7 @@ export default function PremiumPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
-              <button 
+              <button
                 onClick={() => router.push('/dashboard')}
                 className="text-2xl font-bold text-purple-600"
               >
@@ -96,7 +123,7 @@ export default function PremiumPage() {
               onClick={() => router.push('/dashboard')}
               className="text-gray-600 hover:text-purple-600"
             >
-              ← 돌아가기
+              {t('premium.back', lang)}
             </button>
           </div>
         </div>
@@ -109,15 +136,17 @@ export default function PremiumPage() {
           <div className="mb-12 bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl p-8 text-white">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-2xl font-bold mb-2">🎉 프리미엄 회원이시네요!</h2>
+                <h2 className="text-2xl font-bold mb-2">{t('premium.already_member', lang)}</h2>
                 <p className="text-purple-100">
-                  구독 만료일: {new Date(currentSubscription.end_date).toLocaleDateString('ko-KR')}
+                  {t('premium.expiry_label', lang)} {formatExpiryDate(currentSubscription.end_date)}
                 </p>
               </div>
               <div className="text-right">
-                <div className="text-sm text-purple-200">상태</div>
+                <div className="text-sm text-purple-200">{t('premium.status_label', lang)}</div>
                 <div className="text-xl font-semibold">
-                  {currentSubscription.status === 'active' ? '활성' : '비활성'}
+                  {currentSubscription.status === 'active'
+                    ? t('premium.status_active', lang)
+                    : t('premium.status_inactive', lang)}
                 </div>
               </div>
             </div>
@@ -127,10 +156,12 @@ export default function PremiumPage() {
         {/* 헤더 섹션 */}
         <div className="text-center mb-16">
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-            프리미엄으로 <span className="text-purple-600">더 많은 인연</span>을 만나세요
+            {t('premium.headline_prefix', lang)}
+            <span className="text-purple-600">{t('premium.headline_highlight', lang)}</span>
+            {t('premium.headline_suffix', lang)}
           </h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            프리미엄 기능으로 더 빠르고 효과적으로 특별한 사람을 만날 수 있습니다
+            {t('premium.subheadline', lang)}
           </p>
         </div>
 
@@ -150,13 +181,13 @@ export default function PremiumPage() {
               >
                 {isPopular && (
                   <div className="absolute top-0 inset-x-0 bg-gradient-to-r from-purple-600 to-pink-600 text-white text-center py-2 text-sm font-semibold">
-                    가장 인기있는 플랜
+                    {t('premium.most_popular', lang)}
                   </div>
                 )}
-                
+
                 {index === 2 && (
                   <div className="absolute top-4 right-4 bg-green-500 text-white text-xs px-2 py-1 rounded-full font-semibold">
-                    {savings}% 절약
+                    {t('premium.savings_badge', lang, { savings: String(savings) })}
                   </div>
                 )}
 
@@ -164,10 +195,10 @@ export default function PremiumPage() {
                   <h3 className="text-2xl font-bold text-gray-900 mb-2">{plan.name}</h3>
                   <div className="mb-6">
                     <span className="text-4xl font-bold text-gray-900">₩{formatPrice(monthlyPrice)}</span>
-                    <span className="text-gray-600">/월</span>
+                    <span className="text-gray-600">{t('premium.per_month', lang)}</span>
                     {plan.duration_months > 1 && (
                       <div className="text-sm text-gray-500 mt-1">
-                        총 ₩{formatPrice(plan.price)} ({plan.duration_months}개월)
+                        {t('premium.total_price', lang, { price: formatPrice(plan.price), months: String(plan.duration_months) })}
                       </div>
                     )}
                   </div>
@@ -192,8 +223,11 @@ export default function PremiumPage() {
                         : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
                     } disabled:opacity-50 disabled:cursor-not-allowed`}
                   >
-                    {selectedPlan === plan.id ? '처리 중...' : 
-                     currentSubscription ? '이미 구독 중' : '시작하기'}
+                    {selectedPlan === plan.id
+                      ? t('premium.processing', lang)
+                      : currentSubscription
+                        ? t('premium.already_subscribed', lang)
+                        : t('premium.subscribe_cta', lang)}
                   </button>
                 </div>
               </div>
@@ -203,30 +237,21 @@ export default function PremiumPage() {
 
         {/* 기능 비교 */}
         <div className="bg-white rounded-2xl shadow-lg p-8 mb-16">
-          <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">기능 비교</h2>
-          
+          <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">{t('premium.feature_comparison', lang)}</h2>
+
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
                 <tr className="border-b-2 border-gray-200">
-                  <th className="text-left py-4 px-6 font-semibold text-gray-900">기능</th>
-                  <th className="text-center py-4 px-6 font-semibold text-gray-900">무료</th>
-                  <th className="text-center py-4 px-6 font-semibold text-purple-600">프리미엄</th>
+                  <th className="text-left py-4 px-6 font-semibold text-gray-900">{t('premium.col_feature', lang)}</th>
+                  <th className="text-center py-4 px-6 font-semibold text-gray-900">{t('premium.col_free', lang)}</th>
+                  <th className="text-center py-4 px-6 font-semibold text-purple-600">{t('premium.col_premium', lang)}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
-                {[
-                  { feature: '일일 좋아요 횟수', free: '5회', premium: '무제한' },
-                  { feature: '슈퍼 좋아요', free: '1회/주', premium: '무제한' },
-                  { feature: '매칭 필터', free: '기본', premium: '고급' },
-                  { feature: '메시지 번역', free: '❌', premium: '✅' },
-                  { feature: '읽음 확인', free: '❌', premium: '✅' },
-                  { feature: '우선 노출', free: '❌', premium: '✅' },
-                  { feature: '광고', free: '표시됨', premium: '제거됨' },
-                  { feature: '고객 지원', free: '기본', premium: '24/7 프리미엄' }
-                ].map((row, index) => (
-                  <tr key={index}>
-                    <td className="py-4 px-6 text-gray-900">{row.feature}</td>
+                {featureRows.map((row) => (
+                  <tr key={row.key}>
+                    <td className="py-4 px-6 text-gray-900">{t(`premium.feat_${row.key}`, lang)}</td>
                     <td className="py-4 px-6 text-center text-gray-600">{row.free}</td>
                     <td className="py-4 px-6 text-center text-purple-600 font-semibold">{row.premium}</td>
                   </tr>
@@ -238,27 +263,10 @@ export default function PremiumPage() {
 
         {/* FAQ */}
         <div className="bg-gray-50 rounded-2xl p-8">
-          <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">자주 묻는 질문</h2>
-          
+          <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">{t('premium.faq_title', lang)}</h2>
+
           <div className="space-y-6 max-w-3xl mx-auto">
-            {[
-              {
-                q: '언제든지 구독을 취소할 수 있나요?',
-                a: '네, 언제든지 구독을 취소할 수 있습니다. 취소 후에도 구독 기간이 끝날 때까지는 프리미엄 기능을 계속 사용할 수 있습니다.'
-              },
-              {
-                q: '결제는 어떻게 이루어지나요?',
-                a: '신용카드, 체크카드를 통해 결제할 수 있습니다. 모든 결제는 Stripe을 통해 안전하게 처리됩니다.'
-              },
-              {
-                q: '환불이 가능한가요?',
-                a: '서비스 이용 후 7일 이내에는 전액 환불이 가능합니다. 그 이후에는 잔여 기간에 대해 부분 환불됩니다.'
-              },
-              {
-                q: '프리미엄 기능이 즉시 적용되나요?',
-                a: '네, 결제 완료 즉시 모든 프리미엄 기능을 사용할 수 있습니다.'
-              }
-            ].map((faq, index) => (
+            {faqItems.map((faq, index) => (
               <div key={index} className="bg-white rounded-lg p-6">
                 <h3 className="font-semibold text-gray-900 mb-2">{faq.q}</h3>
                 <p className="text-gray-600">{faq.a}</p>
