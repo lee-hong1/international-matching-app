@@ -817,6 +817,7 @@ const MESSAGES: Messages = {
   'payment.success_desc': { ko: '신청이 승인되었습니다.', en: 'Your application has been approved.', ja: '申請が承認されました。', zh: '您的申请已获批准。' },
   'payment.failed_title': { ko: '결제 실패', en: 'Payment failed', ja: '決済失敗', zh: '付款失败' },
   'payment.invalid_info': { ko: '결제 정보가 올바르지 않습니다', en: 'Invalid payment information', ja: '決済情報が正しくありません', zh: '支付信息不正确' },
+  'payment.already_processing': { ko: '결제가 처리 중입니다. 잠시 후 다시 시도해 주세요.', en: 'Payment is being processed. Please try again shortly.', ja: '決済処理中です。しばらく後でもう一度お試しください。', zh: '付款正在处理中，请稍后重试。' },
 
   // ── 애널리틱스 ───────────────────────────────────────────────────────────────
   'analytics.tab_overview': { ko: '전체 개요', en: 'Overview', ja: '全体概要', zh: '总览' },

@@ -40,7 +40,11 @@ function PaymentSuccessContent() {
 
       if (!res.ok) {
         setStatus('error')
-        setErrorMessage(data.error ?? t('payment.failed_title', lang))
+        setErrorMessage(
+          res.status === 409
+            ? t('payment.already_processing', lang)
+            : data.error ?? t('payment.failed_title', lang)
+        )
         return
       }
 
