@@ -132,7 +132,12 @@ export async function POST(req: NextRequest) {
       .select('id, title, external_platform, click_count, created_at')
       .single()
 
-    if (insertErr) return NextResponse.json({ error: 'Failed to create shop link' }, { status: 500 })
+    if (insertErr) {
+      if (insertErr.message?.includes('SHOP_LINK_LIMIT_EXCEEDED')) {
+        return NextResponse.json({ error: 'Maximum 20 active links allowed' }, { status: 409 })
+      }
+      return NextResponse.json({ error: 'Failed to create shop link' }, { status: 500 })
+    }
 
     return NextResponse.json({ link }, { status: 201 })
   } catch {

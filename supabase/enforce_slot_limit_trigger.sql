@@ -46,3 +46,27 @@ DROP TRIGGER IF EXISTS trg_enforce_service_limit ON services;
 CREATE TRIGGER trg_enforce_service_limit
   BEFORE INSERT ON services
   FOR EACH ROW EXECUTE FUNCTION enforce_service_limit();
+
+-- ── 쇼핑 링크 제한: 호스트당 최대 20개 활성 링크 ─────────────────────────────
+
+CREATE OR REPLACE FUNCTION enforce_shop_link_limit()
+RETURNS TRIGGER LANGUAGE plpgsql AS $$
+DECLARE
+  link_count INT;
+BEGIN
+  SELECT COUNT(*) INTO link_count
+    FROM host_shop_links
+   WHERE host_id = NEW.host_id
+     AND status = 'active';
+
+  IF link_count >= 20 THEN
+    RAISE EXCEPTION 'SHOP_LINK_LIMIT_EXCEEDED';
+  END IF;
+  RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS trg_enforce_shop_link_limit ON host_shop_links;
+CREATE TRIGGER trg_enforce_shop_link_limit
+  BEFORE INSERT ON host_shop_links
+  FOR EACH ROW EXECUTE FUNCTION enforce_shop_link_limit();
