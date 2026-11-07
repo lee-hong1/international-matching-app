@@ -768,6 +768,20 @@ const MESSAGES: Messages = {
   'nav.feed': { ko: '피드', en: 'Feed', ja: 'フィード', zh: '动态' },
   'nav.my_channel': { ko: '내 채널', en: 'My Channel', ja: 'マイチャンネル', zh: '我的频道' },
 
+  // ── 프로필 편집 ───────────────────────────────────────────────────────────
+  'profile.edit_title': { ko: '프로필 편집', en: 'Edit Profile', ja: 'プロフィール編集', zh: '编辑资料' },
+  'profile.display_name': { ko: '닉네임', en: 'Display Name', ja: 'ニックネーム', zh: '昵称' },
+  'profile.bio': { ko: '자기소개', en: 'Bio', ja: '自己紹介', zh: '自我介绍' },
+  'profile.bio_placeholder': { ko: '자신을 소개해 주세요 (최대 500자)', en: 'Tell people about yourself (max 500 chars)', ja: '自己紹介を書いてください（最大500文字）', zh: '介绍一下自己（最多500字）' },
+  'profile.country': { ko: '국가', en: 'Country', ja: '国', zh: '国家' },
+  'profile.city': { ko: '도시', en: 'City', ja: '都市', zh: '城市' },
+  'profile.preferred_lang': { ko: '사용 언어', en: 'Preferred Language', ja: '使用言語', zh: '首选语言' },
+  'profile.interests': { ko: '관심사 (쉼표로 구분)', en: 'Interests (comma-separated)', ja: '興味（カンマ区切り）', zh: '兴趣（逗号分隔）' },
+  'profile.save': { ko: '저장', en: 'Save', ja: '保存', zh: '保存' },
+  'profile.saved': { ko: '프로필이 업데이트되었습니다.', en: 'Profile updated.', ja: 'プロフィールを更新しました。', zh: '资料已更新。' },
+  'profile.saving': { ko: '저장 중…', en: 'Saving…', ja: '保存中…', zh: '保存中…' },
+  'profile.select_country': { ko: '국가를 선택하세요', en: 'Select a country', ja: '国を選択してください', zh: '选择国家' },
+
   // ── 대시보드 ─────────────────────────────────────────────────────────────
   'dashboard.title': { ko: '대시보드', en: 'Dashboard', ja: 'ダッシュボード', zh: '仪表板' },
   'dashboard.greeting': { ko: '안녕하세요, {name}님!', en: 'Welcome, {name}!', ja: 'こんにちは、{name}さん！', zh: '您好，{name}！' },
