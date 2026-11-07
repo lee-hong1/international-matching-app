@@ -110,7 +110,7 @@ function EventDetailContent() {
       const data = await res.json()
 
       if (!res.ok) {
-        setError(data.error ?? 'Application failed')
+        setError(data.error ?? t('detail_apply_failed'))
         return
       }
 
@@ -121,7 +121,7 @@ function EventDetailContent() {
 
       // 유료 이벤트: 토스페이먼츠 결제창 호출
       if (!window.TossPayments) {
-        setError('Payment module failed to load. Please try again.')
+        setError(t('detail_payment_module_failed'))
         return
       }
 
@@ -136,7 +136,7 @@ function EventDetailContent() {
       })
     } catch (err: any) {
       if (err?.code !== 'USER_CANCEL') {
-        setError('Payment failed. Please try again.')
+        setError(t('detail_payment_failed'))
       }
     } finally {
       setApplying(false)

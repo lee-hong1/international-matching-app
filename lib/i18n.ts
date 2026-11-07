@@ -38,6 +38,7 @@ export type TranslationKeys = {
   share_boost: string; share_boost_desc: string; share_boost_btn: string; share_featured_badge: string
   payment_success: string; payment_success_desc: string; payment_fail: string; payment_fail_desc: string
   payment_back: string; payment_confirming: string
+  detail_apply_failed: string; detail_payment_module_failed: string; detail_payment_failed: string
   // error namespace
   'error.generic': string; 'error.network': string; 'error.retry': string; 'error.go_home': string
   // auth namespace
@@ -159,6 +160,7 @@ const ko: TranslationKeys = {
   payment_success: '결제가 완료되었습니다', payment_success_desc: '참가 신청이 승인되었습니다.',
   payment_fail: '결제가 취소되었습니다', payment_fail_desc: '결제가 진행되지 않았습니다.',
   payment_back: '모임으로 돌아가기', payment_confirming: '결제를 확인하고 있습니다...',
+  detail_apply_failed: '신청에 실패했습니다. 다시 시도해 주세요.', detail_payment_module_failed: '결제 모듈을 불러오지 못했습니다. 새로고침 후 다시 시도해 주세요.', detail_payment_failed: '결제에 실패했습니다. 다시 시도해 주세요.',
   'error.generic': '오류가 발생했습니다.', 'error.network': '네트워크 오류가 발생했습니다.', 'error.retry': '다시 시도', 'error.go_home': '홈으로',
   'auth.email_label': '이메일', 'auth.password_label': '비밀번호', 'auth.login_title': '다시 오셨군요',
   'auth.have_account': '이미 계정이 있으신가요?', 'auth.no_account': '계정이 없으신가요?',
@@ -273,6 +275,7 @@ const en: TranslationKeys = {
   payment_success: 'Payment Completed', payment_success_desc: 'Your application has been approved.',
   payment_fail: 'Payment Cancelled', payment_fail_desc: 'Payment was not completed.',
   payment_back: 'Back to Event', payment_confirming: 'Confirming payment...',
+  detail_apply_failed: 'Application failed. Please try again.', detail_payment_module_failed: 'Payment module failed to load. Please refresh and try again.', detail_payment_failed: 'Payment failed. Please try again.',
   'error.generic': 'Something went wrong.', 'error.network': 'Network error. Please check your connection.', 'error.retry': 'Try Again', 'error.go_home': 'Go Home',
   'auth.email_label': 'Email', 'auth.password_label': 'Password', 'auth.login_title': 'Welcome Back',
   'auth.have_account': 'Already have an account?', 'auth.no_account': "Don't have an account?",
@@ -387,6 +390,7 @@ const zh: TranslationKeys = {
   payment_success: '付款成功', payment_success_desc: '您的申请已获批准。',
   payment_fail: '付款已取消', payment_fail_desc: '付款未完成。',
   payment_back: '返回活动', payment_confirming: '确认付款中...',
+  detail_apply_failed: '申请失败，请重试。', detail_payment_module_failed: '支付模块加载失败，请刷新页面后重试。', detail_payment_failed: '付款失败，请重试。',
   'error.generic': '发生错误。', 'error.network': '网络错误，请检查连接。', 'error.retry': '重试', 'error.go_home': '返回首页',
   'auth.email_label': '邮箱', 'auth.password_label': '密码', 'auth.login_title': '欢迎回来',
   'auth.have_account': '已有账号？', 'auth.no_account': '没有账号？',
@@ -502,6 +506,7 @@ const ja: TranslationKeys = {
   payment_success: '決済が完了しました', payment_success_desc: '参加申し込みが承認されました。',
   payment_fail: '決済がキャンセルされました', payment_fail_desc: '決済は完了しませんでした。',
   payment_back: 'イベントに戻る', payment_confirming: '決済を確認しています...',
+  detail_apply_failed: '申し込みに失敗しました。もう一度お試しください。', detail_payment_module_failed: '決済モジュールの読み込みに失敗しました。ページを更新して再度お試しください。', detail_payment_failed: '決済に失敗しました。もう一度お試しください。',
   'error.generic': 'エラーが発生しました。', 'error.network': 'ネットワークエラーが発生しました。', 'error.retry': 'やり直す', 'error.go_home': 'ホームへ',
   'auth.email_label': 'メールアドレス', 'auth.password_label': 'パスワード', 'auth.login_title': 'おかえりなさい',
   'auth.have_account': 'すでにアカウントをお持ちですか？', 'auth.no_account': 'アカウントをお持ちでないですか？',
