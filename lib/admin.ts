@@ -212,24 +212,19 @@ export const adminService = {
     }
   },
 
-  // 신고 처리
+  // 신고 처리 — 서버사이드 API 경유 (anon client RLS 우회 위험 방지)
   async handleReport(reportId: string, action: 'resolve' | 'dismiss', adminNote?: string) {
-    const { data, error } = await supabase
-      .from('reports')
-      .update({
-        status: action === 'resolve' ? 'resolved' : 'dismissed',
-        resolved_at: new Date().toISOString(),
-        ...(adminNote && { admin_note: adminNote })
-      })
-      .eq('id', reportId)
-      .select()
-
-    if (error) {
-      console.error('Error handling report:', error)
-      throw error
+    const res = await fetch(`/api/admin/reports/${reportId}`, {
+      method: 'PATCH',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action, admin_note: adminNote }),
+    })
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}))
+      throw new Error((data as { error?: string }).error ?? 'Failed to handle report')
     }
-
-    return data
+    return res.json()
   },
 
   // 사용자 인증 상태 변경 — 서버사이드 RLS 우회 위험 방지: 직접 DB 쓰기 대신 API 호출
