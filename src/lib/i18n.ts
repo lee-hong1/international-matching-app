@@ -1051,6 +1051,43 @@ const MESSAGES: Messages = {
     ja: '予約24時間以上前のキャンセルは全額返金。当日キャンセルは50%返金。ホスト都合のキャンセルは全額返金。デジタルサービスの性質上、サービス提供後の返金は制限される場合があります。紛争時はサポートへお問い合わせください。',
     zh: '预约24小时前取消全额退款。当天取消退款50%。如因主机取消，全额退款。由于数字服务的特性，服务交付后退款可能受限。如有争议，请联系GlobalMatch客服调解。',
   },
+
+  // ── how-it-works 페이지 ──────────────────────────────────────────────────
+  'hiw.title':     { ko: 'GlobalMatch 이용 방법', en: 'How GlobalMatch Works',          ja: 'GlobalMatchの使い方',           zh: 'GlobalMatch使用方法' },
+  'hiw.subtitle':  { ko: '가입부터 첫 만남까지 6단계',  en: 'From sign-up to your first date in 6 simple steps.', ja: '登録から最初のデートまで6ステップ', zh: '从注册到第一次约会，只需6步' },
+  'hiw.cta':       { ko: '지금 시작하기',              en: 'Get Started',                   ja: '今すぐ始める',                  zh: '立即开始' },
+  'hiw.step1_title': { ko: '프로필 만들기',  en: 'Create Your Profile',  ja: 'プロフィール作成',  zh: '创建个人资料' },
+  'hiw.step1_desc':  { ko: '사진·관심사·이상형을 담아 매력적인 프로필을 완성하세요.', en: 'Sign up and build a compelling profile with photos, interests, and what you\'re looking for in a partner.', ja: '写真・趣味・理想のパートナーを入力してプロフィールを完成させましょう。', zh: '注册并建立引人注目的个人资料，包含照片、兴趣和理想伴侣条件。' },
+  'hiw.step2_title': { ko: '인증 완료',      en: 'Get Verified',         ja: '認証を完了',       zh: '完成认证' },
+  'hiw.step2_desc':  { ko: 'ID·사진 인증으로 신뢰를 쌓고 플랫폼 전체 기능을 이용하세요.', en: 'Complete ID and photo verification to build trust and unlock full access to the platform.', ja: 'IDと写真の認証を完了して信頼を築き、全機能を利用しましょう。', zh: '完成身份和照片验证，建立信任并解锁完整功能。' },
+  'hiw.step3_title': { ko: '인연 탐색',      en: 'Discover People',      ja: '相手を探す',       zh: '发现感兴趣的人' },
+  'hiw.step3_desc':  { ko: '한국·일본·중국 등 30개국 이상의 큐레이션된 프로필을 조건별로 탐색하세요.', en: 'Browse curated profiles from Korea, Japan, China and 30+ countries filtered by your preferences.', ja: '韓国、日本、中国など30か国以上のプロフィールを条件別に探索しましょう。', zh: '浏览来自韩国、日本、中国及30多个国家的精选资料，按您的偏好筛选。' },
+  'hiw.step4_title': { ko: '팔로우 & 매칭', en: 'Follow & Match',        ja: 'フォローとマッチ',  zh: '关注与匹配' },
+  'hiw.step4_desc':  { ko: '마음에 드는 분을 팔로우하세요. 서로 팔로우하면 매칭되어 자유롭게 대화할 수 있어요.', en: 'Follow people who interest you. When they follow back, you become a match and can chat freely.', ja: '気になる方をフォローしましょう。互いにフォローするとマッチングが成立し、自由にチャットできます。', zh: '关注感兴趣的人。互相关注后即可匹配，自由聊天。' },
+  'hiw.step5_title': { ko: '채팅 & 연결',   en: 'Chat & Connect',        ja: 'チャットとつながり',zh: '聊天与连接' },
+  'hiw.step5_desc':  { ko: '보안 플랫폼 내에서 메시지·사진 공유·영상통화로 연결을 깊게 만들어가세요.', en: 'Send messages, share photos, and video call within our secure platform. All conversations are protected.', ja: '安全なプラットフォーム内でメッセージ・写真共有・ビデオ通話でつながりを深めましょう。', zh: '在安全平台内发送消息、分享照片和视频通话。所有对话均受保护。' },
+  'hiw.step6_title': { ko: '서비스 예약',   en: 'Book a Service',        ja: 'サービスを予約',   zh: '预约服务' },
+  'hiw.step6_desc':  { ko: '호스트와 1:1 영상 데이트·언어 교환·문화 체험 등 특별한 서비스를 예약해보세요.', en: 'Take it further with a 1-on-1 video date, language exchange, or cultural experience with a host.', ja: 'ホストと1対1のビデオデート、語学交換、文化体験などのサービスを予約しましょう。', zh: '进一步预约与主机的一对一视频约会、语言交流或文化体验服务。' },
+
+  // ── matching 페이지 ─────────────────────────────────────────────────────
+  'match.title':      { ko: '국제 이성 만남',                      en: 'International Matching',                     ja: '国際マッチング',                   zh: '国际配对' },
+  'match.subtitle':   { ko: '한국·일본·중국 등 30개국 이상의 인연을 만나보세요.', en: 'Connect with people from Korea, Japan, China, and 30+ countries.', ja: '韓国、日本、中国など30か国以上の出会い。', zh: '与韩国、日本、中国及30多个国家的人相识。' },
+  'match.cta':        { ko: '지금 시작하기',                        en: 'Start Meeting People',                      ja: '今すぐ出会いを始める',              zh: '立即开始约会' },
+  'match.kr_title':   { ko: '🇰🇷 한국 멤버',  en: '🇰🇷 Korean Members',  ja: '🇰🇷 韓国メンバー', zh: '🇰🇷 韩国会员' },
+  'match.kr_desc':    { ko: '진지한 국제 연애를 원하는 한국 싱글을 만나보세요.', en: 'Connect with Korean singles looking for genuine international relationships.', ja: '真剣な国際恋愛を求める韓国のシングルと出会いましょう。', zh: '结识寻求真诚国际恋情的韩国单身人士。' },
+  'match.jp_title':   { ko: '🇯🇵 일본 멤버',  en: '🇯🇵 Japanese Members', ja: '🇯🇵 日本メンバー', zh: '🇯🇵 日本会员' },
+  'match.jp_desc':    { ko: '문화 교류와 깊은 인연을 소중히 여기는 일본 멤버와 연결하세요.', en: 'Meet Japanese members who value cultural exchange and deep connections.', ja: '文化交流と深いつながりを大切にする日本のメンバーに会いましょう。', zh: '认识重视文化交流和深厚联系的日本会员。' },
+  'match.cn_title':   { ko: '🇨🇳 중국 멤버',  en: '🇨🇳 Chinese Members',  ja: '🇨🇳 中国メンバー', zh: '🇨🇳 中国会员' },
+  'match.cn_desc':    { ko: '중국 본토·대만·홍콩의 중국인 싱글을 만나보세요.', en: 'Discover Chinese singles from mainland China, Taiwan, and Hong Kong.', ja: '中国本土、台湾、香港の中国人シングルを探しましょう。', zh: '认识来自中国大陆、台湾和香港的中国单身人士。' },
+  'match.global_title': { ko: '🌏 글로벌 멤버', en: '🌏 Global Members',  ja: '🌏 グローバルメンバー', zh: '🌏 全球会员' },
+  'match.global_desc':  { ko: '동남아·유럽·아메리카 등 전 세계 멤버와 연결되세요.', en: 'Members from Southeast Asia, Europe, the Americas, and beyond.', ja: '東南アジア、ヨーロッパ、南北アメリカなど世界各地のメンバーと出会えます。', zh: '来自东南亚、欧洲、美洲及世界各地的会员。' },
+  'match.why_title':  { ko: 'GlobalMatch가 특별한 이유',           en: 'Why Choose GlobalMatch',                    ja: 'GlobalMatchが選ばれる理由',        zh: '为什么选择GlobalMatch' },
+  'match.w1_title':   { ko: '검증된 프로필',  en: 'Verified Profiles',   ja: '認証済みプロフィール', zh: '已验证资料' },
+  'match.w1_desc':    { ko: '모든 멤버가 ID·사진 인증 완료.',      en: 'Every member goes through ID and photo verification.', ja: 'すべてのメンバーがIDと写真の認証を完了。', zh: '所有会员均经过身份和照片验证。' },
+  'match.w2_title':   { ko: '다국어 지원',    en: 'Multi-Language Support', ja: '多言語対応',       zh: '多语言支持' },
+  'match.w2_desc':    { ko: '한국어·영어·일본어·중국어 번역 지원.', en: 'Automatic translation in Korean, English, Japanese and Chinese.', ja: '韓国語・英語・日本語・中国語の自動翻訳。', zh: '支持韩语、英语、日语和中文自动翻译。' },
+  'match.w3_title':   { ko: '안전한 환경',    en: 'Safe & Secure',       ja: '安心·安全な環境',   zh: '安全环境' },
+  'match.w3_desc':    { ko: '24시간 모니터링과 신고 시스템 운영.',  en: '24/7 monitoring and reporting system in place.', ja: '24時間モニタリングと通報システムを運営。', zh: '24/7监控和举报系统。' },
 }
 
 /** 언어 코드를 지원 언어로 정규화 */
