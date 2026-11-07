@@ -569,6 +569,8 @@ const MESSAGES: Messages = {
   'book.success_body': { ko: '예약이 접수되었습니다. 호스트 확인 후 알림을 받으실 수 있습니다.', en: 'Your booking has been submitted. You will be notified once the host confirms.', ja: '予約が送信されました。ホストの確認後に通知が届きます。', zh: '您的预约已提交，主人确认后您将收到通知。' },
   'book.back_to_profile': { ko: '프로필로 돌아가기', en: 'Back to Profile', ja: 'プロフィールに戻る', zh: '返回档案' },
   'book.cancel': { ko: '취소', en: 'Cancel', ja: 'キャンセル', zh: '取消' },
+  'book.unavailable_day': { ko: '선택하신 날짜에는 호스트가 운영하지 않습니다. 다른 날짜를 선택해 주세요.', en: 'Host is not available on this day. Please choose another date.', ja: 'この日はホストが対応していません。別の日付を選んでください。', zh: '主人在该日期不提供服务，请选择其他日期。' },
+  'book.select_time_slot': { ko: '시간대를 선택하세요', en: 'Select a time slot', ja: '時間帯を選んでください', zh: '请选择时间段' },
 
   // ── 사용자 예약 목록 ──────────────────────────────────────────────────────
   'bookings.title': { ko: '내 예약', en: 'My Bookings', ja: '予約一覧', zh: '我的预约' },
@@ -667,6 +669,15 @@ const MESSAGES: Messages = {
   'nav.events': { ko: '모임', en: 'Events', ja: 'イベント', zh: '活动' },
   'nav.matching': { ko: '매칭', en: 'Match', ja: 'マッチング', zh: '配对' },
   'nav.profile': { ko: '프로필', en: 'Profile', ja: 'プロフィール', zh: '档案' },
+
+  // ── 매칭 페이지 ──────────────────────────────────────────────────────────────
+  'matches.title': { ko: '나의 매칭', en: 'My Matches', ja: 'マッチング一覧', zh: '我的配对' },
+  'matches.subtitle': { ko: '서로 팔로우한 상대와 대화를 시작해 보세요.', en: 'Start a conversation with people you mutually follow.', ja: '相互フォローした相手と会話を始めましょう。', zh: '和互相关注的人开始聊天吧。' },
+  'matches.empty': { ko: '아직 매칭된 상대가 없습니다.', en: 'No matches yet.', ja: 'まだマッチングした相手がいません。', zh: '暂无配对。' },
+  'matches.empty_cta': { ko: '새로운 사람을 탐색해 보세요', en: 'Discover new people', ja: '新しい人を探してみましょう', zh: '去认识新朋友吧' },
+  'matches.send_message': { ko: '메시지 보내기', en: 'Send Message', ja: 'メッセージを送る', zh: '发送消息' },
+  'matches.view_profile': { ko: '프로필 보기', en: 'View Profile', ja: 'プロフィールを見る', zh: '查看档案' },
+  'matches.loading': { ko: '매칭 목록 불러오는 중…', en: 'Loading matches…', ja: 'マッチングを読み込み中…', zh: '正在加载配对…' },
 
   // ── 공통 액션 ─────────────────────────────────────────────────────────────
   'common.delete': { ko: '삭제', en: 'Delete', ja: '削除', zh: '删除' },

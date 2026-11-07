@@ -82,6 +82,32 @@ function BookingForm({ serviceId }: { serviceId: string }) {
     zh: ['日', '一', '二', '三', '四', '五', '六'],
   }
 
+  // Generate selectable time options from availability slots for a given date
+  function getTimeOptions(date: string): string[] {
+    if (!date || slots.length === 0) return []
+    const dow = new Date(date).getDay()
+    const daySlots = slots.filter(s => s.day_of_week === dow)
+    if (daySlots.length === 0) return []
+    const duration = service?.duration_minutes ?? 60
+    const options: string[] = []
+    for (const slot of daySlots) {
+      const [sh, sm] = slot.start_time.split(':').map(Number)
+      const [eh, em] = slot.end_time.split(':').map(Number)
+      let cur = sh * 60 + sm
+      const end = eh * 60 + em
+      while (cur + duration <= end) {
+        const hh = String(Math.floor(cur / 60)).padStart(2, '0')
+        const mm = String(cur % 60).padStart(2, '0')
+        options.push(`${hh}:${mm}`)
+        cur += duration
+      }
+    }
+    return options
+  }
+
+  const timeOptions = getTimeOptions(selectedDate)
+  const dateHasNoSlots = selectedDate && slots.length > 0 && timeOptions.length === 0
+
   async function submitBooking() {
     if (!selectedDate || !selectedTime || !service) return
     setLoading(true)
@@ -180,17 +206,34 @@ function BookingForm({ serviceId }: { serviceId: string }) {
           type="date"
           value={selectedDate}
           min={new Date().toISOString().split('T')[0]}
-          onChange={e => setSelectedDate(e.target.value)}
+          onChange={e => { setSelectedDate(e.target.value); setSelectedTime('') }}
           style={styles.input}
         />
 
         <label style={{ ...styles.label, marginTop: 12 }}>{t('book.time', lang)}</label>
-        <input
-          type="time"
-          value={selectedTime}
-          onChange={e => setSelectedTime(e.target.value)}
-          style={styles.input}
-        />
+        {dateHasNoSlots ? (
+          <p style={{ color: '#dc2626', fontSize: '0.875rem', margin: '4px 0 0' }}>
+            {t('book.unavailable_day', lang)}
+          </p>
+        ) : timeOptions.length > 0 ? (
+          <select
+            value={selectedTime}
+            onChange={e => setSelectedTime(e.target.value)}
+            style={styles.input}
+          >
+            <option value="">{t('book.select_time_slot', lang)}</option>
+            {timeOptions.map(opt => (
+              <option key={opt} value={opt}>{opt}</option>
+            ))}
+          </select>
+        ) : (
+          <input
+            type="time"
+            value={selectedTime}
+            onChange={e => setSelectedTime(e.target.value)}
+            style={styles.input}
+          />
+        )}
 
         <label style={{ ...styles.label, marginTop: 12 }}>{t('book.notes', lang)}</label>
         <textarea
@@ -206,8 +249,8 @@ function BookingForm({ serviceId }: { serviceId: string }) {
 
         <button
           onClick={submitBooking}
-          disabled={loading || !selectedDate || !selectedTime}
-          style={{ ...styles.btn, marginTop: 16, opacity: loading || !selectedDate || !selectedTime ? 0.6 : 1 }}
+          disabled={loading || !selectedDate || !selectedTime || !!dateHasNoSlots}
+          style={{ ...styles.btn, marginTop: 16, opacity: loading || !selectedDate || !selectedTime || !!dateHasNoSlots ? 0.6 : 1 }}
         >
           {loading ? t('book.submitting', lang) : t('book.confirm', lang)}
         </button>

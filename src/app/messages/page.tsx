@@ -170,9 +170,9 @@ export default function MessagesPage() {
                           <p className="text-sm font-medium text-gray-900 truncate">
                             {room.partner?.full_name}
                           </p>
-                          {room.last_message && (
+                          {room.last_message_at && (
                             <p className="text-xs text-gray-500">
-                              {formatMessageTime(room.last_message.created_at)}
+                              {formatMessageTime(room.last_message_at)}
                             </p>
                           )}
                         </div>
@@ -187,20 +187,11 @@ export default function MessagesPage() {
 
                         {room.last_message && (
                           <p className="text-sm text-gray-600 truncate mt-1">
-                            {room.last_message.sender_id === user.id ? t('messages.sent_prefix', lang) : ''}
-                            {room.last_message.content}
+                            {room.last_message}
                           </p>
                         )}
                       </div>
 
-                      {/* 온라인 상태 및 읽지 않은 메시지 */}
-                      <div className="flex-shrink-0 flex flex-col items-end space-y-1">
-                        <div className="w-3 h-3 bg-green-400 rounded-full"></div>
-                        {/* TODO: 읽지 않은 메시지 카운트 */}
-                        {/* <div className="bg-purple-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                          2
-                        </div> */}
-                      </div>
                     </div>
                   </div>
                 </Link>
