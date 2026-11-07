@@ -731,6 +731,11 @@ const MESSAGES: Messages = {
   'creator.empty_posts': { ko: '아직 게시물이 없습니다', en: 'No posts yet', ja: 'まだ投稿がありません', zh: '还没有帖子' },
   'creator.first_post': { ko: '첫 게시물 올리기', en: 'Share your first post', ja: '最初の投稿をシェア', zh: '分享第一篇帖子' },
   'creator.not_found': { ko: '프로필을 찾을 수 없습니다', en: 'Profile not found', ja: 'プロフィールが見つかりません', zh: '找不到资料' },
+  'creator.follow': { ko: '팔로우', en: 'Follow', ja: 'フォロー', zh: '关注' },
+  'creator.unfollow': { ko: '팔로우 취소', en: 'Unfollow', ja: 'フォロー解除', zh: '取消关注' },
+  'creator.services': { ko: '서비스', en: 'Services', ja: 'サービス', zh: '服务' },
+  'creator.book_service': { ko: '예약하기', en: 'Book', ja: '予約する', zh: '预约' },
+  'creator.send_message': { ko: '메시지', en: 'Message', ja: 'メッセージ', zh: '消息' },
   'creator.post_detail': { ko: '게시물', en: 'Post', ja: '投稿', zh: '帖子' },
 
   // ── 계정 정지 알림 ────────────────────────────────────────────────────────
