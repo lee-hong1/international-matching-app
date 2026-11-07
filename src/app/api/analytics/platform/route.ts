@@ -57,8 +57,8 @@ export async function GET(req: NextRequest) {
       supabaseService.from('messages').select('id', { count: 'exact', head: true }),
       supabaseService.from('messages').select('id', { count: 'exact', head: true }).gte('created_at', todayIso),
       supabaseService.from('profiles').select('id', { count: 'exact', head: true }).eq('is_premium', true),
-      supabaseService.from('payments').select('amount').eq('payment_status', 'completed').gte('created_at', start30dAgo),
-      supabaseService.from('payments').select('amount').eq('payment_status', 'completed'),
+      supabaseService.from('payments').select('amount').eq('payment_status', 'completed').gte('created_at', start30dAgo).limit(50000),
+      supabaseService.from('payments').select('amount').eq('payment_status', 'completed').limit(50000),
     ])
 
     const revenueMonth = (revenueMonthResult.data ?? []).reduce((sum: number, p: any) => sum + Number(p.amount ?? 0), 0)
