@@ -1,4 +1,3 @@
-import { supabase } from './supabase'
 import { supabaseService } from '@src/lib/commerce'
 
 export interface AdminStats {
@@ -121,16 +120,19 @@ export const adminService = {
     isPremium?: boolean
     country?: string
   }): Promise<{ users: UserManagement[]; total: number }> {
-    let query = supabase
+    let query = supabaseService
       .from('profiles')
       .select(`
-        id, email, full_name, country, gender, verification_status, 
+        id, email, full_name, country, gender, verification_status,
         is_premium, created_at, last_active
       `)
 
-    // 필터 적용
+    // 필터 적용 — search 값의 PostgREST .or() 특수문자 제거 (filter injection 방지)
     if (filters?.search) {
-      query = query.or(`full_name.ilike.%${filters.search}%,email.ilike.%${filters.search}%`)
+      const safeSearch = filters.search.replace(/[,()]/g, '').slice(0, 100)
+      if (safeSearch) {
+        query = query.or(`full_name.ilike.%${safeSearch}%,email.ilike.%${safeSearch}%`)
+      }
     }
     if (filters?.verificationStatus) {
       query = query.eq('verification_status', filters.verificationStatus)
@@ -154,27 +156,38 @@ export const adminService = {
       throw error
     }
 
-    // 각 사용자의 매칭 및 메시지 통계 가져오기
-    const usersWithStats = await Promise.all(
-      (users || []).map(async (user) => {
-        const [matchesQuery, messagesQuery] = await Promise.all([
-          supabase
+    // N+1 방지: 페이지 사용자 전체 통계를 2개 쿼리로 일괄 조회
+    const userIds = (users || []).map((u) => u.id)
+    const [matchesData, messagesData] = await Promise.all([
+      userIds.length > 0
+        ? supabaseService
             .from('matches')
-            .select('id', { count: 'exact', head: true })
-            .or(`user1_id.eq.${user.id},user2_id.eq.${user.id}`),
-          supabase
+            .select('user1_id, user2_id')
+            .or(userIds.flatMap((id) => [`user1_id.eq.${id}`, `user2_id.eq.${id}`]).join(','))
+        : Promise.resolve({ data: [] }),
+      userIds.length > 0
+        ? supabaseService
             .from('messages')
-            .select('id', { count: 'exact', head: true })
-            .eq('sender_id', user.id)
-        ])
+            .select('sender_id')
+            .in('sender_id', userIds)
+        : Promise.resolve({ data: [] }),
+    ])
 
-        return {
-          ...user,
-          total_matches: matchesQuery.count || 0,
-          total_messages: messagesQuery.count || 0
-        }
-      })
-    )
+    const matchCounts: Record<string, number> = {}
+    const messageCounts: Record<string, number> = {}
+    ;(matchesData.data ?? []).forEach((m: { user1_id: string; user2_id: string }) => {
+      matchCounts[m.user1_id] = (matchCounts[m.user1_id] ?? 0) + 1
+      matchCounts[m.user2_id] = (matchCounts[m.user2_id] ?? 0) + 1
+    })
+    ;(messagesData.data ?? []).forEach((m: { sender_id: string }) => {
+      messageCounts[m.sender_id] = (messageCounts[m.sender_id] ?? 0) + 1
+    })
+
+    const usersWithStats = (users || []).map((user) => ({
+      ...user,
+      total_matches: matchCounts[user.id] ?? 0,
+      total_messages: messageCounts[user.id] ?? 0,
+    }))
 
     return {
       users: usersWithStats,
@@ -184,7 +197,7 @@ export const adminService = {
 
   // 신고 목록 가져오기
   async getReports(page: number = 1, limit: number = 20, status?: string): Promise<{ reports: ReportManagement[]; total: number }> {
-    let query = supabase
+    let query = supabaseService
       .from('reports')
       .select(`
         id, reason, description, status, created_at, resolved_at,
@@ -265,15 +278,15 @@ export const adminService = {
 
     try {
       const [usersQuery, matchesQuery, revenueQuery] = await Promise.all([
-        supabase
+        supabaseService
           .from('profiles')
           .select('created_at')
           .gte('created_at', startDate.toISOString()),
-        supabase
+        supabaseService
           .from('matches')
           .select('created_at')
           .gte('created_at', startDate.toISOString()),
-        supabase
+        supabaseService
           .from('payments')
           .select('amount, created_at')
           .eq('payment_status', 'completed')
@@ -322,7 +335,7 @@ export const adminService = {
 
   // 국가별 통계
   async getCountryStats() {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseService
       .from('profiles')
       .select('country')
 
