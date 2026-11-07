@@ -1,4 +1,5 @@
 import { supabase } from './supabase'
+import { detectExternalPlatform } from '@src/lib/chat-safety'
 
 export interface PostMedia {
   id: string
@@ -144,6 +145,24 @@ export const postsService = {
   async createPost(postData: CreatePostData): Promise<{ post: Post | null; error: any }> {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return { post: null, error: new Error('인증이 필요합니다') }
+
+    // 프로필 검증: 정지 계정 및 미성년자 차단 (서비스 보안 / 청소년보호법)
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('is_suspended, is_adult')
+      .eq('id', user.id)
+      .single()
+    if (profile?.is_suspended) {
+      return { post: null, error: new Error('계정이 정지되었습니다') }
+    }
+    if (!profile?.is_adult) {
+      return { post: null, error: new Error('성인 인증이 필요합니다') }
+    }
+
+    // 외부 플랫폼 유도 방지 (수익 누수 차단)
+    if (postData.caption && detectExternalPlatform(postData.caption)) {
+      return { post: null, error: new Error('외부 플랫폼 유도는 허용되지 않습니다') }
+    }
 
     // MIME 타입 → 허용 확장자 (파일명에서 추출하지 않음 — 위장 실행파일 방지)
     const ALLOWED_TYPES: Record<string, string> = {
