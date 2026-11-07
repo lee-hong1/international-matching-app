@@ -155,7 +155,7 @@ function BookingForm({ serviceId }: { serviceId: string }) {
           <h2 style={{ marginBottom: 4 }}>{service.title}</h2>
           {service.description && <p style={{ color: '#555', marginBottom: 8 }}>{service.description}</p>}
           <div style={{ display: 'flex', gap: 16, fontSize: '0.9rem', color: '#444' }}>
-            <span>⏱ {service.duration_minutes}{lang === 'ko' ? '분' : lang === 'ja' ? '分' : lang === 'zh' ? '分钟' : ' min'}</span>
+            <span>⏱ {service.duration_minutes}{t('common.min', lang)}</span>
             <span>💰 {service.price.toLocaleString()} {service.currency}</span>
           </div>
         </div>
