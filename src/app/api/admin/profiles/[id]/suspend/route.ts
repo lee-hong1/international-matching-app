@@ -111,7 +111,9 @@ export async function PATCH(
   // 감사 로그 기록 (fire-and-forget — 로그 실패가 응답에 영향 없음)
   void (async () => {
     try {
-      const adminKeyHash = createHash('sha256').update(adminKey).digest('hex').substring(0, 16)
+      const adminKeyHash = adminKey
+        ? createHash('sha256').update(adminKey).digest('hex').substring(0, 16)
+        : 'email-auth'
       await supabaseService.from('admin_actions').insert({
         admin_key_hash: adminKeyHash,
         target_user_id: id,

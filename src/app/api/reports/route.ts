@@ -60,12 +60,20 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid report_type' }, { status: 400 })
     }
 
+    const ALLOWED_CATEGORIES = ['profile', 'message', 'photo', 'behavior'] as const
+    type ReportCategory = typeof ALLOWED_CATEGORIES[number]
+    const rawCategory = reportData.category
+    const category: ReportCategory = ALLOWED_CATEGORIES.includes(rawCategory)
+      ? rawCategory as ReportCategory
+      : 'behavior'
+
     // 허용 필드만 명시적으로 추출 — 관리자 전용 필드(reviewed_by, reviewed_at, resolution_notes 등) 삽입 차단
     const safeReportData = {
       reported_user_id: reportData.reported_user_id as string,
       reported_content_id: reportData.reported_content_id as string | undefined,
-      report_type: reportData.report_type as string,
-      description: typeof reportData.description === 'string' ? reportData.description.slice(0, 2000) : undefined,
+      report_type: reportData.report_type as 'harassment' | 'spam' | 'inappropriate_content' | 'fake_profile' | 'other' | 'abuse',
+      category,
+      description: typeof reportData.description === 'string' ? reportData.description.slice(0, 2000) : '',
       reporter_id: user.id,
     }
 
