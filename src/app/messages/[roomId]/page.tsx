@@ -101,8 +101,8 @@ export default function ChatPage() {
 
     setIsSending(true)
     try {
-      await chatService.sendMessage(params.roomId, user.id, newMessage.trim())
-      setNewMessage('')
+      const sent = await chatService.sendMessage(params.roomId, user.id, newMessage.trim())
+      if (sent) setNewMessage('')
     } catch (error: unknown) {
       const redirect = (error as { redirect?: string }).redirect
       if (redirect) { router.push(redirect); return }
