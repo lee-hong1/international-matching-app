@@ -286,6 +286,9 @@ export async function POST(req: NextRequest) {
   if (!isValidUuid(host_id)) {
     return NextResponse.json({ error: 'Invalid host_id' }, { status: 400 })
   }
+  if (host_id === user.id) {
+    return NextResponse.json({ error: 'Cannot book your own service' }, { status: 400 })
+  }
   if (service_id && !isValidUuid(service_id)) {
     return NextResponse.json({ error: 'Invalid service_id' }, { status: 400 })
   }

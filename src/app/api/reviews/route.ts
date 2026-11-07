@@ -147,6 +147,10 @@ export async function POST(req: NextRequest) {
   // reviewer → reviewee 판별
   const reviewee_id = booking.guest_id === user.id ? booking.host_id : booking.guest_id
 
+  if (reviewee_id === user.id) {
+    return NextResponse.json({ error: 'Cannot review yourself' }, { status: 400 })
+  }
+
   const { data: review, error: insertErr } = await supabaseService
     .from('reviews')
     .insert({
