@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
-import { getAuthUser, supabaseService, isValidUuid } from '@src/lib/commerce'
+import { getAuthUser, supabaseService, isValidUuid, hasForbiddenContent } from '@src/lib/commerce'
 import { detectExternalPlatform } from '@src/lib/chat-safety'
 import { isSuspended } from '@src/lib/suspended-check'
 
@@ -108,6 +108,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'location must be under 300 characters' }, { status: 400 })
   }
 
+  // 금지 키워드 (도박, 성인콘텐츠 등)
+  if (caption && hasForbiddenContent(caption)) {
+    return NextResponse.json({ error: 'Caption contains prohibited content' }, { status: 400 })
+  }
   // 수익 누수 방지: 포스트 캡션에 외부 플랫폼 유도 금지
   if (caption && detectExternalPlatform(caption)) {
     return NextResponse.json({ error: 'External platform references are not allowed' }, { status: 400 })

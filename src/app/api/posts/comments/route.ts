@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
-import { isValidUuid, getAuthUser, supabaseService } from '@src/lib/commerce'
+import { isValidUuid, getAuthUser, supabaseService, hasForbiddenContent } from '@src/lib/commerce'
 import { isSuspended } from '@src/lib/suspended-check'
 import { detectExternalPlatform } from '@src/lib/chat-safety'
 
@@ -39,6 +39,9 @@ export async function POST(request: NextRequest) {
   }
   if (typeof content !== 'string' || content.trim().length === 0 || content.length > 500) {
     return NextResponse.json({ error: 'content must be 1–500 characters' }, { status: 400 })
+  }
+  if (hasForbiddenContent(content)) {
+    return NextResponse.json({ error: 'Comment contains prohibited content' }, { status: 400 })
   }
   if (detectExternalPlatform(content)) {
     return NextResponse.json({ error: 'External platform references are not allowed in comments' }, { status: 400 })
