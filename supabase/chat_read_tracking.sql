@@ -17,6 +17,7 @@ CREATE OR REPLACE FUNCTION mark_chat_room_read(p_room_id uuid)
 RETURNS void
 LANGUAGE plpgsql
 SECURITY DEFINER
+SET search_path = public
 AS $$
 DECLARE
   v_room chat_rooms%ROWTYPE;

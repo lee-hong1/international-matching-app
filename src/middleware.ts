@@ -67,10 +67,10 @@ async function handleAdminRoute(request: NextRequest): Promise<NextResponse> {
 
     const adminEmails = (process.env.ADMIN_EMAILS ?? '')
       .split(',')
-      .map((e) => e.trim())
+      .map((e) => e.trim().toLowerCase())
       .filter(Boolean)
 
-    if (!adminEmails.includes(user.email ?? '')) {
+    if (!adminEmails.includes((user.email ?? '').toLowerCase())) {
       return NextResponse.redirect(new URL('/feed', request.url))
     }
 

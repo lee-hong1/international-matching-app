@@ -2,7 +2,9 @@
 -- Replaces the TOCTOU count-then-insert patterns in the availability and services APIs.
 
 CREATE OR REPLACE FUNCTION enforce_availability_slot_limit()
-RETURNS TRIGGER LANGUAGE plpgsql AS $$
+RETURNS TRIGGER LANGUAGE plpgsql
+SET search_path = public
+AS $$
 DECLARE
   slot_count INT;
 BEGIN
@@ -26,7 +28,9 @@ CREATE TRIGGER trg_enforce_availability_slot_limit
 -- ── 서비스 수 제한: 호스트당 최대 50개 ───────────────────────────────────────
 
 CREATE OR REPLACE FUNCTION enforce_service_limit()
-RETURNS TRIGGER LANGUAGE plpgsql AS $$
+RETURNS TRIGGER LANGUAGE plpgsql
+SET search_path = public
+AS $$
 DECLARE
   svc_count INT;
 BEGIN
@@ -50,7 +54,9 @@ CREATE TRIGGER trg_enforce_service_limit
 -- ── 쇼핑 링크 제한: 호스트당 최대 20개 활성 링크 ─────────────────────────────
 
 CREATE OR REPLACE FUNCTION enforce_shop_link_limit()
-RETURNS TRIGGER LANGUAGE plpgsql AS $$
+RETURNS TRIGGER LANGUAGE plpgsql
+SET search_path = public
+AS $$
 DECLARE
   link_count INT;
 BEGIN

@@ -19,6 +19,7 @@ RETURNS TABLE (
 LANGUAGE plpgsql
 STABLE
 SECURITY DEFINER
+SET search_path = public
 AS $$
 BEGIN
   -- IDOR 방지: SECURITY DEFINER 함수이므로 호출자 본인 UUID만 허용
