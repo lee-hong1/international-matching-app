@@ -1,4 +1,5 @@
 import { supabase } from './supabase'
+import { supabaseService } from '@src/lib/commerce'
 
 export interface AdminStats {
   totalUsers: number
@@ -7,7 +8,9 @@ export interface AdminStats {
   totalMatches: number
   totalMessages: number
   dailyActiveUsers: number
+  dailySignups: number
   revenue: number
+  avgOrderValue: number
   pendingReports: number
 }
 
@@ -57,8 +60,9 @@ export const adminService = {
       return false
     }
 
-    // 관리자 이메일 목록 (환경 변수로 관리)
-    const adminEmails = process.env.NEXT_PUBLIC_ADMIN_EMAILS?.split(',') || []
+    // ADMIN_EMAILS는 서버사이드 전용 env var (NEXT_PUBLIC_ 없음)
+    const adminEmails = (process.env.ADMIN_EMAILS ?? process.env.NEXT_PUBLIC_ADMIN_EMAILS ?? '')
+      .split(',').map((e) => e.trim()).filter(Boolean)
     return adminEmails.includes(data.email)
   },
 
@@ -66,6 +70,9 @@ export const adminService = {
   async getDashboardStats(): Promise<AdminStats> {
     try {
       // 병렬로 모든 통계 쿼리 실행
+      const todayStart = new Date()
+      todayStart.setHours(0, 0, 0, 0)
+
       const [
         totalUsersQuery,
         verifiedUsersQuery,
@@ -73,22 +80,27 @@ export const adminService = {
         totalMatchesQuery,
         totalMessagesQuery,
         dailyActiveUsersQuery,
+        dailySignupsQuery,
         revenueQuery,
         pendingReportsQuery
       ] = await Promise.all([
-        supabase.from('profiles').select('id', { count: 'exact', head: true }),
-        supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('verification_status', 'verified'),
-        supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('is_premium', true),
-        supabase.from('matches').select('id', { count: 'exact', head: true }),
-        supabase.from('messages').select('id', { count: 'exact', head: true }),
-        supabase.from('profiles').select('id', { count: 'exact', head: true })
+        supabaseService.from('profiles').select('id', { count: 'exact', head: true }),
+        supabaseService.from('profiles').select('id', { count: 'exact', head: true }).eq('verification_status', 'verified'),
+        supabaseService.from('profiles').select('id', { count: 'exact', head: true }).eq('is_premium', true),
+        supabaseService.from('matches').select('id', { count: 'exact', head: true }),
+        supabaseService.from('messages').select('id', { count: 'exact', head: true }),
+        supabaseService.from('profiles').select('id', { count: 'exact', head: true })
           .gte('last_active', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()),
-        supabase.from('payments').select('amount').eq('payment_status', 'completed'),
-        supabase.from('reports').select('id', { count: 'exact', head: true }).eq('status', 'pending')
+        supabaseService.from('profiles').select('id', { count: 'exact', head: true })
+          .gte('created_at', todayStart.toISOString()),
+        supabaseService.from('payments').select('amount').eq('payment_status', 'completed'),
+        supabaseService.from('reports').select('id', { count: 'exact', head: true }).eq('status', 'pending')
       ])
 
-      // 수익 계산
-      const totalRevenue = revenueQuery.data?.reduce((sum, payment) => sum + payment.amount, 0) || 0
+      // Revenue and AOV calculation
+      const payments = revenueQuery.data ?? []
+      const totalRevenue = payments.reduce((sum, p) => sum + p.amount, 0)
+      const avgOrderValue = payments.length > 0 ? Math.round(totalRevenue / payments.length) : 0
 
       return {
         totalUsers: totalUsersQuery.count || 0,
@@ -97,7 +109,9 @@ export const adminService = {
         totalMatches: totalMatchesQuery.count || 0,
         totalMessages: totalMessagesQuery.count || 0,
         dailyActiveUsers: dailyActiveUsersQuery.count || 0,
+        dailySignups: dailySignupsQuery.count || 0,
         revenue: totalRevenue,
+        avgOrderValue,
         pendingReports: pendingReportsQuery.count || 0
       }
     } catch (error) {
@@ -199,7 +213,7 @@ export const adminService = {
     }
 
     return {
-      reports: reports || [],
+      reports: (reports || []) as unknown as ReportManagement[],
       total: count || 0
     }
   },

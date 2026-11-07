@@ -1,13 +1,27 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { LanguageProvider } from "@/contexts/LanguageContext";
 
 export const metadata: Metadata = {
   title: "GlobalMatch - 국제 매칭 플랫폼",
   description: "전 세계의 특별한 인연을 만나는 신뢰할 수 있는 국제 매칭 서비스",
   keywords: "국제연애, 매칭, 데이팅, 외국인친구, 글로벌매칭",
   authors: [{ name: "GlobalMatch Team" }],
-  viewport: "width=device-width, initial-scale=1",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "GlobalMatch",
+  },
+  formatDetection: {
+    telephone: false,
+  },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
   themeColor: "#9333ea",
 };
 
@@ -18,13 +32,26 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
-      <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-      </head>
       <body className="antialiased">
-        <AuthProvider>
-          {children}
-        </AuthProvider>
+        <LanguageProvider>
+          <AuthProvider>
+            {children}
+          </AuthProvider>
+        </LanguageProvider>
+        {/* SW 등록 — 프로덕션 전용, 외부 스크립트 없이 inline */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    var buildId = ${JSON.stringify(process.env.NEXT_PUBLIC_BUILD_ID ?? 'v1')};
+    navigator.serviceWorker.register('/sw.js?v=' + buildId, { scope: '/' })
+      .catch(function() {});
+  });
+}
+            `.trim(),
+          }}
+        />
       </body>
     </html>
   );

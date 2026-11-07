@@ -1,4 +1,5 @@
 import { supabase } from './supabase'
+import { supabaseService } from '@src/lib/commerce'
 import { notificationService } from './notifications'
 
 export interface ReportData {
@@ -238,7 +239,7 @@ class ReportingService {
   // 신고 처리 (관리자용)
   async processReport(reportId: string, status: ReportData['status'], resolutionNotes: string, adminId: string) {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await supabaseService
         .from('reports')
         .update({
           status,
@@ -278,7 +279,7 @@ class ReportingService {
   private async checkForAutomaticActions(userId: string, reportType: ReportData['report_type']) {
     try {
       // 최근 30일간 같은 사용자에 대한 신고 수 확인
-      const { data: recentReports, count } = await supabase
+      const { data: recentReports, count } = await supabaseService
         .from('reports')
         .select('id', { count: 'exact' })
         .eq('reported_user_id', userId)
@@ -316,65 +317,37 @@ class ReportingService {
     }
   }
 
-  // 안전 조치 적용
+  // 안전 조치 적용 — /api/admin/profiles/:id/suspend 경유 (ADMIN_API_KEY)
+  // 클라이언트 anon키 직접 safety_actions INSERT 차단 (N+52 RLS)
   async applySafetyAction(userId: string, actionData: Omit<SafetyAction, 'id' | 'user_id' | 'applied_at'>) {
     try {
-      // 안전 조치 기록
-      const { error: actionError } = await supabase
-        .from('safety_actions')
-        .insert({
-          user_id: userId,
-          ...actionData,
-          applied_at: new Date().toISOString()
+      const adminKey = typeof process !== 'undefined' ? process.env.ADMIN_API_KEY : undefined
+      if (!adminKey) return false
+
+      const isSuspend = actionData.action_type === 'temporary_ban' || actionData.action_type === 'permanent_ban'
+
+      if (isSuspend) {
+        const res = await fetch(`/api/admin/profiles/${userId}/suspend`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json', 'x-admin-key': adminKey },
+          body: JSON.stringify({
+            action: 'suspend',
+            reason: actionData.reason,
+          }),
         })
-
-      if (actionError) {
-        console.error('Error recording safety action:', actionError)
-        return false
+        if (!res.ok) return false
       }
 
-      // 사용자 상태 업데이트
-      let updateData: any = {}
-      
-      switch (actionData.action_type) {
-        case 'temporary_ban':
-          updateData = {
-            account_status: 'suspended',
-            suspension_until: new Date(Date.now() + (actionData.duration || 24) * 60 * 60 * 1000).toISOString()
-          }
-          break
-        case 'permanent_ban':
-          updateData = {
-            account_status: 'banned',
-            banned_at: new Date().toISOString()
-          }
-          break
-        case 'profile_review':
-          updateData = {
-            account_status: 'under_review'
-          }
-          break
-      }
-
-      if (Object.keys(updateData).length > 0) {
-        await supabase
-          .from('profiles')
-          .update(updateData)
-          .eq('id', userId)
-      }
-
-      // 사용자에게 알림
       await notificationService.createNotification({
         user_id: userId,
         type: 'system',
         title: '계정 조치 알림',
         body: `계정에 안전 조치가 적용되었습니다: ${actionData.reason}`,
-        is_read: false
+        is_read: false,
       })
 
       return true
-    } catch (error) {
-      console.error('Error applying safety action:', error)
+    } catch {
       return false
     }
   }
@@ -383,19 +356,19 @@ class ReportingService {
   private async deactivateUserInteractions(userId1: string, userId2: string) {
     try {
       // 매치 비활성화
-      await supabase
+      await supabaseService
         .from('matches')
         .update({ is_active: false })
         .or(`and(user1_id.eq.${userId1},user2_id.eq.${userId2}),and(user1_id.eq.${userId2},user2_id.eq.${userId1})`)
 
       // 채팅방 비활성화
-      const { data: chatRooms } = await supabase
+      const { data: chatRooms } = await supabaseService
         .from('chat_rooms')
         .select('id')
         .contains('participants', [userId1, userId2])
 
       if (chatRooms && chatRooms.length > 0) {
-        await supabase
+        await supabaseService
           .from('chat_rooms')
           .update({ is_active: false })
           .in('id', chatRooms.map(room => room.id))
@@ -409,24 +382,22 @@ class ReportingService {
   private async notifyAdminsOfNewReport(report: ReportData) {
     try {
       // 관리자 사용자들 조회
-      const { data: admins } = await supabase
+      const { data: admins } = await supabaseService
         .from('profiles')
         .select('id')
         .eq('role', 'admin')
 
       if (admins && admins.length > 0) {
-        const notifications = admins.map(admin => ({
-          user_id: admin.id,
-          type: 'system' as const,
-          title: `새로운 신고 (${report.priority.toUpperCase()})`,
-          body: `${report.report_type} 유형의 신고가 접수되었습니다.`,
-          data: { reportId: report.id },
-          is_read: false
-        }))
-
-        await supabase
-          .from('notifications')
-          .insert(notifications)
+        await Promise.allSettled(admins.map(admin =>
+          notificationService.createNotification({
+            user_id: admin.id,
+            type: 'system',
+            title: `새로운 신고 (${report.priority.toUpperCase()})`,
+            body: `${report.report_type} 유형의 신고가 접수되었습니다.`,
+            data: { reportId: report.id },
+            is_read: false,
+          })
+        ))
       }
     } catch (error) {
       console.error('Error notifying admins:', error)
@@ -439,19 +410,19 @@ class ReportingService {
       const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString()
       
       // 신고 유형별 통계
-      const { data: reportsByType } = await supabase
+      const { data: reportsByType } = await supabaseService
         .from('reports')
         .select('report_type')
         .gte('created_at', since)
 
       // 상태별 통계
-      const { data: reportsByStatus } = await supabase
+      const { data: reportsByStatus } = await supabaseService
         .from('reports')
         .select('status')
         .gte('created_at', since)
 
       // 우선순위별 통계
-      const { data: reportsByPriority } = await supabase
+      const { data: reportsByPriority } = await supabaseService
         .from('reports')
         .select('priority')
         .gte('created_at', since)
@@ -490,7 +461,7 @@ class ReportingService {
       const { status, priority, report_type, reporter_id, reported_user_id, page = 1, limit = 20 } = query
       const from = (page - 1) * limit
       
-      let queryBuilder = supabase
+      let queryBuilder = supabaseService
         .from('reports')
         .select(`
           *,

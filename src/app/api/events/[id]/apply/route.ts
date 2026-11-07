@@ -1,0 +1,145 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
+import { isValidUuid, supabaseService, getAuthUser } from '@src/lib/commerce'
+import { isSuspended } from '@src/lib/suspended-check'
+
+// 이벤트 참가 신청: 무료 이벤트는 즉시 승인 대기, 유료 이벤트는 결제용 주문(payment) 생성
+export async function POST(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
+  const rl = await checkRateLimit(`event-apply:${ip}`, 'payment')
+  if (!rl.allowed) {
+    const r = rateLimitResponse(rl.resetAt)
+    return NextResponse.json(r.body, { status: r.status, headers: r.headers })
+  }
+
+  const user = await getAuthUser(request)
+  if (!user) {
+    return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
+  }
+
+  if (await isSuspended(user.id)) {
+    return NextResponse.json({ error: 'Account suspended' }, { status: 403 })
+  }
+
+  const { id: eventId } = await params
+  if (!isValidUuid(eventId)) {
+    return NextResponse.json({ error: 'Invalid event id' }, { status: 400 })
+  }
+
+  // 청소년보호법: 성인 인증 필수
+  const { data: requesterProfile } = await supabaseService
+    .from('profiles').select('is_adult').eq('id', user.id).single()
+  if (!requesterProfile?.is_adult) {
+    return NextResponse.json({ error: 'Age verification required', redirect: '/onboarding/verify-age' }, { status: 403 })
+  }
+
+  const { data: event, error: eventError } = await supabaseService
+    .from('events')
+    .select('*, partner_venues (commission_rate)')
+    .eq('id', eventId)
+    .single()
+
+  if (eventError || !event) {
+    return NextResponse.json({ error: 'Event not found' }, { status: 404 })
+  }
+
+  if (event.status !== 'open') {
+    return NextResponse.json({ error: 'Event is not accepting applications' }, { status: 400 })
+  }
+
+  if (event.participants_count >= event.max_participants) {
+    return NextResponse.json({ error: 'Event is fully booked' }, { status: 400 })
+  }
+
+  if (event.host_id === user.id) {
+    return NextResponse.json({ error: 'Cannot apply to your own event' }, { status: 400 })
+  }
+
+  // 이미 신청했는지 확인
+  const { data: existing } = await supabaseService
+    .from('event_participants')
+    .select('id, status')
+    .eq('event_id', eventId)
+    .eq('user_id', user.id)
+    .maybeSingle()
+
+  if (existing) {
+    return NextResponse.json({ error: 'Already applied to this event', participant: existing }, { status: 409 })
+  }
+
+  // 무료 이벤트: 결제 없이 바로 신청 등록 (호스트 승인 대기)
+  if (!event.fee_per_person || event.fee_per_person === 0) {
+    const { data: participant, error } = await supabaseService
+      .from('event_participants')
+      .insert({ event_id: eventId, user_id: user.id, status: 'pending' })
+      .select('id, event_id, user_id, status, created_at')
+      .single()
+
+    if (error) {
+      // DB 트리거 EVENT_FULL 예외 (동시 신청 race condition 대응)
+      if (error.message?.includes('EVENT_FULL') || error.code === 'P0001') {
+        return NextResponse.json({ error: 'Event is fully booked' }, { status: 409 })
+      }
+      // 중복 신청 unique violation
+      if (error.code === '23505') {
+        return NextResponse.json({ error: 'Already applied to this event' }, { status: 409 })
+      }
+      return NextResponse.json({ error: 'Failed to register participant' }, { status: 500 })
+    }
+    return NextResponse.json({ participant, requiresPayment: false }, { status: 201 })
+  }
+
+  // 유료 이벤트: 결제 주문 생성 후 토스 결제창으로 연결
+  const orderId = `event_${eventId}_${user.id}_${Date.now()}`
+
+  const { data: payment, error: paymentError } = await supabaseService
+    .from('payments')
+    .insert({
+      user_id: user.id,
+      event_id: eventId,
+      amount: event.fee_per_person,
+      currency: 'KRW',
+      payment_provider: 'toss',
+      provider_order_id: orderId,
+      payment_status: 'pending',
+      description: `이벤트 참가비: ${event.title}`,
+    })
+    .select()
+    .single()
+
+  if (paymentError || !payment) {
+    return NextResponse.json({ error: 'Failed to create payment' }, { status: 500 })
+  }
+
+  const { data: participant, error: participantError } = await supabaseService
+    .from('event_participants')
+    .insert({ event_id: eventId, user_id: user.id, status: 'pending_payment', payment_id: payment.id })
+    .select('id, event_id, user_id, status, payment_id, created_at')
+    .single()
+
+  if (participantError) {
+    // 고아 payment 정리 (participant 생성 실패 시 pending payment 레코드 제거)
+    await supabaseService.from('payments').delete().eq('id', payment.id)
+
+    if (participantError.message?.includes('EVENT_FULL') || participantError.code === 'P0001') {
+      return NextResponse.json({ error: 'Event is fully booked' }, { status: 409 })
+    }
+    if (participantError.code === '23505') {
+      return NextResponse.json({ error: 'Already applied to this event' }, { status: 409 })
+    }
+    return NextResponse.json({ error: 'Failed to register participant' }, { status: 500 })
+  }
+
+  return NextResponse.json({
+    participant,
+    requiresPayment: true,
+    payment: {
+      orderId,
+      amount: event.fee_per_person,
+      orderName: `${event.title} 참가비`,
+    },
+  }, { status: 201 })
+}
