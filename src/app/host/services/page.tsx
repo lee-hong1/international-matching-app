@@ -150,7 +150,7 @@ export default function HostServicesPage() {
                 <div>
                   <div style={{ fontWeight: 600, marginBottom: 2 }}>{s.title}</div>
                   <div style={{ fontSize: '0.85rem', color: '#555' }}>
-                    {s.duration_minutes}min · {s.price.toLocaleString()} {s.currency} · {s.category}
+                    {s.duration_minutes}{t('common.min', lang)} · {s.price.toLocaleString()} {s.currency} · {s.category}
                   </div>
                   {!s.is_active && <span style={{ fontSize: '0.75rem', color: '#999', marginTop: 2 }}>{t('host.services_inactive', lang)}</span>}
                 </div>
