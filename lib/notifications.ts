@@ -1,6 +1,15 @@
 import { initializeApp, getApps } from 'firebase/app'
 import { getMessaging, getToken, onMessage, MessagePayload } from 'firebase/messaging'
 import { supabase } from './supabase'
+import { supabaseService } from '@src/lib/commerce'
+import { t, type Lang } from '@src/lib/i18n'
+
+async function getUserLang(userId: string): Promise<Lang> {
+  try {
+    const { data } = await supabaseService.from('profiles').select('preferred_lang').eq('id', userId).single()
+    return (data?.preferred_lang as Lang) ?? 'ko'
+  } catch { return 'ko' }
+}
 
 // Firebase 설정
 const firebaseConfig = {
@@ -316,41 +325,45 @@ class NotificationService {
 
   // 자주 사용하는 알림 생성 헬퍼 메서드들
   async notifyNewMatch(userId: string, matchedUserName: string) {
+    const lang = await getUserLang(userId)
     return this.createNotification({
       user_id: userId,
       type: 'match',
-      title: '새로운 매칭! 🎉',
-      body: `${matchedUserName}님과 매칭되었습니다!`,
+      title: t('notification.match.title', lang),
+      body: t('notification.match.body', lang),
       is_read: false
     })
   }
 
   async notifyNewMessage(userId: string, senderName: string, messagePreview: string) {
+    const lang = await getUserLang(userId)
     return this.createNotification({
       user_id: userId,
       type: 'message',
-      title: `${senderName}님의 새 메시지`,
+      title: senderName,
       body: messagePreview.substring(0, 50) + (messagePreview.length > 50 ? '...' : ''),
       is_read: false
     })
   }
 
   async notifyNewLike(userId: string, likerName: string) {
+    const lang = await getUserLang(userId)
     return this.createNotification({
       user_id: userId,
       type: 'like',
-      title: '새로운 좋아요! 💕',
-      body: `${likerName}님이 회원님을 좋아합니다!`,
+      title: t('notification.like.title', lang),
+      body: t('notification.like.body', lang),
       is_read: false
     })
   }
 
   async notifyProfileView(userId: string, viewerName: string) {
+    const lang = await getUserLang(userId)
     return this.createNotification({
       user_id: userId,
       type: 'profile_view',
-      title: '프로필 조회 👀',
-      body: `${viewerName}님이 회원님의 프로필을 보았습니다`,
+      title: t('notification.profile_view.title', lang),
+      body: t('notification.profile_view.body', lang),
       is_read: false
     })
   }

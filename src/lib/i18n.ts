@@ -493,6 +493,18 @@ const MESSAGES: Messages = {
     zh: '服务已完成，请留下评价！',
   },
 
+  // ── 신고/안전 알림 ────────────────────────────────────────────────────
+  'notification.report_resolved.title': { ko: '신고 처리 완료', en: 'Report Resolved', ja: '報告が処理されました', zh: '举报已处理' },
+  'notification.report_resolved.body': { ko: '신고해주신 내용이 처리되었습니다.', en: 'Your report has been reviewed and resolved.', ja: 'ご報告いただいた内容が処理されました。', zh: '您的举报已审核处理。' },
+  'notification.safety_action.title': { ko: '계정 조치 알림', en: 'Account Action Notice', ja: 'アカウント措置のお知らせ', zh: '账户处理通知' },
+  'notification.safety_action.body': { ko: '계정에 안전 조치가 적용되었습니다.', en: 'A safety action has been applied to your account.', ja: 'アカウントに安全措置が適用されました。', zh: '账户已采取安全措施。' },
+  'notification.match.title': { ko: '새로운 매칭! 🎉', en: 'New Match! 🎉', ja: '新しいマッチング！🎉', zh: '新配对！🎉' },
+  'notification.match.body': { ko: '새로운 매칭이 성사되었습니다! 지금 채팅을 시작해보세요.', en: 'You have a new match! Start chatting now.', ja: '新しいマッチングが成立しました！今すぐチャットを始めましょう。', zh: '您有新的配对！现在开始聊天。' },
+  'notification.like.title': { ko: '새로운 좋아요! 💕', en: 'New Like! 💕', ja: '新しいいいね！💕', zh: '新的喜欢！💕' },
+  'notification.like.body': { ko: '누군가 회원님의 프로필에 좋아요를 눌렀습니다.', en: 'Someone liked your profile.', ja: '誰かがあなたのプロフィールにいいねしました。', zh: '有人喜欢了您的个人资料。' },
+  'notification.profile_view.title': { ko: '프로필 조회 👀', en: 'Profile Viewed 👀', ja: 'プロフィール閲覧 👀', zh: '个人资料被查看 👀' },
+  'notification.profile_view.body': { ko: '누군가 회원님의 프로필을 조회했습니다.', en: 'Someone viewed your profile.', ja: '誰かがあなたのプロフィールを閲覧しました。', zh: '有人查看了您的个人资料。' },
+
   // ── 호스트 가용 시간 ───────────────────────────────────────────────────
   'availability.title': { ko: '가용 시간 설정', en: 'Set Availability', ja: '予約可能時間設定', zh: '设置可用时间' },
   'availability.day_of_week': { ko: '요일', en: 'Day of Week', ja: '曜日', zh: '星期' },

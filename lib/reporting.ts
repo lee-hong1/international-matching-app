@@ -1,6 +1,14 @@
 import { supabase } from './supabase'
 import { supabaseService } from '@src/lib/commerce'
 import { notificationService } from './notifications'
+import { t, type Lang } from '@src/lib/i18n'
+
+async function getUserLang(userId: string): Promise<Lang> {
+  try {
+    const { data } = await supabaseService.from('profiles').select('preferred_lang').eq('id', userId).single()
+    return (data?.preferred_lang as Lang) ?? 'ko'
+  } catch { return 'ko' }
+}
 
 export interface ReportData {
   id: string
@@ -257,13 +265,14 @@ class ReportingService {
         return false
       }
 
-      // 신고자에게 처리 결과 알림
+      // 신고자에게 처리 결과 알림 (사용자 언어로)
       if (status === 'resolved') {
+        const lang = await getUserLang(data.reporter_id)
         await notificationService.createNotification({
           user_id: data.reporter_id,
           type: 'system',
-          title: '신고 처리 완료',
-          body: '신고해주신 내용이 처리되었습니다.',
+          title: t('notification.report_resolved.title', lang),
+          body: t('notification.report_resolved.body', lang),
           is_read: false
         })
       }
@@ -338,11 +347,12 @@ class ReportingService {
         if (!res.ok) return false
       }
 
+      const lang = await getUserLang(userId)
       await notificationService.createNotification({
         user_id: userId,
         type: 'system',
-        title: '계정 조치 알림',
-        body: `계정에 안전 조치가 적용되었습니다: ${actionData.reason}`,
+        title: t('notification.safety_action.title', lang),
+        body: t('notification.safety_action.body', lang),
         is_read: false,
       })
 
