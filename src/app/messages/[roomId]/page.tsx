@@ -20,6 +20,7 @@ export default function ChatPage() {
   const [newMessage, setNewMessage] = useState('')
   const [isLoading, setIsLoading] = useState(true)
   const [isSending, setIsSending] = useState(false)
+  const [sendError, setSendError] = useState('')
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const subscription = useRef<RealtimeChannel | null>(null)
 
@@ -100,13 +101,16 @@ export default function ChatPage() {
     if (!user || !newMessage.trim() || isSending) return
 
     setIsSending(true)
+    setSendError('')
     try {
       const sent = await chatService.sendMessage(params.roomId, user.id, newMessage.trim())
       if (sent) setNewMessage('')
+      else setSendError('Failed to send message. Please try again.')
     } catch (error: unknown) {
       const redirect = (error as { redirect?: string }).redirect
       if (redirect) { router.push(redirect); return }
       console.error('Error sending message:', error)
+      setSendError('Failed to send message. Please try again.')
     } finally {
       setIsSending(false)
     }
@@ -294,6 +298,9 @@ export default function ChatPage() {
       {/* 메시지 입력 */}
       <div className="bg-white border-t p-4">
         <div className="max-w-4xl mx-auto">
+          {sendError && (
+            <p className="text-xs text-red-500 mb-2 px-1">{sendError}</p>
+          )}
           <form onSubmit={handleSendMessage} className="flex items-end space-x-3">
             <div className="flex-1">
               <div className="relative">
