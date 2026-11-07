@@ -29,6 +29,12 @@ export async function POST(
     return NextResponse.json({ error: 'Invalid post ID' }, { status: 400 })
   }
 
+  // 자신의 게시물에 좋아요 금지 (지표 오염 방지)
+  const { data: post } = await supabaseService.from('posts').select('user_id').eq('id', postId).single()
+  if (post?.user_id === user.id) {
+    return NextResponse.json({ error: 'Cannot like your own post' }, { status: 400 })
+  }
+
   const { error } = await supabaseService
     .from('post_likes')
     .insert({ post_id: postId, user_id: user.id })
