@@ -232,40 +232,34 @@ export const adminService = {
     return data
   },
 
-  // 사용자 인증 상태 변경
+  // 사용자 인증 상태 변경 — 서버사이드 RLS 우회 위험 방지: 직접 DB 쓰기 대신 API 호출
   async updateUserVerification(userId: string, status: 'verified' | 'rejected') {
-    const { data, error } = await supabase
-      .from('profiles')
-      .update({ verification_status: status })
-      .eq('id', userId)
-      .select()
-
-    if (error) {
-      console.error('Error updating verification status:', error)
-      throw error
+    const res = await fetch(`/api/admin/profiles/${userId}/verify`, {
+      method: 'PATCH',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status }),
+    })
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}))
+      throw new Error((data as { error?: string }).error ?? 'Failed to update verification status')
     }
-
-    return data
+    return res.json()
   },
 
-  // 사용자 계정 정지/활성화
+  // 사용자 계정 정지/활성화 — supabase service role 보장: /api/admin/profiles/:id/suspend 경유
   async suspendUser(userId: string, suspend: boolean, reason?: string) {
-    const { data, error } = await supabase
-      .from('profiles')
-      .update({ 
-        is_suspended: suspend,
-        suspension_reason: suspend ? reason : null,
-        suspended_at: suspend ? new Date().toISOString() : null
-      })
-      .eq('id', userId)
-      .select()
-
-    if (error) {
-      console.error('Error updating suspension status:', error)
-      throw error
+    const res = await fetch(`/api/admin/profiles/${userId}/suspend`, {
+      method: 'PATCH',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: suspend ? 'suspend' : 'unsuspend', reason }),
+    })
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}))
+      throw new Error((data as { error?: string }).error ?? 'Failed to update suspension status')
     }
-
-    return data
+    return res.json()
   },
 
   // 월별 통계 가져오기

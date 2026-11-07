@@ -1,11 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabaseService, isValidUuid } from '@src/lib/commerce'
+import { supabaseService, isValidUuid, getAuthUser } from '@src/lib/commerce'
 import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
 import { timingSafeEqual, createHash } from 'crypto'
 
 /**
  * PATCH /api/admin/profiles/:id/suspend
- * 관리자 계정 정지/해제. x-admin-key 헤더 인증 (타이밍 어택 방지).
+ * 관리자 계정 정지/해제.
+ * 인증 방법 (둘 중 하나):
+ *   A. x-admin-key 헤더 (서버 간 호출, timingSafeEqual 검증)
+ *   B. JWT Bearer 토큰 (브라우저 관리자 UI, ADMIN_EMAILS 서버사이드 env var 체크)
  */
 export async function PATCH(
   req: NextRequest,
@@ -19,19 +22,26 @@ export async function PATCH(
     return NextResponse.json(r.body, { status: r.status, headers: r.headers })
   }
 
-  // ── Admin key 인증 (타이밍 어택 방지) ───────────────────────────────────
-  const adminKey = process.env.ADMIN_API_KEY
-  if (!adminKey) {
-    return NextResponse.json({ error: 'Admin API not configured' }, { status: 500 })
-  }
-  const provided = req.headers.get('x-admin-key') ?? ''
+  // ── 인증: x-admin-key 또는 JWT + ADMIN_EMAILS ──────────────────────────
   let authorized = false
-  try {
-    const a = Buffer.from(adminKey)
-    const b = Buffer.from(provided)
-    authorized = a.length === b.length && timingSafeEqual(a, b)
-  } catch {
-    authorized = false
+  const adminKey = process.env.ADMIN_API_KEY
+  const providedKey = req.headers.get('x-admin-key')
+  if (adminKey && providedKey) {
+    try {
+      const a = Buffer.from(adminKey)
+      const b = Buffer.from(providedKey)
+      authorized = a.length === b.length && timingSafeEqual(a, b)
+    } catch {
+      authorized = false
+    }
+  }
+  if (!authorized) {
+    const user = await getAuthUser(req)
+    if (user?.email) {
+      const adminEmails = (process.env.ADMIN_EMAILS ?? '')
+        .split(',').map((e) => e.trim().toLowerCase()).filter(Boolean)
+      authorized = adminEmails.length > 0 && adminEmails.includes(user.email.toLowerCase())
+    }
   }
   if (!authorized) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
