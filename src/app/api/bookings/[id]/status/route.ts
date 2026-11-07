@@ -132,7 +132,7 @@ export async function PATCH(
   // ── 예약 조회 ─────────────────────────────────────────────────────────────
   const { data: booking, error: fetchErr } = await supabaseService
     .from('bookings')
-    .select('id, guest_id, host_id, status, amount, currency, payment_intent_id, payment_status')
+    .select('id, guest_id, host_id, status, amount, currency, booked_at, payment_intent_id, payment_status')
     .eq('id', id)
     .single()
 
