@@ -53,7 +53,7 @@ export async function PATCH(
   // 이벤트 호스트 확인 (IDOR 방지)
   const { data: event, error: eventError } = await supabaseService
     .from('events')
-    .select('id, host_id, fee_per_person')
+    .select('id, host_id, fee_per_person, max_participants, participants_count')
     .eq('id', eventId)
     .single()
 
@@ -67,6 +67,11 @@ export async function PATCH(
   // 유료 이벤트는 이 엔드포인트로 처리 불가
   if (event.fee_per_person && event.fee_per_person > 0) {
     return NextResponse.json({ error: 'Paid event participants are managed via payment flow' }, { status: 400 })
+  }
+
+  // 승인 시 인원 초과 방지 (race condition: DB 쿼리 시점에 재확인)
+  if (action === 'approved' && event.participants_count >= event.max_participants) {
+    return NextResponse.json({ error: 'Event is fully booked' }, { status: 409 })
   }
 
   // 대상 participant 확인 — 반드시 이 이벤트의 pending 신청이어야 함
@@ -91,6 +96,14 @@ export async function PATCH(
 
   if (updateError || !updated) {
     return NextResponse.json({ error: 'Failed to update participant status' }, { status: 500 })
+  }
+
+  // 승인 시 participants_count 증가 (fire-and-forget: status 반영은 완료)
+  if (action === 'approved') {
+    void supabaseService
+      .from('events')
+      .update({ participants_count: (event.participants_count ?? 0) + 1 })
+      .eq('id', eventId)
   }
 
   // 신청자에게 알림 발송 (fire-and-forget)
