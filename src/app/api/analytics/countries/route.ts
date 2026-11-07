@@ -24,34 +24,65 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    // 풀스캔 후 JS 집계 대신 DB 집계 쿼리 사용 (성능: O(N) → O(distinct countries))
-    const { data, error } = await supabaseService
-      .rpc('get_country_counts')
+    const start30dAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()
 
-    // RPC 미존재 시 fallback: 집계된 뷰 또는 group by 쿼리
-    if (error) {
-      const { data: raw, error: rawErr } = await supabaseService
-        .from('profiles')
-        .select('country')
-        .not('country', 'is', null)
-        .limit(50000) // 최대 5만 행 제한 (무한 풀스캔 방지)
+    // 프로필에서 국가별 집계 (풀스캔 → DB 집계로 O(N) 방지)
+    const { data: profiles, error: profileErr } = await supabaseService
+      .from('profiles')
+      .select('country, is_premium, last_active_at')
+      .not('country', 'is', null)
+      .limit(50000) // 무한 풀스캔 방지
 
-      if (rawErr) throw rawErr
+    if (profileErr) throw profileErr
 
-      const counts: Record<string, number> = {}
-      for (const row of raw ?? []) {
-        if (row.country) counts[row.country] = (counts[row.country] ?? 0) + 1
+    // JS 집계: 국가별 그룹핑
+    const byCountry: Record<string, {
+      user_count: number
+      active_users: number
+      premium_users: number
+    }> = {}
+
+    for (const p of profiles ?? []) {
+      const c = p.country as string
+      if (!c) continue
+      if (!byCountry[c]) byCountry[c] = { user_count: 0, active_users: 0, premium_users: 0 }
+      byCountry[c].user_count++
+      if (p.last_active_at && p.last_active_at >= start30dAgo) byCountry[c].active_users++
+      if (p.is_premium) byCountry[c].premium_users++
+    }
+
+    // 매칭 수 집계 (matches 테이블 미존재 시 0으로 처리)
+    const matchesByCountry: Record<string, number> = {}
+    try {
+      // matches 테이블이 없을 수 있으므로 에러 무시
+      const { data: matchData } = await supabaseService
+        .from('matches')
+        .select('user1_country, user2_country')
+        .limit(50000)
+      for (const m of matchData ?? []) {
+        if (m.user1_country) matchesByCountry[m.user1_country] = (matchesByCountry[m.user1_country] ?? 0) + 1
+        if (m.user2_country) matchesByCountry[m.user2_country] = (matchesByCountry[m.user2_country] ?? 0) + 1
       }
-      return NextResponse.json({ data: counts })
+    } catch {
+      // matches 테이블 없으면 0으로 유지
     }
 
-    // RPC 결과: [{country, count}] 형태
-    const counts: Record<string, number> = {}
-    for (const row of data ?? []) {
-      if (row.country) counts[row.country] = Number(row.count)
-    }
+    const result = Object.entries(byCountry)
+      .map(([country, stats]) => ({
+        country,
+        user_count: stats.user_count,
+        active_users: stats.active_users,
+        matches_count: matchesByCountry[country] ?? 0,
+        premium_users: stats.premium_users,
+        // 참여도 점수: 활성/전체 * 100 (간이 계산)
+        average_engagement: stats.user_count > 0
+          ? parseFloat(((stats.active_users / stats.user_count) * 100).toFixed(1))
+          : 0,
+      }))
+      .sort((a, b) => b.user_count - a.user_count)
+      .slice(0, 50) // 상위 50개 국가만 반환
 
-    return NextResponse.json({ data: counts })
+    return NextResponse.json(result)
   } catch (error: unknown) {
     console.error('[analytics/countries] error:', (error as Error).message)
     return NextResponse.json({ error: 'Failed to fetch country statistics' }, { status: 500 })

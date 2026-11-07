@@ -24,22 +24,82 @@ export async function GET(req: NextRequest) {
   }
 
   try {
+    const now = new Date()
+    const startOfToday = new Date(now)
+    startOfToday.setUTCHours(0, 0, 0, 0)
+    const startOfWeek = new Date(now)
+    startOfWeek.setUTCDate(now.getUTCDate() - 7)
+    const startOfMonth = new Date(now)
+    startOfMonth.setUTCDate(now.getUTCDate() - 30)
+    const start7dAgo = startOfWeek.toISOString()
+    const start30dAgo = startOfMonth.toISOString()
+    const todayIso = startOfToday.toISOString()
+
     const [
       { count: totalUsers },
-      { count: totalBookings },
-      { count: totalHosts },
+      { count: activeToday },
+      { count: activeWeek },
+      { count: activeMonth },
+      { count: totalMatches },
+      { count: matchesToday },
+      { count: totalMessages },
+      { count: messagesToday },
+      { count: premiumUsers },
+      revenueMonthResult,
+      revenueTotalResult,
     ] = await Promise.all([
       supabaseService.from('profiles').select('id', { count: 'exact', head: true }),
-      supabaseService.from('bookings').select('id', { count: 'exact', head: true }),
-      supabaseService.from('profiles').select('id', { count: 'exact', head: true }).eq('is_host', true),
+      supabaseService.from('user_activities').select('user_id', { count: 'exact', head: true }).gte('created_at', todayIso),
+      supabaseService.from('user_activities').select('user_id', { count: 'exact', head: true }).gte('created_at', start7dAgo),
+      supabaseService.from('user_activities').select('user_id', { count: 'exact', head: true }).gte('created_at', start30dAgo),
+      supabaseService.from('matches').select('id', { count: 'exact', head: true }),
+      supabaseService.from('matches').select('id', { count: 'exact', head: true }).gte('created_at', todayIso),
+      supabaseService.from('messages').select('id', { count: 'exact', head: true }),
+      supabaseService.from('messages').select('id', { count: 'exact', head: true }).gte('created_at', todayIso),
+      supabaseService.from('profiles').select('id', { count: 'exact', head: true }).eq('is_premium', true),
+      supabaseService.from('payments').select('amount').eq('payment_status', 'completed').gte('created_at', start30dAgo),
+      supabaseService.from('payments').select('amount').eq('payment_status', 'completed'),
     ])
 
+    const revenueMonth = (revenueMonthResult.data ?? []).reduce((sum: number, p: any) => sum + Number(p.amount ?? 0), 0)
+    const revenueTotal = (revenueTotalResult.data ?? []).reduce((sum: number, p: any) => sum + Number(p.amount ?? 0), 0)
+
+    // 전환율: 프리미엄 / 전체 (division-by-zero guard)
+    const totalU = totalUsers ?? 0
+    const premiumU = premiumUsers ?? 0
+    const conversionRate = totalU > 0 ? (premiumU / totalU) * 100 : 0
+
+    // 7일 유지율: 7일 전~30일 전 가입자 중 7일 내 활동한 비율 (근사치)
+    const { count: cohortSize } = await supabaseService
+      .from('profiles')
+      .select('id', { count: 'exact', head: true })
+      .gte('created_at', start30dAgo)
+      .lt('created_at', start7dAgo)
+
+    const { count: cohortActive } = await supabaseService
+      .from('user_activities')
+      .select('user_id', { count: 'exact', head: true })
+      .gte('created_at', start7dAgo)
+
+    const retentionRate7d = (cohortSize ?? 0) > 0
+      ? Math.min(((cohortActive ?? 0) / (cohortSize ?? 1)) * 100, 100)
+      : 0
+
     return NextResponse.json({
-      data: {
-        totalUsers: totalUsers ?? 0,
-        totalBookings: totalBookings ?? 0,
-        totalHosts: totalHosts ?? 0,
-      }
+      total_users: totalU,
+      active_users_today: activeToday ?? 0,
+      active_users_week: activeWeek ?? 0,
+      active_users_month: activeMonth ?? 0,
+      total_matches: totalMatches ?? 0,
+      matches_today: matchesToday ?? 0,
+      total_messages: totalMessages ?? 0,
+      messages_today: messagesToday ?? 0,
+      premium_users: premiumU,
+      revenue_total: revenueTotal,
+      revenue_month: revenueMonth,
+      conversion_rate: parseFloat(conversionRate.toFixed(1)),
+      retention_rate_7d: parseFloat(retentionRate7d.toFixed(1)),
+      retention_rate_30d: 0,
     })
   } catch (error: unknown) {
     console.error('[analytics/platform] error:', (error as Error).message)
