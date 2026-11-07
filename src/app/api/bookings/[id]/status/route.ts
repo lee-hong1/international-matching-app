@@ -254,7 +254,7 @@ export async function PATCH(
             const hoursUntil = (bookedAtMs - Date.now()) / 36e5
             refundAmount = hoursUntil >= 24
               ? undefined // 전액
-              : Math.round(amount * 50) // 50% (Stripe는 소수점 단위 통화 처리 주의)
+              : Math.round(amount * 0.5) // 50% 환불 (Stripe: 최소 통화 단위 기준)
           }
           const refundParams: Parameters<typeof stripe.refunds.create>[0] = {
             payment_intent: paymentIntentId,
