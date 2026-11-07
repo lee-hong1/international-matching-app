@@ -36,7 +36,7 @@ export default function CreatePost({ onClose, onPostCreated }: CreatePostProps) 
       const limit = f.type.startsWith('video/') ? MAX_VIDEO_BYTES : MAX_IMAGE_BYTES
       if (f.size > limit) {
         const mb = Math.round(limit / 1024 / 1024)
-        errors.push(`${f.name}: 최대 ${mb}MB`)
+        errors.push(t('file.size_limit_error', lang, { name: f.name, mb: String(mb) }))
         return false
       }
       return true

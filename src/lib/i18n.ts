@@ -1089,6 +1089,9 @@ const MESSAGES: Messages = {
   'match.w3_title':   { ko: '안전한 환경',    en: 'Safe & Secure',       ja: '安心·安全な環境',   zh: '安全环境' },
   'match.w3_desc':    { ko: '24시간 모니터링과 신고 시스템 운영.',  en: '24/7 monitoring and reporting system in place.', ja: '24時間モニタリングと通報システムを運営。', zh: '24/7监控和举报系统。' },
 
+  // generic file validation
+  'file.size_limit_error': { ko: '{name}: 최대 {mb}MB', en: '{name}: max {mb}MB', ja: '{name}: 最大{mb}MB', zh: '{name}: 最大{mb}MB' },
+
   // create post
   'create_post.title':              { ko: '새 게시물',              en: 'New Post',                  ja: '新しい投稿',               zh: '新帖子' },
   'create_post.close':              { ko: '닫기',                   en: 'Close',                     ja: '閉じる',                   zh: '关闭' },
