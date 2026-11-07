@@ -12,7 +12,7 @@ import { t } from '@src/lib/i18n'
 export default function MessagesPage() {
   const { user, loading } = useAuth()
   const router = useRouter()
-  const { lang } = useLanguage()
+  const { locale: lang } = useLanguage()
   const [chatRooms, setChatRooms] = useState<ChatRoom[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')

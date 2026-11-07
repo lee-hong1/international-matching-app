@@ -35,7 +35,7 @@ export default function CreatorProfilePage() {
   const { userId } = useParams<{ userId: string }>()
   const { user } = useAuth()
   const router = useRouter()
-  const { lang } = useLanguage()
+  const { locale: lang } = useLanguage()
 
   const CATEGORY_LABELS: Record<string, string> = {
     lifestyle: t('explore.cat_lifestyle', lang),

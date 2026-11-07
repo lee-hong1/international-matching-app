@@ -15,7 +15,7 @@ const EVENT_TYPES: EventType[] = ['drink', 'meal', 'party']
 export default function CreateEventPage() {
   const { user, loading } = useAuth()
   const router = useRouter()
-  const { lang } = useLanguage()
+  const { locale: lang } = useLanguage()
   const [checkingPremium, setCheckingPremium] = useState(true)
   const [isPremium, setIsPremium] = useState(false)
   const [venues, setVenues] = useState<PartnerVenue[]>([])

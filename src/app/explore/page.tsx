@@ -31,7 +31,7 @@ const CATEGORY_KEYS = ['all', 'lifestyle', 'beauty', 'travel', 'food', 'fitness'
 export default function ExplorePage() {
   const { user, loading } = useAuth()
   const router = useRouter()
-  const { lang } = useLanguage()
+  const { locale: lang } = useLanguage()
 
   const CATEGORIES = CATEGORY_KEYS.map((key) => ({ key, label: t(`explore.cat_${key}`, lang) }))
   const [posts, setPosts] = useState<Post[]>([])
