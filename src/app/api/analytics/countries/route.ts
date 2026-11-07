@@ -26,61 +26,61 @@ export async function GET(req: NextRequest) {
   try {
     const start30dAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()
 
-    // 프로필에서 국가별 집계 (풀스캔 → DB 집계로 O(N) 방지)
-    const { data: profiles, error: profileErr } = await supabaseService
-      .from('profiles')
-      .select('country, is_premium, last_active_at')
-      .not('country', 'is', null)
-      .limit(50000) // 무한 풀스캔 방지
-
-    if (profileErr) throw profileErr
-
-    // JS 집계: 국가별 그룹핑
-    const byCountry: Record<string, {
+    // DB 집계: GROUP BY country (O(N) JS 집계 대신 DB 처리)
+    const { data: rows, error: profileErr } = await supabaseService.rpc('analytics_countries', {
+      p_since: start30dAgo,
+    }) as { data: Array<{
+      country: string
       user_count: number
       active_users: number
       premium_users: number
-    }> = {}
+    }> | null, error: unknown }
 
-    for (const p of profiles ?? []) {
-      const c = p.country as string
-      if (!c) continue
-      if (!byCountry[c]) byCountry[c] = { user_count: 0, active_users: 0, premium_users: 0 }
-      byCountry[c].user_count++
-      if (p.last_active_at && p.last_active_at >= start30dAgo) byCountry[c].active_users++
-      if (p.is_premium) byCountry[c].premium_users++
-    }
+    // RPC 미존재 시 fallback: select + JS (최대 10000행 제한)
+    if (profileErr) {
+      const { data: profiles, error: fallbackErr } = await supabaseService
+        .from('profiles')
+        .select('country, is_premium, last_active_at')
+        .not('country', 'is', null)
+        .limit(10000)
+      if (fallbackErr) throw fallbackErr
 
-    // 매칭 수 집계 (matches 테이블 미존재 시 0으로 처리)
-    const matchesByCountry: Record<string, number> = {}
-    try {
-      // matches 테이블이 없을 수 있으므로 에러 무시
-      const { data: matchData } = await supabaseService
-        .from('matches')
-        .select('user1_country, user2_country')
-        .limit(50000)
-      for (const m of matchData ?? []) {
-        if (m.user1_country) matchesByCountry[m.user1_country] = (matchesByCountry[m.user1_country] ?? 0) + 1
-        if (m.user2_country) matchesByCountry[m.user2_country] = (matchesByCountry[m.user2_country] ?? 0) + 1
+      const byCountry: Record<string, { user_count: number; active_users: number; premium_users: number }> = {}
+      for (const p of profiles ?? []) {
+        const c = p.country as string
+        if (!c) continue
+        if (!byCountry[c]) byCountry[c] = { user_count: 0, active_users: 0, premium_users: 0 }
+        byCountry[c].user_count++
+        if (p.last_active_at && p.last_active_at >= start30dAgo) byCountry[c].active_users++
+        if (p.is_premium) byCountry[c].premium_users++
       }
-    } catch {
-      // matches 테이블 없으면 0으로 유지
+      const result = Object.entries(byCountry)
+        .map(([country, s]) => ({
+          country,
+          user_count: s.user_count,
+          active_users: s.active_users,
+          matches_count: 0,
+          premium_users: s.premium_users,
+          average_engagement: s.user_count > 0 ? parseFloat(((s.active_users / s.user_count) * 100).toFixed(1)) : 0,
+        }))
+        .sort((a, b) => b.user_count - a.user_count)
+        .slice(0, 50)
+      return NextResponse.json(result)
     }
 
-    const result = Object.entries(byCountry)
-      .map(([country, stats]) => ({
-        country,
-        user_count: stats.user_count,
-        active_users: stats.active_users,
-        matches_count: matchesByCountry[country] ?? 0,
-        premium_users: stats.premium_users,
-        // 참여도 점수: 활성/전체 * 100 (간이 계산)
-        average_engagement: stats.user_count > 0
-          ? parseFloat(((stats.active_users / stats.user_count) * 100).toFixed(1))
+    const result = (rows ?? [])
+      .map((r) => ({
+        country: r.country,
+        user_count: Number(r.user_count),
+        active_users: Number(r.active_users),
+        matches_count: 0,
+        premium_users: Number(r.premium_users),
+        average_engagement: Number(r.user_count) > 0
+          ? parseFloat(((Number(r.active_users) / Number(r.user_count)) * 100).toFixed(1))
           : 0,
       }))
       .sort((a, b) => b.user_count - a.user_count)
-      .slice(0, 50) // 상위 50개 국가만 반환
+      .slice(0, 50)
 
     return NextResponse.json(result)
   } catch (error: unknown) {
