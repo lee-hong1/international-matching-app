@@ -1088,6 +1088,30 @@ const MESSAGES: Messages = {
   'match.w2_desc':    { ko: '한국어·영어·일본어·중국어 번역 지원.', en: 'Automatic translation in Korean, English, Japanese and Chinese.', ja: '韓国語・英語・日本語・中国語の自動翻訳。', zh: '支持韩语、英语、日语和中文自动翻译。' },
   'match.w3_title':   { ko: '안전한 환경',    en: 'Safe & Secure',       ja: '安心·安全な環境',   zh: '安全环境' },
   'match.w3_desc':    { ko: '24시간 모니터링과 신고 시스템 운영.',  en: '24/7 monitoring and reporting system in place.', ja: '24時間モニタリングと通報システムを運営。', zh: '24/7监控和举报系统。' },
+
+  // create post
+  'create_post.title':              { ko: '새 게시물',              en: 'New Post',                  ja: '新しい投稿',               zh: '新帖子' },
+  'create_post.close':              { ko: '닫기',                   en: 'Close',                     ja: '閉じる',                   zh: '关闭' },
+  'create_post.add_media':          { ko: '사진/영상 추가 (최대 10개)', en: 'Add photos/videos (max 10)', ja: '写真/動画を追加（最大10枚）', zh: '添加照片/视频（最多10张）' },
+  'create_post.caption_placeholder': { ko: '문구를 입력하세요... (선택)', en: 'Write a caption... (optional)', ja: 'キャプションを入力... (任意)', zh: '输入说明...（可选）' },
+  'create_post.location_placeholder': { ko: '위치 추가 (선택)',        en: 'Add location (optional)',   ja: '場所を追加 (任意)',          zh: '添加位置（可选）' },
+  'create_post.submit':             { ko: '게시하기',               en: 'Post',                      ja: '投稿する',                 zh: '发布' },
+  'create_post.submitting':         { ko: '게시 중...',             en: 'Posting...',                ja: '投稿中...',                zh: '发布中...' },
+  'create_post.no_media_error':     { ko: '사진 또는 영상을 추가하세요.', en: 'Please add a photo or video.', ja: '写真または動画を追加してください。', zh: '请添加照片或视频。' },
+  'create_post.fail_error':         { ko: '게시물 등록에 실패했습니다. 다시 시도해주세요.', en: 'Failed to create post. Please try again.', ja: '投稿に失敗しました。もう一度お試しください。', zh: '发布失败，请重试。' },
+
+  // create story
+  'create_story.title':             { ko: '스토리 추가',            en: 'Add Story',                 ja: 'ストーリーを追加',           zh: '添加故事' },
+  'create_story.subtitle':          { ko: '스토리는 24시간 후 자동으로 사라집니다.', en: 'Stories disappear after 24 hours.', ja: 'ストーリーは24時間後に自動的に消えます。', zh: '故事将在24小时后自动消失。' },
+  'create_story.select_media':      { ko: '사진 또는 영상 선택',     en: 'Select photo or video',     ja: '写真または動画を選択',         zh: '选择照片或视频' },
+  'create_story.max_size':          { ko: '최대 50MB',              en: 'Max 50MB',                  ja: '最大50MB',                 zh: '最大50MB' },
+  'create_story.caption_placeholder': { ko: '스토리 문구 (선택)',    en: 'Story caption (optional)',  ja: 'ストーリーの説明文 (任意)',   zh: '故事说明（可选）' },
+  'create_story.submit':            { ko: '스토리 올리기',           en: 'Share Story',               ja: 'ストーリーをシェア',          zh: '分享故事' },
+  'create_story.submitting':        { ko: '업로드 중...',            en: 'Uploading...',              ja: 'アップロード中...',           zh: '上传中...' },
+  'create_story.no_file_error':     { ko: '파일을 선택하세요.',       en: 'Please select a file.',     ja: 'ファイルを選択してください。', zh: '请选择文件。' },
+  'create_story.invalid_type_error': { ko: '이미지 또는 영상 파일만 업로드할 수 있습니다.', en: 'Only image or video files are allowed.', ja: '画像または動画ファイルのみアップロードできます。', zh: '只能上传图片或视频文件。' },
+  'create_story.size_error':        { ko: '파일 크기는 50MB 이하여야 합니다.', en: 'File size must be 50MB or less.', ja: 'ファイルサイズは50MB以下にしてください。', zh: '文件大小必须在50MB以下。' },
+  'create_story.fail_error':        { ko: '스토리 등록에 실패했습니다.', en: 'Failed to upload story.',  ja: 'ストーリーのアップロードに失敗しました。', zh: '故事上传失败。' },
 }
 
 /** 언어 코드를 지원 언어로 정규화 */

@@ -1,6 +1,8 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
+import { useLanguage } from '@/contexts/LanguageContext'
+import { t } from '@src/lib/i18n'
 
 interface CreateStoryProps {
   onClose: () => void
@@ -8,6 +10,7 @@ interface CreateStoryProps {
 }
 
 export default function CreateStory({ onClose, onStoryCreated }: CreateStoryProps) {
+  const { locale: lang } = useLanguage()
   const [file, setFile] = useState<File | null>(null)
   const [preview, setPreview] = useState<string | null>(null)
   const [caption, setCaption] = useState('')
@@ -23,11 +26,11 @@ export default function CreateStory({ onClose, onStoryCreated }: CreateStoryProp
   function handleFile(selected: File | null) {
     if (!selected) return
     if (!selected.type.startsWith('image/') && !selected.type.startsWith('video/')) {
-      setError('이미지 또는 영상 파일만 업로드할 수 있습니다.')
+      setError(t('create_story.invalid_type_error', lang))
       return
     }
     if (selected.size > 50 * 1024 * 1024) {
-      setError('파일 크기는 50MB 이하여야 합니다.')
+      setError(t('create_story.size_error', lang))
       return
     }
     if (preview) URL.revokeObjectURL(preview)
@@ -38,7 +41,7 @@ export default function CreateStory({ onClose, onStoryCreated }: CreateStoryProp
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (!file) { setError('파일을 선택하세요.'); return }
+    if (!file) { setError(t('create_story.no_file_error', lang)); return }
     setSubmitting(true)
     setError('')
     try {
@@ -48,11 +51,11 @@ export default function CreateStory({ onClose, onStoryCreated }: CreateStoryProp
       const res = await fetch('/api/stories', { method: 'POST', body: form })
       if (!res.ok) {
         const err = await res.json().catch(() => ({}))
-        throw new Error(err.error ?? '오류가 발생했습니다.')
+        throw new Error(err.error ?? t('create_story.fail_error', lang))
       }
       onStoryCreated()
     } catch (err) {
-      setError(err instanceof Error ? err.message : '스토리 등록에 실패했습니다.')
+      setError(err instanceof Error ? err.message : t('create_story.fail_error', lang))
       setSubmitting(false)
     }
   }
@@ -61,7 +64,7 @@ export default function CreateStory({ onClose, onStoryCreated }: CreateStoryProp
     <div
       role="dialog"
       aria-modal="true"
-      aria-label="스토리 추가"
+      aria-label={t('create_story.title', lang)}
       style={{
         position: 'fixed',
         inset: 0,
@@ -83,10 +86,10 @@ export default function CreateStory({ onClose, onStoryCreated }: CreateStoryProp
         padding: '1.25rem',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
-          <h2 style={{ margin: 0, fontSize: '1rem', fontWeight: 700 }}>스토리 추가</h2>
-          <button onClick={onClose} aria-label="닫기" style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.5rem', color: '#9ca3af', lineHeight: 1 }}>×</button>
+          <h2 style={{ margin: 0, fontSize: '1rem', fontWeight: 700 }}>{t('create_story.title', lang)}</h2>
+          <button onClick={onClose} aria-label={t('create_post.close', lang)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.5rem', color: '#9ca3af', lineHeight: 1 }}>×</button>
         </div>
-        <p style={{ margin: '0 0 1rem', fontSize: '0.825rem', color: '#6b7280' }}>스토리는 24시간 후 자동으로 사라집니다.</p>
+        <p style={{ margin: '0 0 1rem', fontSize: '0.825rem', color: '#6b7280' }}>{t('create_story.subtitle', lang)}</p>
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '0.875rem' }}>
           <div
@@ -112,8 +115,8 @@ export default function CreateStory({ onClose, onStoryCreated }: CreateStoryProp
             ) : (
               <div style={{ textAlign: 'center', color: '#9ca3af', padding: '1rem' }}>
                 <svg style={{ width: 40, height: 40, margin: '0 auto 8px' }} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M15 10l4.553-2.069A1 1 0 0121 8.869v6.262a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
-                <p style={{ fontSize: '0.85rem', margin: 0 }}>사진 또는 영상 선택</p>
-                <p style={{ fontSize: '0.75rem', margin: '4px 0 0', color: '#d1d5db' }}>최대 50MB</p>
+                <p style={{ fontSize: '0.85rem', margin: 0 }}>{t('create_story.select_media', lang)}</p>
+                <p style={{ fontSize: '0.75rem', margin: '4px 0 0', color: '#d1d5db' }}>{t('create_story.max_size', lang)}</p>
               </div>
             )}
           </div>
@@ -123,7 +126,7 @@ export default function CreateStory({ onClose, onStoryCreated }: CreateStoryProp
             value={caption}
             onChange={(e) => setCaption(e.target.value)}
             maxLength={200}
-            placeholder="스토리 문구 (선택)"
+            placeholder={t('create_story.caption_placeholder', lang)}
             style={{ padding: '0.625rem', borderRadius: 8, border: '1px solid #e5e7eb', fontSize: '0.9rem' }}
           />
 
@@ -145,7 +148,7 @@ export default function CreateStory({ onClose, onStoryCreated }: CreateStoryProp
               cursor: submitting || !file ? 'default' : 'pointer',
             }}
           >
-            {submitting ? '업로드 중...' : '스토리 올리기'}
+            {submitting ? t('create_story.submitting', lang) : t('create_story.submit', lang)}
           </button>
         </form>
       </div>

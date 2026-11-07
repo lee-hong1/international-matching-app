@@ -2,6 +2,8 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { postsService, type Post, type CreatePostData } from '@/lib/posts'
+import { useLanguage } from '@/contexts/LanguageContext'
+import { t } from '@src/lib/i18n'
 
 const MAX_IMAGE_BYTES = 20 * 1024 * 1024   // 20MB
 const MAX_VIDEO_BYTES = 200 * 1024 * 1024  // 200MB
@@ -12,6 +14,7 @@ interface CreatePostProps {
 }
 
 export default function CreatePost({ onClose, onPostCreated }: CreatePostProps) {
+  const { locale: lang } = useLanguage()
   const [caption, setCaption] = useState('')
   const [location, setLocation] = useState('')
   const [files, setFiles] = useState<File[]>([])
@@ -49,7 +52,7 @@ export default function CreatePost({ onClose, onPostCreated }: CreatePostProps) 
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (files.length === 0) { setError('사진 또는 영상을 추가하세요.'); return }
+    if (files.length === 0) { setError(t('create_post.no_media_error', lang)); return }
     setSubmitting(true)
     setError('')
     const { post, error: postError } = await postsService.createPost({
@@ -59,7 +62,7 @@ export default function CreatePost({ onClose, onPostCreated }: CreatePostProps) 
     } as CreatePostData)
     setSubmitting(false)
     if (postError || !post) {
-      setError(postError instanceof Error ? postError.message : '게시물 등록에 실패했습니다. 다시 시도해주세요.')
+      setError(postError instanceof Error ? postError.message : t('create_post.fail_error', lang))
       return
     }
     onPostCreated(post)
@@ -69,7 +72,7 @@ export default function CreatePost({ onClose, onPostCreated }: CreatePostProps) 
     <div
       role="dialog"
       aria-modal="true"
-      aria-label="새 게시물"
+      aria-label={t('create_post.title', lang)}
       style={{
         position: 'fixed',
         inset: 0,
@@ -91,8 +94,8 @@ export default function CreatePost({ onClose, onPostCreated }: CreatePostProps) 
         padding: '1.25rem',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
-          <h2 style={{ margin: 0, fontSize: '1rem', fontWeight: 700 }}>새 게시물</h2>
-          <button onClick={onClose} aria-label="닫기" style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.5rem', color: '#9ca3af', lineHeight: 1 }}>×</button>
+          <h2 style={{ margin: 0, fontSize: '1rem', fontWeight: 700 }}>{t('create_post.title', lang)}</h2>
+          <button onClick={onClose} aria-label={t('create_post.close', lang)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.5rem', color: '#9ca3af', lineHeight: 1 }}>×</button>
         </div>
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '0.875rem' }}>
@@ -116,7 +119,7 @@ export default function CreatePost({ onClose, onPostCreated }: CreatePostProps) 
             {previews.length === 0 ? (
               <div style={{ textAlign: 'center', color: '#9ca3af' }}>
                 <svg style={{ width: 40, height: 40, margin: '0 auto 8px' }} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                <p style={{ fontSize: '0.85rem', margin: 0 }}>사진/영상 추가 (최대 10개)</p>
+                <p style={{ fontSize: '0.85rem', margin: 0 }}>{t('create_post.add_media', lang)}</p>
               </div>
             ) : (
               previews.map((src, i) => (
@@ -137,7 +140,7 @@ export default function CreatePost({ onClose, onPostCreated }: CreatePostProps) 
             onChange={(e) => setCaption(e.target.value)}
             maxLength={2200}
             rows={3}
-            placeholder="문구를 입력하세요... (선택)"
+            placeholder={t('create_post.caption_placeholder', lang)}
             style={{ padding: '0.625rem', borderRadius: 8, border: '1px solid #e5e7eb', fontSize: '0.9rem', resize: 'vertical', fontFamily: 'inherit' }}
           />
 
@@ -145,7 +148,7 @@ export default function CreatePost({ onClose, onPostCreated }: CreatePostProps) 
             value={location}
             onChange={(e) => setLocation(e.target.value)}
             maxLength={100}
-            placeholder="위치 추가 (선택)"
+            placeholder={t('create_post.location_placeholder', lang)}
             style={{ padding: '0.625rem', borderRadius: 8, border: '1px solid #e5e7eb', fontSize: '0.9rem' }}
           />
 
@@ -167,7 +170,7 @@ export default function CreatePost({ onClose, onPostCreated }: CreatePostProps) 
               cursor: submitting || files.length === 0 ? 'default' : 'pointer',
             }}
           >
-            {submitting ? '게시 중...' : '게시하기'}
+            {submitting ? t('create_post.submitting', lang) : t('create_post.submit', lang)}
           </button>
         </form>
       </div>
