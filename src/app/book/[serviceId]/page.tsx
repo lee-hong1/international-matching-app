@@ -110,11 +110,15 @@ function BookingForm({ serviceId }: { serviceId: string }) {
         setError(t('book.slot_taken', lang))
         return
       }
+      const data = await res.json()
       if (!res.ok) {
-        setError(t('error.generic', lang))
+        if (data.redirect) {
+          router.push(data.redirect)
+          return
+        }
+        setError(data.error ?? t('error.generic', lang))
         return
       }
-      const data = await res.json()
       setBookingId(data.id)
       setStep('success')
     } catch {

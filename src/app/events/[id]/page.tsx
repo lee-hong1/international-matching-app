@@ -110,6 +110,10 @@ function EventDetailContent() {
       const data = await res.json()
 
       if (!res.ok) {
+        if (data.redirect) {
+          router.push(data.redirect)
+          return
+        }
         setError(data.error ?? t('detail_apply_failed'))
         return
       }
