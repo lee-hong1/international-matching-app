@@ -125,7 +125,7 @@ export async function PATCH(
 
   const { data: boost, error: boostError } = await supabaseService
     .from('event_boosts')
-    .select('*')
+    .select('id, event_id, host_id, amount, toss_order_id, status, expires_at')
     .eq('toss_order_id', orderId)
     .eq('host_id', user.id)
     .single()
