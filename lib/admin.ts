@@ -48,22 +48,16 @@ export interface ReportManagement {
 }
 
 export const adminService = {
-  // 관리자 권한 확인
-  async checkAdminRole(userId: string): Promise<boolean> {
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('email')
-      .eq('id', userId)
-      .single()
-
-    if (error || !data) {
+  // 관리자 권한 확인 — 서버사이드 API 호출 (ADMIN_EMAILS env var 클라이언트 노출 방지)
+  async checkAdminRole(_userId: string): Promise<boolean> {
+    try {
+      const res = await fetch('/api/admin/check-role', { credentials: 'include' })
+      if (!res.ok) return false
+      const data = await res.json()
+      return Boolean(data.isAdmin)
+    } catch {
       return false
     }
-
-    // ADMIN_EMAILS는 서버사이드 전용 env var (NEXT_PUBLIC_ 없음)
-    const adminEmails = (process.env.ADMIN_EMAILS ?? process.env.NEXT_PUBLIC_ADMIN_EMAILS ?? '')
-      .split(',').map((e) => e.trim()).filter(Boolean)
-    return adminEmails.includes(data.email)
   },
 
   // 대시보드 통계 가져오기
