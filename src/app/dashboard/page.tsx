@@ -1,27 +1,16 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useEffect } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-
-interface UserProfile {
-  id: string
-  full_name: string
-  avatar_url?: string
-  country: string
-  age: number
-  verification_status: string
-  is_premium: boolean
-  last_active: string
-}
+import { useLanguage } from '@/contexts/LanguageContext'
+import { t } from '@src/lib/i18n'
 
 export default function Dashboard() {
   const { user, loading } = useAuth()
   const router = useRouter()
-  const [profile, setProfile] = useState<UserProfile | null>(null)
-  const [matches, setMatches] = useState([])
-  const [messages, setMessages] = useState([])
+  const { locale: lang } = useLanguage()
 
   useEffect(() => {
     if (!loading && !user) {
@@ -41,6 +30,8 @@ export default function Dashboard() {
     return null
   }
 
+  const displayName = user.user_metadata?.full_name || user.email || ''
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* 헤더 */}
@@ -53,12 +44,12 @@ export default function Dashboard() {
               </Link>
             </div>
             <nav className="flex items-center space-x-6">
-              <Link href="/dashboard" className="text-purple-600 font-medium">대시보드</Link>
-              <Link href="/feed" className="text-gray-600 hover:text-purple-600">피드</Link>
-              <Link href="/explore" className="text-gray-600 hover:text-purple-600">탐색</Link>
-              <Link href="/discover" className="text-gray-600 hover:text-purple-600">매칭</Link>
-              <Link href="/messages" className="text-gray-600 hover:text-purple-600">메시지</Link>
-              <Link href={`/creator/${user?.id ?? ''}`} className="text-gray-600 hover:text-purple-600">내 채널</Link>
+              <Link href="/dashboard" className="text-purple-600 font-medium">{t('nav.dashboard', lang)}</Link>
+              <Link href="/feed" className="text-gray-600 hover:text-purple-600">{t('nav.feed', lang)}</Link>
+              <Link href="/explore" className="text-gray-600 hover:text-purple-600">{t('nav.explore', lang)}</Link>
+              <Link href="/discover" className="text-gray-600 hover:text-purple-600">{t('nav.discover', lang)}</Link>
+              <Link href="/messages" className="text-gray-600 hover:text-purple-600">{t('nav.messages', lang)}</Link>
+              <Link href={`/creator/${user?.id ?? ''}`} className="text-gray-600 hover:text-purple-600">{t('nav.my_channel', lang)}</Link>
             </nav>
           </div>
         </div>
@@ -67,11 +58,11 @@ export default function Dashboard() {
       {/* 메인 콘텐츠 */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">대시보드</h1>
-          <p className="text-gray-600">안녕하세요, {user.user_metadata?.full_name || user.email}님!</p>
+          <h1 className="text-3xl font-bold text-gray-900">{t('dashboard.title', lang)}</h1>
+          <p className="text-gray-600">{t('dashboard.greeting', lang, { name: displayName })}</p>
         </div>
 
-        {/* 통계 카드 */}
+        {/* 통계 카드 (더미 데이터 — TODO: 실제 API 연동 필요) */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <div className="bg-white p-6 rounded-lg shadow">
             <div className="flex items-center">
@@ -81,7 +72,7 @@ export default function Dashboard() {
                 </svg>
               </div>
               <div className="ml-4">
-                <p className="text-sm text-gray-600">프로필 조회수</p>
+                <p className="text-sm text-gray-600">{t('dashboard.stat_views', lang)}</p>
                 <p className="text-2xl font-semibold text-gray-900">127</p>
               </div>
             </div>
@@ -95,7 +86,7 @@ export default function Dashboard() {
                 </svg>
               </div>
               <div className="ml-4">
-                <p className="text-sm text-gray-600">받은 좋아요</p>
+                <p className="text-sm text-gray-600">{t('dashboard.stat_likes', lang)}</p>
                 <p className="text-2xl font-semibold text-gray-900">23</p>
               </div>
             </div>
@@ -109,7 +100,7 @@ export default function Dashboard() {
                 </svg>
               </div>
               <div className="ml-4">
-                <p className="text-sm text-gray-600">새 메시지</p>
+                <p className="text-sm text-gray-600">{t('dashboard.stat_messages', lang)}</p>
                 <p className="text-2xl font-semibold text-gray-900">5</p>
               </div>
             </div>
@@ -123,7 +114,7 @@ export default function Dashboard() {
                 </svg>
               </div>
               <div className="ml-4">
-                <p className="text-sm text-gray-600">매칭 수</p>
+                <p className="text-sm text-gray-600">{t('dashboard.stat_matches', lang)}</p>
                 <p className="text-2xl font-semibold text-gray-900">12</p>
               </div>
             </div>
@@ -134,9 +125,9 @@ export default function Dashboard() {
           {/* 최근 매칭 */}
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold text-gray-900">최근 매칭</h2>
+              <h2 className="text-xl font-semibold text-gray-900">{t('dashboard.recent_matches', lang)}</h2>
               <Link href="/matches" className="text-purple-600 hover:text-purple-500 text-sm font-medium">
-                모두 보기
+                {t('dashboard.view_all', lang)}
               </Link>
             </div>
             <div className="space-y-4">
@@ -145,10 +136,10 @@ export default function Dashboard() {
                   <div className="w-12 h-12 bg-gray-200 rounded-full"></div>
                   <div className="flex-1">
                     <p className="font-medium text-gray-900">Maria Rodriguez</p>
-                    <p className="text-sm text-gray-600">스페인, 28세</p>
+                    <p className="text-sm text-gray-600">Spain, 28</p>
                   </div>
                   <button className="bg-purple-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-purple-700">
-                    메시지
+                    {t('dashboard.message_btn', lang)}
                   </button>
                 </div>
               ))}
@@ -157,27 +148,27 @@ export default function Dashboard() {
 
           {/* 최근 활동 */}
           <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">최근 활동</h2>
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">{t('dashboard.recent_activity', lang)}</h2>
             <div className="space-y-4">
               <div className="flex items-start space-x-3">
                 <div className="w-2 h-2 bg-green-400 rounded-full mt-2"></div>
                 <div>
-                  <p className="text-gray-900">새로운 매칭이 있습니다!</p>
-                  <p className="text-sm text-gray-600">2시간 전</p>
+                  <p className="text-gray-900">{t('dashboard.activity_new_match', lang)}</p>
+                  <p className="text-sm text-gray-600">{t('dashboard.time_2h_ago', lang)}</p>
                 </div>
               </div>
               <div className="flex items-start space-x-3">
                 <div className="w-2 h-2 bg-blue-400 rounded-full mt-2"></div>
                 <div>
-                  <p className="text-gray-900">프로필을 조회했습니다</p>
-                  <p className="text-sm text-gray-600">4시간 전</p>
+                  <p className="text-gray-900">{t('dashboard.activity_profile_view', lang)}</p>
+                  <p className="text-sm text-gray-600">{t('dashboard.time_4h_ago', lang)}</p>
                 </div>
               </div>
               <div className="flex items-start space-x-3">
                 <div className="w-2 h-2 bg-purple-400 rounded-full mt-2"></div>
                 <div>
-                  <p className="text-gray-900">메시지를 받았습니다</p>
-                  <p className="text-sm text-gray-600">1일 전</p>
+                  <p className="text-gray-900">{t('dashboard.activity_new_message', lang)}</p>
+                  <p className="text-sm text-gray-600">{t('dashboard.time_1d_ago', lang)}</p>
                 </div>
               </div>
             </div>
@@ -186,7 +177,7 @@ export default function Dashboard() {
 
         {/* 프로필 완성도 */}
         <div className="mt-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg shadow p-6 text-white">
-          <h2 className="text-xl font-semibold mb-4">프로필 완성도</h2>
+          <h2 className="text-xl font-semibold mb-4">{t('dashboard.profile_completion', lang)}</h2>
           <div className="flex items-center space-x-4">
             <div className="flex-1">
               <div className="bg-white bg-opacity-20 rounded-full h-3">
@@ -196,10 +187,10 @@ export default function Dashboard() {
             <span className="text-lg font-semibold">75%</span>
           </div>
           <p className="mt-4 text-white text-opacity-90">
-            프로필을 완성하여 더 많은 매칭 기회를 얻으세요!
+            {t('dashboard.completion_cta', lang)}
           </p>
           <Link href="/profile/edit" className="inline-block mt-4 bg-white text-purple-600 px-4 py-2 rounded-lg font-semibold hover:bg-gray-100">
-            프로필 완성하기
+            {t('dashboard.complete_profile', lang)}
           </Link>
         </div>
       </main>
