@@ -70,12 +70,12 @@ export async function POST(
     return NextResponse.json({ error: 'Already applied to this event', participant: existing }, { status: 409 })
   }
 
-  // 무료 이벤트: 결제 없이 바로 신청 등록 (승인 대기)
+  // 무료 이벤트: 결제 없이 바로 신청 등록 (호스트 승인 대기)
   if (!event.fee_per_person || event.fee_per_person === 0) {
     const { data: participant, error } = await supabaseService
       .from('event_participants')
-      .insert({ event_id: eventId, user_id: user.id, status: 'pending_payment' })
-      .select()
+      .insert({ event_id: eventId, user_id: user.id, status: 'pending' })
+      .select('id, event_id, user_id, status, created_at')
       .single()
 
     if (error) {
@@ -117,7 +117,7 @@ export async function POST(
   const { data: participant, error: participantError } = await supabaseService
     .from('event_participants')
     .insert({ event_id: eventId, user_id: user.id, status: 'pending_payment', payment_id: payment.id })
-    .select()
+    .select('id, event_id, user_id, status, payment_id, created_at')
     .single()
 
   if (participantError) {
