@@ -58,11 +58,13 @@ export const postsService = {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return []
 
-    // 팔로잉 중인 사용자의 게시물 + 본인 게시물
+    // 팔로잉 중인 사용자의 게시물 + 본인 게시물 (최근 팔로우 500명 — IN 절 크기 제한)
     const { data: followingData } = await supabase
       .from('follows')
       .select('following_id')
       .eq('follower_id', user.id)
+      .order('created_at', { ascending: false })
+      .limit(500)
 
     const followingIds = followingData?.map((f) => f.following_id) ?? []
     const feedUserIds = [user.id, ...followingIds]
