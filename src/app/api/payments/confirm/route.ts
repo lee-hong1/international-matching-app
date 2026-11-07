@@ -63,6 +63,21 @@ export async function POST(request: NextRequest) {
     }
 
     if (paymentRecord.payment_status === 'completed') {
+      // 원장 항목이 누락되었을 경우 복구 (ledger insert 실패 후 재시도 시 적용)
+      if (paymentRecord.platform_fee_amount != null && paymentRecord.host_payout_amount != null) {
+        const ev = paymentRecord.events
+        const healEntries: any[] = [
+          { payment_id: paymentRecord.id, recipient_type: 'platform', recipient_id: null, amount: paymentRecord.platform_fee_amount },
+          { payment_id: paymentRecord.id, recipient_type: 'host', recipient_id: ev?.host_id ?? null, amount: paymentRecord.host_payout_amount },
+        ]
+        if (ev?.venue_type === 'partner' && ev.venue_id && paymentRecord.venue_commission_amount) {
+          healEntries.push({ payment_id: paymentRecord.id, recipient_type: 'venue', recipient_id: ev.venue_id, amount: paymentRecord.venue_commission_amount })
+        }
+        await supabaseService
+          .from('commission_ledger')
+          .upsert(healEntries, { onConflict: 'payment_id,recipient_type', ignoreDuplicates: true })
+          .then(null, () => null) // fire-and-forget: 복구 실패는 성공 응답에 영향 없음
+      }
       return NextResponse.json({ success: true, payment: paymentRecord })
     }
 
@@ -154,9 +169,12 @@ export async function POST(request: NextRequest) {
         amount: breakdown.venueCommissionAmount,
       })
     }
-    const { error: ledgerErr } = await supabaseService.from('commission_ledger').insert(ledgerEntries)
+    // upsert: UNIQUE(payment_id, recipient_type) 제약으로 중복 삽입 방지 (멱등성)
+    const { error: ledgerErr } = await supabaseService
+      .from('commission_ledger')
+      .upsert(ledgerEntries, { onConflict: 'payment_id,recipient_type', ignoreDuplicates: true })
     if (ledgerErr) {
-      console.error('[payments/confirm] ledger insert failed:', ledgerErr.code)
+      console.error('[payments/confirm] ledger upsert failed:', ledgerErr.code)
     }
 
     return NextResponse.json({ success: true, breakdown })
