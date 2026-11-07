@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getAuthUser, supabaseService as supabase } from '@src/lib/commerce'
+import { getAuthUser, supabaseService as supabase, hasForbiddenContent } from '@src/lib/commerce'
 import { isSuspended } from '@src/lib/suspended-check'
 import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
 import { detectExternalPlatform } from '@src/lib/chat-safety'
@@ -92,6 +92,9 @@ export async function PATCH(req: NextRequest) {
     const bio = updates.bio
     if (bio !== null && (typeof bio !== 'string' || bio.length > 500)) {
       return NextResponse.json({ error: 'bio must be under 500 characters' }, { status: 400 })
+    }
+    if (bio && hasForbiddenContent(bio)) {
+      return NextResponse.json({ error: 'Bio contains prohibited content' }, { status: 400 })
     }
     if (bio && detectExternalPlatform(bio)) {
       return NextResponse.json({ error: 'External platform references not allowed in bio' }, { status: 400 })
