@@ -6,9 +6,12 @@ import { useRouter, useParams } from 'next/navigation'
 import { chatService, Message, ChatRoom } from '@/lib/chat'
 import Image from 'next/image'
 import { RealtimeChannel } from '@supabase/supabase-js'
+import { useLanguage } from '@/contexts/LanguageContext'
+import { t } from '@src/lib/i18n'
 
 export default function ChatPage() {
   const { user, loading } = useAuth()
+  const { locale: lang } = useLanguage()
   const router = useRouter()
   const rawParams = useParams()
   const params = { roomId: rawParams.roomId as string }
@@ -124,15 +127,12 @@ export default function ChatPage() {
     yesterday.setDate(today.getDate() - 1)
 
     if (date.toDateString() === today.toDateString()) {
-      return '오늘'
+      return t('messages.today', lang)
     } else if (date.toDateString() === yesterday.toDateString()) {
-      return '어제'
+      return t('messages.yesterday', lang)
     } else {
-      return date.toLocaleDateString('ko-KR', { 
-        year: 'numeric', 
-        month: 'long', 
-        day: 'numeric' 
-      })
+      const locale = lang === 'ko' ? 'ko-KR' : lang === 'ja' ? 'ja-JP' : lang === 'zh' ? 'zh-CN' : 'en-US'
+      return date.toLocaleDateString(locale, { year: 'numeric', month: 'long', day: 'numeric' })
     }
   }
 
@@ -299,7 +299,7 @@ export default function ChatPage() {
                 <textarea
                   value={newMessage}
                   onChange={(e) => setNewMessage(e.target.value)}
-                  placeholder="메시지를 입력하세요..."
+                  placeholder={t('messages.input_placeholder', lang)}
                   rows={1}
                   className="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 resize-none"
                   style={{ minHeight: '44px', maxHeight: '120px' }}

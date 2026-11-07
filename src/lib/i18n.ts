@@ -740,6 +740,9 @@ const MESSAGES: Messages = {
   'messages.tip_2': { ko: '상대방의 프로필을 참고해서 공통 관심사를 찾아보세요', en: "Check their profile to find common interests", ja: '相手のプロフィールを参考に共通の趣味を探しましょう', zh: '参考对方资料，寻找共同兴趣' },
   'messages.tip_3': { ko: '번역 기능을 사용해 언어 장벽을 극복하세요', en: 'Use translation to break language barriers', ja: '翻訳機能を使って言語の壁を乗り越えましょう', zh: '使用翻译功能打破语言障碍' },
   'messages.tip_4': { ko: '개인정보는 충분히 알게 된 후에 공유하세요', en: 'Share personal information only when you feel comfortable', ja: '十分信頼できると感じてから個人情報をシェアしましょう', zh: '充分了解对方后再分享个人信息' },
+  'messages.today': { ko: '오늘', en: 'Today', ja: '今日', zh: '今天' },
+  'messages.yesterday': { ko: '어제', en: 'Yesterday', ja: '昨日', zh: '昨天' },
+  'messages.input_placeholder': { ko: '메시지를 입력하세요...', en: 'Type a message...', ja: 'メッセージを入力...', zh: '输入消息...' },
 
   // ── 헤더 네비게이션 (추가) ──────────────────────────────────────────────
   'nav.dashboard': { ko: '대시보드', en: 'Dashboard', ja: 'ダッシュボード', zh: '仪表板' },
