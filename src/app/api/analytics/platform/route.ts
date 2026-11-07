@@ -18,8 +18,8 @@ export async function GET(req: NextRequest) {
 
   // 관리자 이메일 체크
   const adminEmails = (process.env.ADMIN_EMAILS ?? '')
-    .split(',').map((e) => e.trim()).filter(Boolean)
-  if (!adminEmails.includes(user.email ?? '')) {
+    .split(',').map((e) => e.trim().toLowerCase()).filter(Boolean)
+  if (!adminEmails.includes((user.email ?? '').toLowerCase())) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 

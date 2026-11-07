@@ -104,9 +104,10 @@ export async function POST(request: NextRequest) {
   }
 
   const isVideo = media.type.startsWith('video/')
-  const isImage = media.type.startsWith('image/')
+  // SVG 차단: image/svg+xml 은 <script> 실행 가능 → XSS 벡터
+  const isImage = media.type.startsWith('image/') && media.type !== 'image/svg+xml'
   if (!isVideo && !isImage) {
-    return NextResponse.json({ error: 'Only image or video files are allowed' }, { status: 400 })
+    return NextResponse.json({ error: 'Only image or video files are allowed (SVG not permitted)' }, { status: 400 })
   }
 
   const ext = media.type.split('/')[1]?.split(';')[0] ?? (isVideo ? 'mp4' : 'jpg')
