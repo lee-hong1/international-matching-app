@@ -208,9 +208,14 @@ async function handleHostPageRoute(request: NextRequest): Promise<NextResponse> 
     const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey)
     const { data: profile } = await supabaseAdmin
       .from('profiles')
-      .select('is_adult')
+      .select('is_adult, is_suspended')
       .eq('id', user.id)
       .single()
+
+    // DB 최신 정지 상태 확인 — JWT 클레임 지연(최대 1시간) 보완
+    if (profile?.is_suspended === true) {
+      return NextResponse.redirect(new URL('/suspended', request.url))
+    }
 
     if (!profile || profile.is_adult !== true) {
       // 페이지 라우트: 403 대신 연령 인증 페이지로 리디렉션
