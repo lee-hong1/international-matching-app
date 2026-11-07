@@ -22,6 +22,16 @@ const EXTERNAL_PLATFORM_PATTERNS: readonly string[] = [
   'skype',
   'discord.gg',
   'discord.com/invite',
+  // 직접 결제 우회 채널 (에스크로 외부 거래 방지)
+  'paypal.me',
+  'paypal.com/send',
+  'venmo.com',
+  '@venmo',
+  'cash.app',
+  '$cashtag',
+  'alipay.com',
+  'pay.weixin',
+  'toss.im',
 ]
 
 /**

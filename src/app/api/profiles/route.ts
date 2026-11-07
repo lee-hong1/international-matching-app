@@ -70,6 +70,9 @@ export async function PATCH(req: NextRequest) {
     if (typeof dn !== 'string' || dn.trim().length < 1 || dn.trim().length > 50) {
       return NextResponse.json({ error: 'display_name must be 1-50 characters' }, { status: 400 })
     }
+    if (hasForbiddenContent(dn)) {
+      return NextResponse.json({ error: 'Display name contains prohibited content' }, { status: 400 })
+    }
     updates.display_name = dn.trim()
   }
 
