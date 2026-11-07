@@ -234,7 +234,13 @@ export const postsService = {
     }))
 
     if (mediaInserts.length > 0) {
-      await supabase.from('post_media').insert(mediaInserts)
+      const { error: mediaError } = await supabase.from('post_media').insert(mediaInserts)
+      if (mediaError) {
+        // 미디어 삽입 실패 시 post 행과 업로드 파일 모두 롤백
+        await supabase.from('posts').delete().eq('id', post.id).eq('user_id', user.id)
+        await supabase.storage.from('post-media').remove(uploadResults.map((r) => r.filePath))
+        return { post: null, error: mediaError }
+      }
     }
 
     const fullPost = await postsService.getPost(post.id)
