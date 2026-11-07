@@ -202,7 +202,10 @@ export async function PATCH(
     void (async () => {
       try {
         const baseUrl = process.env.NEXT_PUBLIC_SITE_URL
-        if (!baseUrl) return
+        if (!baseUrl) {
+          console.error('[bookings/status] NEXT_PUBLIC_SITE_URL not set — commission not recorded for booking', id)
+          return
+        }
         const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY ?? ''
         await fetch(`${baseUrl}/api/commissions`, {
           method: 'POST',

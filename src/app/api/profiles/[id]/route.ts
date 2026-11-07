@@ -3,9 +3,11 @@ import Stripe from 'stripe'
 import { isValidUuid, getAuthUser, supabaseService } from '@src/lib/commerce'
 import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY ?? 'sk_test_placeholder', {
-  apiVersion: '2025-07-30.basil',
-})
+function getStripe(): Stripe | null {
+  const key = process.env.STRIPE_SECRET_KEY
+  if (!key) return null
+  return new Stripe(key, { apiVersion: '2025-07-30.basil' })
+}
 
 // GET /api/profiles/:id — 공개 프로필 (email/birth_date 미포함)
 export async function GET(
@@ -111,7 +113,10 @@ export async function DELETE(
         activeSubs.map(async (sub) => {
           if (sub.stripe_subscription_id) {
             try {
-              await stripe.subscriptions.cancel(sub.stripe_subscription_id)
+              const stripeClient = getStripe()
+              if (stripeClient) {
+                await stripeClient.subscriptions.cancel(sub.stripe_subscription_id)
+              }
             } catch (e) {
               console.error('[profiles DELETE] stripe cancel failed:', (e as Error).message)
             }

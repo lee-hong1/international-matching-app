@@ -44,6 +44,9 @@ export async function GET(req: NextRequest) {
         .not('country', 'is', null)
         .limit(10000)
       if (fallbackErr) throw fallbackErr
+      if ((profiles?.length ?? 0) >= 10000) {
+        console.error('[analytics/countries] fallback query hit 10000-row cap — upgrade to rpc analytics_countries')
+      }
 
       const byCountry: Record<string, { user_count: number; active_users: number; premium_users: number }> = {}
       for (const p of profiles ?? []) {
