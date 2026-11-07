@@ -14,6 +14,8 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
   const userId = searchParams.get('userId')
   const type = searchParams.get('type') ?? 'followers'
+  const rawLimit = parseInt(searchParams.get('limit') ?? '20', 10)
+  const limit = Math.min(Number.isFinite(rawLimit) && rawLimit > 0 ? rawLimit : 20, 200)
 
   if (!userId) {
     return NextResponse.json({ error: 'userId is required' }, { status: 400 })
@@ -55,7 +57,7 @@ export async function GET(request: NextRequest) {
       `)
       .eq(column, userId)
       .order('created_at', { ascending: false })
-      .limit(20)
+      .limit(limit)
 
     if (error) {
       console.error('[follows GET] db error:', error.code)

@@ -255,7 +255,7 @@ export default function ProfileEditPage() {
               type="text"
               value={interestsText}
               onChange={e => setInterestsText(e.target.value)}
-              placeholder="e.g. travel, music, coffee"
+              placeholder={t('profile.interests_placeholder', lang)}
               className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
             />
           </div>

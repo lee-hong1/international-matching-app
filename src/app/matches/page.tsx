@@ -43,8 +43,8 @@ export default function MatchesPage() {
     try {
       // Fetch both following and followers in parallel
       const [followingRes, followersRes] = await Promise.all([
-        fetch(`/api/follows?userId=${user.id}&type=following`),
-        fetch(`/api/follows?userId=${user.id}&type=followers`),
+        fetch(`/api/follows?userId=${user.id}&type=following&limit=200`),
+        fetch(`/api/follows?userId=${user.id}&type=followers&limit=200`),
       ])
 
       if (!followingRes.ok || !followersRes.ok) {

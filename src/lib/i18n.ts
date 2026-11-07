@@ -783,6 +783,7 @@ const MESSAGES: Messages = {
   'profile.city': { ko: '도시', en: 'City', ja: '都市', zh: '城市' },
   'profile.preferred_lang': { ko: '사용 언어', en: 'Preferred Language', ja: '使用言語', zh: '首选语言' },
   'profile.interests': { ko: '관심사 (쉼표로 구분)', en: 'Interests (comma-separated)', ja: '興味（カンマ区切り）', zh: '兴趣（逗号分隔）' },
+  'profile.interests_placeholder': { ko: '여행, 음악, 커피 등', en: 'e.g. travel, music, coffee', ja: '旅行、音楽、コーヒーなど', zh: '例如：旅行、音乐、咖啡' },
   'profile.save': { ko: '저장', en: 'Save', ja: '保存', zh: '保存' },
   'profile.saved': { ko: '프로필이 업데이트되었습니다.', en: 'Profile updated.', ja: 'プロフィールを更新しました。', zh: '资料已更新。' },
   'profile.saving': { ko: '저장 중…', en: 'Saving…', ja: '保存中…', zh: '保存中…' },

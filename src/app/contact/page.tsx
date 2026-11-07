@@ -18,20 +18,16 @@ export default function ContactPage() {
     setIsSending(true)
     setError('')
     try {
-      // Sends via internal email API
-      const res = await fetch('/api/email/send', {
+      const res = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          to: 'support@globalmatch.app',
-          subject: `[Contact] ${form.subject}: ${form.name}`,
-          text: `From: ${form.name} <${form.email}>\n\n${form.message}`,
-        }),
+        body: JSON.stringify(form),
       })
       if (res.ok) {
         setSent(true)
       } else {
-        setError('Failed to send. Please email us directly at support@globalmatch.app')
+        const data = await res.json().catch(() => ({}))
+        setError(data.error ?? 'Failed to send. Please email us directly at support@globalmatch.app')
       }
     } catch {
       setError('Network error. Please email us directly at support@globalmatch.app')
