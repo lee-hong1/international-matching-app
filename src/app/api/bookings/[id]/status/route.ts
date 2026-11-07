@@ -179,17 +179,21 @@ export async function PATCH(
     return NextResponse.json({ error: 'Payment must be completed before marking booking as done' }, { status: 400 })
   }
 
-  // ── 상태 업데이트 ─────────────────────────────────────────────────────────
+  // ── 상태 업데이트 (atomic: current status 조건 추가로 race condition 방지) ──
   const { data: updated, error: updateErr } = await supabaseService
     .from('bookings')
     .update({ status: newStatus })
     .eq('id', id)
+    .eq('status', currentStatus)
     .select('id, status, updated_at')
-    .single()
+    .maybeSingle()
 
   if (updateErr) {
     console.error('[bookings/status PATCH] update error:', updateErr.code)
     return NextResponse.json({ error: 'Failed to update booking status' }, { status: 500 })
+  }
+  if (!updated) {
+    return NextResponse.json({ error: 'Booking status was already changed by another request' }, { status: 409 })
   }
 
   // completed → 커미션 자동 생성 (fire-and-forget)
