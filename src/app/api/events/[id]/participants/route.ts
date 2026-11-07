@@ -107,15 +107,13 @@ export async function PATCH(
   }
 
   // 신청자에게 알림 발송 (fire-and-forget)
-  const notifTitle = action === 'approved' ? '이벤트 신청 승인' : '이벤트 신청 거절'
-  const notifBody = action === 'approved'
-    ? '이벤트 참가 신청이 승인되었습니다.'
-    : '이벤트 참가 신청이 거절되었습니다.'
   void supabaseService.from('notifications').insert({
     user_id: participant.user_id,
     type: 'system',
-    title: notifTitle,
-    body: notifBody,
+    title: action === 'approved' ? 'Event application approved' : 'Event application rejected',
+    body: action === 'approved'
+      ? 'Your event application has been approved.'
+      : 'Your event application has been rejected.',
     is_read: false,
   })
 
