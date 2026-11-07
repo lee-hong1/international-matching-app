@@ -81,6 +81,18 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: true, payment: paymentRecord })
     }
 
+    // processing 상태 고착 복구: 5분 이상 processing 중이면 재시도 허용 (Toss 성공 후 DB 오류로 고착된 경우)
+    const PROCESSING_STALE_MS = 5 * 60 * 1000
+    if (paymentRecord.payment_status === 'processing') {
+      const updatedAt = new Date(paymentRecord.updated_at ?? paymentRecord.created_at).getTime()
+      if (Date.now() - updatedAt < PROCESSING_STALE_MS) {
+        return NextResponse.json({ error: 'Payment is already being processed' }, { status: 409 })
+      }
+      // 5분 이상 고착: pending으로 복원 후 재시도 허용
+      await supabaseService.from('payments').update({ payment_status: 'pending' }).eq('id', paymentRecord.id)
+      paymentRecord.payment_status = 'pending'
+    }
+
     // 원자적 잠금: pending → processing (동시 요청이 Toss API를 2번 호출하는 race condition 방지)
     // 다른 요청이 이미 processing 중이면 0 rows 반환 → 409
     const { data: locked, error: lockErr } = await supabaseService
@@ -120,8 +132,11 @@ export async function POST(request: NextRequest) {
       } catch {
         console.error('[payments/confirm] toss error: non-JSON response', tossRes.status)
       }
-      await supabaseService.from('payments').update({ payment_status: 'failed' }).eq('id', locked.id)
-      return NextResponse.json({ error: 'Payment confirmation failed' }, { status: 400 })
+      // ALREADY_PROCESSED_PAYMENT: 재시도 경로에서 Toss가 이미 처리됨 → 완료 처리 계속 진행
+      if (tossCode !== 'ALREADY_PROCESSED_PAYMENT') {
+        await supabaseService.from('payments').update({ payment_status: 'failed' }).eq('id', locked.id)
+        return NextResponse.json({ error: 'Payment confirmation failed' }, { status: 400 })
+      }
     }
 
     // 수수료 분배 계산
@@ -142,7 +157,9 @@ export async function POST(request: NextRequest) {
       .eq('id', paymentRecord.id)
 
     if (payUpdateErr) {
-      console.error('[payments/confirm] payment record update failed:', payUpdateErr.code, 'payment_id:', paymentRecord.id)
+      // Toss 결제 성공 후 DB 업데이트 실패 → 수동 조정 필요. 상태를 reconcile_needed로 표시
+      console.error('[payments/confirm] payment record update failed — Toss already charged, needs reconciliation. code:', payUpdateErr.code, 'payment_id:', paymentRecord.id, 'paymentKey:', paymentKey.substring(0, 12))
+      void supabaseService.from('payments').update({ payment_status: 'reconcile_needed' }).eq('id', paymentRecord.id)
       return NextResponse.json({ error: 'Failed to record payment completion' }, { status: 500 })
     }
 
