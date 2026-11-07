@@ -128,6 +128,36 @@ export async function DELETE(
     // 구독 취소 실패는 계정 삭제를 막지 않음 (best-effort)
   }
 
+  // Stories 미디어 스토리지 삭제 — GDPR Art.17 (업로드 경로: {userId}/{timestamp}.{ext})
+  try {
+    const { data: storyFiles } = await supabaseService.storage
+      .from('stories')
+      .list(id)
+    if (storyFiles && storyFiles.length > 0) {
+      await supabaseService.storage
+        .from('stories')
+        .remove(storyFiles.map((f) => `${id}/${f.name}`))
+    }
+  } catch {
+    // best-effort
+  }
+
+  // Post 미디어 스토리지 삭제 (버킷 이름 'post_media' 또는 'posts')
+  for (const bucket of ['post_media', 'posts']) {
+    try {
+      const { data: postFiles } = await supabaseService.storage
+        .from(bucket)
+        .list(id)
+      if (postFiles && postFiles.length > 0) {
+        await supabaseService.storage
+          .from(bucket)
+          .remove(postFiles.map((f) => `${id}/${f.name}`))
+      }
+    } catch {
+      // bucket이 없거나 파일 없으면 무시 (best-effort)
+    }
+  }
+
   // 미확정/확정 예약 취소 (호스트에게 cascade 알림은 webhook에서 처리)
   try {
     await supabaseService
