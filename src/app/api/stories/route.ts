@@ -69,6 +69,16 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Account suspended' }, { status: 403 })
   }
 
+  // 청소년보호법: 성인 인증 필수
+  const { data: storyCreatorProfile } = await supabaseService
+    .from('profiles').select('is_adult').eq('id', user.id).single()
+  if (!storyCreatorProfile?.is_adult) {
+    return NextResponse.json(
+      { error: 'Age verification required', redirect: '/onboarding/verify-age' },
+      { status: 403 }
+    )
+  }
+
   let formData: FormData
   try {
     formData = await request.formData()
