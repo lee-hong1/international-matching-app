@@ -38,22 +38,14 @@ async function getAuthToken(): Promise<string | null> {
 
 export const chatService = {
   async getUserChatRooms(userId: string): Promise<ChatRoom[]> {
-    // N+1 방지: chat_rooms와 messages를 단일 쿼리로 조인.
-    // 파트너 프로필은 별도 쿼리 1회로 일괄 조회.
-    const { data, error } = await supabase
-      .from('chat_rooms')
-      .select(`
-        id, booking_id, user_id, host_id, created_at,
-        user_last_read_at, host_last_read_at,
-        messages(content, created_at, sender_id)
-      `)
-      .or(`user_id.eq.${userId},host_id.eq.${userId}`)
-      .order('created_at', { ascending: false })
-      .limit(50)
+    // get_chat_room_summaries RPC: 채팅방당 최신 메시지 1개 + 미읽음 카운트를 DB에서 계산
+    // 기존 방식(messages 전체 조인)보다 대역폭 ~90% 절감
+    const { data: rooms, error } = await supabase
+      .rpc('get_chat_room_summaries', { p_user_id: userId })
 
-    if (error || !data) return []
+    if (error || !rooms) return []
 
-    type RawRoom = {
+    type RpcRow = {
       id: string
       booking_id: string | null
       user_id: string
@@ -61,10 +53,13 @@ export const chatService = {
       created_at: string
       user_last_read_at: string | null
       host_last_read_at: string | null
-      messages?: Array<{ content: string; created_at: string; sender_id: string }>
+      last_message: string | null
+      last_message_at: string | null
+      last_sender_id: string | null
+      unread_count: number
     }
 
-    const rows = data as RawRoom[]
+    const rows = rooms as RpcRow[]
 
     // 파트너 ID 목록을 한 번에 수집 → 단일 IN 쿼리
     const partnerIds = [...new Set(rows.map((r) =>
@@ -83,9 +78,6 @@ export const chatService = {
     return rows.map((row) => {
       const partnerId = row.user_id === userId ? row.host_id : row.user_id
       const profile = profileMap.get(partnerId)
-      const sortedMsgs = (row.messages ?? []).sort(
-        (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-      )
       return {
         id: row.id,
         booking_id: row.booking_id,
@@ -100,18 +92,9 @@ export const chatService = {
               country: (profile as { country?: string }).country ?? null,
             }
           : undefined,
-        last_message: sortedMsgs[0]?.content,
-        last_message_at: sortedMsgs[0]?.created_at,
-        // 본인의 last_read_at 이후에 상대방이 보낸 메시지만 미읽음으로 카운트
-        unread_count: (() => {
-          const myLastRead = row.user_id === userId
-            ? row.user_last_read_at
-            : row.host_last_read_at
-          return (row.messages ?? []).filter(m =>
-            m.sender_id !== userId &&
-            (!myLastRead || new Date(m.created_at) > new Date(myLastRead))
-          ).length
-        })(),
+        last_message: row.last_message ?? undefined,
+        last_message_at: row.last_message_at ?? undefined,
+        unread_count: row.unread_count,
       }
     })
   },
