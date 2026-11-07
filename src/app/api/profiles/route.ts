@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getAuthUser, supabaseService as supabase } from '@src/lib/commerce'
 import { isSuspended } from '@src/lib/suspended-check'
 import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
+import { detectExternalPlatform } from '@src/lib/chat-safety'
 
 const ALLOWED_COUNTRIES = new Set([
   'KR','JP','CN','US','GB','CA','AU','DE','FR','SG','TH','VN','PH','MY','ID',
@@ -91,6 +92,9 @@ export async function PATCH(req: NextRequest) {
     const bio = updates.bio
     if (bio !== null && (typeof bio !== 'string' || bio.length > 500)) {
       return NextResponse.json({ error: 'bio must be under 500 characters' }, { status: 400 })
+    }
+    if (bio && detectExternalPlatform(bio)) {
+      return NextResponse.json({ error: 'External platform references not allowed in bio' }, { status: 400 })
     }
   }
 

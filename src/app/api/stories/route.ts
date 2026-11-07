@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
 import { getAuthUser, supabaseService, isValidUuid } from '@src/lib/commerce'
 import { isSuspended } from '@src/lib/suspended-check'
+import { detectExternalPlatform } from '@src/lib/chat-safety'
 
 export async function GET(request: NextRequest) {
   const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
@@ -87,6 +88,10 @@ export async function POST(request: NextRequest) {
 
   const caption = formData.get('caption')
   const captionStr = typeof caption === 'string' ? caption.slice(0, 200) : null
+
+  if (captionStr && detectExternalPlatform(captionStr)) {
+    return NextResponse.json({ error: 'External platform references not allowed in caption' }, { status: 400 })
+  }
 
   const isVideo = media.type.startsWith('video/')
   const isImage = media.type.startsWith('image/')
