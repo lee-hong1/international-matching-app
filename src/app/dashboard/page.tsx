@@ -1,22 +1,58 @@
 'use client'
 
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { t } from '@src/lib/i18n'
+import { supabase } from '@/lib/supabase'
+
+interface DashboardStats {
+  followers: number
+  following: number
+  chatRooms: number
+  events: number
+}
 
 export default function Dashboard() {
   const { user, loading } = useAuth()
   const router = useRouter()
   const { locale: lang } = useLanguage()
+  const [stats, setStats] = useState<DashboardStats | null>(null)
 
   useEffect(() => {
     if (!loading && !user) {
       router.push('/login')
     }
   }, [user, loading, router])
+
+  useEffect(() => {
+    if (!user) return
+    ;(async () => {
+      const [profileRes, chatRes, eventRes] = await Promise.all([
+        supabase
+          .from('creator_profiles')
+          .select('followers_count, following_count')
+          .eq('user_id', user.id)
+          .single(),
+        supabase
+          .from('chat_rooms')
+          .select('id', { count: 'exact', head: true })
+          .or(`user_id.eq.${user.id},host_id.eq.${user.id}`),
+        supabase
+          .from('event_participants')
+          .select('id', { count: 'exact', head: true })
+          .eq('user_id', user.id),
+      ])
+      setStats({
+        followers: profileRes.data?.followers_count ?? 0,
+        following: profileRes.data?.following_count ?? 0,
+        chatRooms: chatRes.count ?? 0,
+        events: eventRes.count ?? 0,
+      })
+    })()
+  }, [user])
 
   if (loading) {
     return (
@@ -31,6 +67,9 @@ export default function Dashboard() {
   }
 
   const displayName = user.user_metadata?.full_name || user.email || ''
+
+  const statValue = (n: number | undefined) =>
+    stats === null ? '—' : String(n ?? 0)
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -62,7 +101,7 @@ export default function Dashboard() {
           <p className="text-gray-600">{t('dashboard.greeting', lang, { name: displayName })}</p>
         </div>
 
-        {/* 통계 카드 (더미 데이터 — TODO: 실제 API 연동 필요) */}
+        {/* 통계 카드 */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <div className="bg-white p-6 rounded-lg shadow">
             <div className="flex items-center">
@@ -73,7 +112,7 @@ export default function Dashboard() {
               </div>
               <div className="ml-4">
                 <p className="text-sm text-gray-600">{t('dashboard.stat_views', lang)}</p>
-                <p className="text-2xl font-semibold text-gray-900">127</p>
+                <p className="text-2xl font-semibold text-gray-900">{statValue(stats?.followers)}</p>
               </div>
             </div>
           </div>
@@ -87,7 +126,7 @@ export default function Dashboard() {
               </div>
               <div className="ml-4">
                 <p className="text-sm text-gray-600">{t('dashboard.stat_likes', lang)}</p>
-                <p className="text-2xl font-semibold text-gray-900">23</p>
+                <p className="text-2xl font-semibold text-gray-900">{statValue(stats?.following)}</p>
               </div>
             </div>
           </div>
@@ -101,7 +140,7 @@ export default function Dashboard() {
               </div>
               <div className="ml-4">
                 <p className="text-sm text-gray-600">{t('dashboard.stat_messages', lang)}</p>
-                <p className="text-2xl font-semibold text-gray-900">5</p>
+                <p className="text-2xl font-semibold text-gray-900">{statValue(stats?.chatRooms)}</p>
               </div>
             </div>
           </div>
@@ -115,34 +154,34 @@ export default function Dashboard() {
               </div>
               <div className="ml-4">
                 <p className="text-sm text-gray-600">{t('dashboard.stat_matches', lang)}</p>
-                <p className="text-2xl font-semibold text-gray-900">12</p>
+                <p className="text-2xl font-semibold text-gray-900">{statValue(stats?.events)}</p>
               </div>
             </div>
           </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* 최근 매칭 */}
+          {/* 탐색 CTA */}
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-semibold text-gray-900">{t('dashboard.recent_matches', lang)}</h2>
-              <Link href="/matches" className="text-purple-600 hover:text-purple-500 text-sm font-medium">
+              <Link href="/discover" className="text-purple-600 hover:text-purple-500 text-sm font-medium">
                 {t('dashboard.view_all', lang)}
               </Link>
             </div>
-            <div className="space-y-4">
-              {[1, 2, 3].map((item) => (
-                <div key={item} className="flex items-center space-x-4">
-                  <div className="w-12 h-12 bg-gray-200 rounded-full"></div>
-                  <div className="flex-1">
-                    <p className="font-medium text-gray-900">Maria Rodriguez</p>
-                    <p className="text-sm text-gray-600">Spain, 28</p>
-                  </div>
-                  <button className="bg-purple-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-purple-700">
-                    {t('dashboard.message_btn', lang)}
-                  </button>
-                </div>
-              ))}
+            <div className="flex flex-col items-center justify-center py-8 text-center">
+              <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mb-4">
+                <svg className="w-8 h-8 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+              </div>
+              <p className="text-gray-500 text-sm mb-4">{t('dashboard.no_matches_yet', lang)}</p>
+              <Link
+                href="/discover"
+                className="bg-purple-600 text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-purple-700 transition-colors"
+              >
+                {t('dashboard.explore_cta', lang)}
+              </Link>
             </div>
           </div>
 
