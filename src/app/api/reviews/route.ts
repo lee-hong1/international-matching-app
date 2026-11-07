@@ -127,10 +127,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'External platform referral not allowed' }, { status: 400 })
   }
 
-  // 예약 조회 — reviewer가 user인지 host인지 확인
+  // 예약 조회 — reviewer가 guest인지 host인지 확인
   const { data: booking, error: bookingErr } = await supabaseService
     .from('bookings')
-    .select('id, user_id, host_id, status')
+    .select('id, guest_id, host_id, status')
     .eq('id', booking_id)
     .single()
 
@@ -140,12 +140,12 @@ export async function POST(req: NextRequest) {
   if (booking.status !== 'completed') {
     return NextResponse.json({ error: 'Can only review completed bookings' }, { status: 400 })
   }
-  if (booking.user_id !== user.id && booking.host_id !== user.id) {
+  if (booking.guest_id !== user.id && booking.host_id !== user.id) {
     return NextResponse.json({ error: 'Not a party to this booking' }, { status: 403 })
   }
 
   // reviewer → reviewee 판별
-  const reviewee_id = booking.user_id === user.id ? booking.host_id : booking.user_id
+  const reviewee_id = booking.guest_id === user.id ? booking.host_id : booking.guest_id
 
   const { data: review, error: insertErr } = await supabaseService
     .from('reviews')
