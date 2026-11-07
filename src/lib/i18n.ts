@@ -987,6 +987,56 @@ const MESSAGES: Messages = {
 
   // ── Host dashboard ─────────────────────────────────────────────────────────
   'availability.empty': { ko: '가용 시간을 등록하면 예약을 받을 수 있어요', en: 'Add availability slots to start receiving bookings', ja: '予約可能時間を追加すると予約を受け付けられます', zh: '添加时段以开始接受预订' },
+
+  // ── Static pages (About / Safety / FAQ / Help) ─────────────────────────────
+  'static.join_free':     { ko: '무료 가입', en: 'Join Free', ja: '無料登録', zh: '免费加入' },
+  'static.sign_in':       { ko: '로그인',   en: 'Sign In',   ja: 'サインイン', zh: '登录' },
+
+  'about.title':          { ko: 'GlobalMatch 소개',         en: 'About GlobalMatch',          ja: 'GlobalMatchについて',       zh: '关于GlobalMatch' },
+  'about.desc':           { ko: 'GlobalMatch는 한국, 일본, 중국 등 전 세계 사람들을 연결하는 국제 만남 플랫폼입니다. 우리는 의미 있는 관계가 국경을 초월한다고 믿으며, 이문화 간 연결을 안전하고 설레며 진정성 있게 만드는 것이 우리의 미션입니다.', en: 'GlobalMatch is an international dating platform connecting people from Korea, Japan, China, and beyond. We believe that meaningful relationships transcend borders, and our mission is to make cross-cultural connections safe, exciting, and genuine.', ja: 'GlobalMatchは、韓国・日本・中国など世界中の人々をつなぐ国際的な出会いプラットフォームです。国境を超えた意味のある関係を安全・ワクワク・誠実に実現することが私たちのミッションです。', zh: 'GlobalMatch是一个连接韩国、日本、中国等世界各地人们的国际交友平台。我们相信有意义的关系超越国界，我们的使命是让跨文化连接变得安全、令人兴奋且真实。' },
+  'about.global_title':   { ko: '글로벌 커뮤니티', en: 'Global Community', ja: 'グローバルコミュニティ', zh: '全球社区' },
+  'about.global_desc':    { ko: '30개국 이상의 회원들이 문화를 나누며 진짜 인연을 만들어 갑니다.', en: 'Members across 30+ countries, sharing cultures and building real connections.', ja: '30ヶ国以上のメンバーが文化を共有し、リアルなつながりを築いています。', zh: '来自30多个国家的会员，分享文化，建立真实的联系。' },
+  'about.safety_title':   { ko: '안전 최우선', en: 'Safety First', ja: '安全第一', zh: '安全第一' },
+  'about.safety_desc':    { ko: '신분증 인증, 실시간 모니터링, 24/7 지원으로 플랫폼을 안전하게 유지합니다.', en: 'ID verification, real-time moderation, and 24/7 support keep our platform secure.', ja: '身分証確認・リアルタイムモデレーション・24/7サポートでプラットフォームの安全を守ります。', zh: '身份验证、实时监控和24/7支持，保持平台安全。' },
+  'about.premium_title':  { ko: '프리미엄 경험', en: 'Premium Experience', ja: 'プレミアム体験', zh: '高级体验' },
+  'about.premium_desc':   { ko: '엄선된 프로필, 화상 통화, 전문 매칭 서비스로 진지한 만남을 지원합니다.', en: 'Curated profiles, video calls, and expert matchmaking services for serious connections.', ja: 'キュレートされたプロフィール、ビデオ通話、専門マッチングサービスで真剣な出会いを支援します。', zh: '精选资料、视频通话和专业配对服务，支持认真的交往。' },
+  'about.cta_title':      { ko: '지금 인연을 찾아보세요', en: 'Ready to find your match?', ja: '今すぐマッチを見つけましょう', zh: '准备好找到你的缘分了吗？' },
+  'about.cta_desc':       { ko: '수천 명의 회원들이 소중한 인연을 찾았습니다.', en: 'Join thousands of members who found their special someone.', ja: '何千人ものメンバーが大切なご縁を見つけました。', zh: '加入数千名找到特别缘分的会员。' },
+  'about.cta_btn':        { ko: '지금 무료로 시작', en: 'Start Free Today', ja: '今日から無料で始める', zh: '今天免费开始' },
+
+  'safety.title':         { ko: 'GlobalMatch의 안전', en: 'Safety at GlobalMatch', ja: 'GlobalMatchの安全',      zh: 'GlobalMatch的安全' },
+  'safety.subtitle':      { ko: '회원님의 안전이 최우선입니다. 보호 방법을 알아보세요.', en: 'Your safety is our top priority. Here\'s how we protect you.', ja: 'お客様の安全が最優先です。保護方法をご覧ください。', zh: '您的安全是我们的首要任务。了解我们如何保护您。' },
+  'safety.id_title':      { ko: '신원 인증',    en: 'Identity Verification', ja: '本人確認',        zh: '身份验证' },
+  'safety.id_desc':       { ko: 'Veriff가 제공하는 신분증·셀카 인증으로 모든 회원을 확인합니다. 가짜 프로필은 가입 전에 차단됩니다.', en: 'Every member completes ID and selfie verification powered by Veriff. Fake profiles are blocked before they reach you.', ja: 'すべてのメンバーがVeriff提供の身分証・自撮り確認を完了します。偽プロフィールは届く前にブロックされます。', zh: '每位会员都完成Veriff提供的身份证和自拍验证。假资料在到达您之前就被屏蔽。' },
+  'safety.age_title':     { ko: '연령 인증',    en: 'Age Verification',      ja: '年齢確認',        zh: '年龄验证' },
+  'safety.age_desc':      { ko: '플랫폼은 성인 전용입니다. 온보딩 시 연령을 인증하며 미성년자의 접근을 차단합니다.', en: 'Our platform is strictly 18+. We verify age during onboarding and block access to any user who cannot confirm their age.', ja: 'プラットフォームは18歳以上専用です。オンボーディング時に年齢を確認し、未成年のアクセスをブロックします。', zh: '我们的平台严格限制18岁以上。我们在入职时验证年龄，并阻止无法确认年龄的用户访问。' },
+  'safety.ai_title':      { ko: 'AI 모니터링', en: 'AI Moderation',          ja: 'AIモデレーション', zh: 'AI监控' },
+  'safety.ai_desc':       { ko: '업로드된 사진과 메시지를 실시간으로 스캔해 부적절한 콘텐츠·괴롭힘·정책 위반을 감지합니다.', en: 'Uploaded photos and messages are scanned in real time for inappropriate content, harassment, and policy violations.', ja: 'アップロードされた写真やメッセージをリアルタイムでスキャンし、不適切なコンテンツ・ハラスメント・ポリシー違反を検出します。', zh: '实时扫描上传的照片和消息，检测不当内容、骚扰和政策违规。' },
+  'safety.report_title':  { ko: '신고 간편화', en: 'Easy Reporting',         ja: '簡単な通報',      zh: '轻松举报' },
+  'safety.report_desc':   { ko: '한 번의 탭으로 차단·신고 가능합니다. 모든 신고는 24시간 내 검토되며 위반자에게 조치가 취해집니다.', en: 'Block or report any user with one tap. Our team reviews every report within 24 hours and takes action against violators.', ja: 'ワンタップでブロック・通報できます。すべての通報は24時間以内に確認し、違反者への対応を行います。', zh: '一键举报或屏蔽任何用户。我们的团队在24小时内审核每份举报，并对违规者采取行动。' },
+  'safety.private_title': { ko: '기본 비공개', en: 'Private by Default',     ja: '基本非公開',      zh: '默认私密' },
+  'safety.private_desc':  { ko: '개인 연락처는 절대 공개되지 않습니다. 모든 커뮤니케이션은 안전한 플랫폼 내에서만 이루어집니다.', en: 'Your personal contact information is never shared. All communication happens within our secure platform.', ja: '個人の連絡先は絶対に公開されません。すべてのコミュニケーションは安全なプラットフォーム内でのみ行われます。', zh: '您的个人联系信息永远不会被共享。所有通信都在我们的安全平台内进行。' },
+
+  'faq.title':            { ko: '자주 묻는 질문', en: 'Frequently Asked Questions', ja: 'よくある質問', zh: '常见问题' },
+  'faq.subtitle':         { ko: 'GlobalMatch에 대해 궁금한 점을 답해드립니다.', en: 'Find answers to common questions about GlobalMatch.', ja: 'GlobalMatchについてよくある質問にお答えします。', zh: '找到关于GlobalMatch的常见问题的答案。' },
+  'faq.q1':               { ko: 'GlobalMatch는 무엇인가요?',         en: 'What is GlobalMatch?',              ja: 'GlobalMatchとは何ですか？',      zh: 'GlobalMatch是什么？' },
+  'faq.a1':               { ko: 'GlobalMatch는 한국, 일본, 중국 등 아시아권 사용자를 중심으로 국제적인 만남을 주선하는 플랫폼입니다. 모든 회원은 신원 인증을 완료해야 합니다.', en: 'GlobalMatch is an international dating platform focused on connecting Asian users from Korea, Japan, China, and beyond. All members must complete identity verification.', ja: 'GlobalMatchは韓国・日本・中国などアジアのユーザーを中心に国際的な出会いを仲介するプラットフォームです。全メンバーが本人確認を完了する必要があります。', zh: 'GlobalMatch是一个以韩国、日本、中国等亚洲用户为主的国际交友平台。所有会员必须完成身份验证。' },
+  'faq.q2':               { ko: '가입비가 있나요?',                  en: 'Is there a membership fee?',       ja: '入会費はかかりますか？',            zh: '有会员费吗？' },
+  'faq.a2':               { ko: '기본 가입과 프로필 탐색은 무료입니다. 화상 통화, 프리미엄 매칭 등 고급 기능은 프리미엄 구독이 필요합니다.', en: 'Basic sign-up and profile browsing are free. Advanced features like video calls and premium matching require a subscription.', ja: '基本登録とプロフィール閲覧は無料です。ビデオ通話やプレミアムマッチングなどの高度な機能はサブスクリプションが必要です。', zh: '基本注册和浏览资料是免费的。视频通话和高级配对等高级功能需要订阅。' },
+  'faq.q3':               { ko: '안전한가요?',                       en: 'Is it safe?',                      ja: '安全ですか？',                     zh: '安全吗？' },
+  'faq.a3':               { ko: '네. 신분증 인증, AI 모니터링, 24/7 지원으로 모든 회원의 안전을 보장합니다. 성인 전용 플랫폼입니다.', en: 'Yes. ID verification, AI moderation, and 24/7 support ensure the safety of all members. This is an adults-only platform.', ja: 'はい。身分証確認・AIモデレーション・24/7サポートで全メンバーの安全を守ります。成人専用プラットフォームです。', zh: '是的。身份验证、AI监控和24/7支持确保所有会员的安全。这是一个仅限成人的平台。' },
+  'faq.q4':               { ko: '어떤 나라 사용자와 연결될 수 있나요?', en: 'Which countries can I connect with?', ja: 'どの国のユーザーとつながれますか？', zh: '我可以与哪些国家的用户联系？' },
+  'faq.a4':               { ko: '한국, 일본, 중국을 비롯해 30개국 이상의 회원과 연결됩니다.', en: 'Korea, Japan, China, and 30+ countries around the world.', ja: '韓国・日本・中国をはじめ、世界30ヶ国以上のメンバーとつながれます。', zh: '韩国、日本、中国以及全球30多个国家。' },
+
+  'help.title':           { ko: '도움말 센터',              en: 'Help Center',                        ja: 'ヘルプセンター',          zh: '帮助中心' },
+  'help.subtitle':        { ko: '어떻게 도와드릴까요?',      en: 'How can we help you?',               ja: 'どのようにお手伝いできますか？', zh: '我们能帮您什么？' },
+  'help.getting_started': { ko: '시작하기',                  en: 'Getting Started',                    ja: 'はじめに',               zh: '开始使用' },
+  'help.gs_desc':         { ko: '계정 만들기부터 첫 대화까지 단계별로 안내합니다.', en: 'Step-by-step guidance from creating your account to your first conversation.', ja: 'アカウント作成から最初の会話まで、ステップバイステップでガイドします。', zh: '从创建账户到第一次对话的分步指南。' },
+  'help.safety_tips':     { ko: '안전 팁',                   en: 'Safety Tips',                        ja: '安全のヒント',            zh: '安全提示' },
+  'help.safety_desc':     { ko: '개인 정보 보호와 안전한 만남을 위한 팁을 알아보세요.', en: 'Tips for protecting your personal information and having safe meetings.', ja: '個人情報保護と安全な出会いのためのヒントをご紹介します。', zh: '保护个人信息和安全约会的提示。' },
+  'help.contact_us':      { ko: '문의하기',                  en: 'Contact Us',                         ja: 'お問い合わせ',            zh: '联系我们' },
+  'help.contact_desc':    { ko: '직접 답변이 필요하시면 지원팀에 문의하세요.', en: 'Need a direct answer? Reach out to our support team.', ja: '直接回答が必要な場合は、サポートチームにお問い合わせください。', zh: '需要直接解答？请联系我们的支持团队。' },
+  'help.contact_btn':     { ko: '지원팀 문의',               en: 'Contact Support',                    ja: 'サポートに問い合わせる',  zh: '联系支持' },
 }
 
 /** 언어 코드를 지원 언어로 정규화 */
