@@ -31,7 +31,9 @@ export async function GET(request: NextRequest) {
     let query = supabaseService
       .from('events')
       .select(`
-        *,
+        id, host_id, event_type, title, description, venue_type, venue_id, custom_location,
+        event_datetime, max_participants, fee_per_person, status,
+        participants_count, created_at,
         profiles!events_host_id_fkey (id, full_name, avatar_url),
         partner_venues (id, name, category, address, image_url, discount_price)
       `)

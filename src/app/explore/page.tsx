@@ -273,7 +273,7 @@ export default function ExplorePage() {
                             <span className="text-xs text-pink-500 font-medium">{category}</span>
                           )}
                           <p className="text-xs text-gray-400 mt-0.5 truncate">
-                            팔로워 {(creator.creator_profiles?.followers_count ?? 0).toLocaleString()}명 · 게시물 {creator.creator_profiles?.posts_count ?? 0}
+                            {t('creator.followers', lang)} {(creator.creator_profiles?.followers_count ?? 0).toLocaleString()} · {t('creator.posts', lang)} {creator.creator_profiles?.posts_count ?? 0}
                           </p>
                         </Link>
                       </div>
