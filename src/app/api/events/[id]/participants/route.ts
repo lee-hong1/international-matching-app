@@ -98,12 +98,24 @@ export async function PATCH(
     return NextResponse.json({ error: 'Failed to update participant status' }, { status: 500 })
   }
 
-  // 승인 시 participants_count 증가 (fire-and-forget: status 반영은 완료)
+  // 승인 시 participants_count 원자적 증가 (낙관적 잠금 — TOCTOU 방지)
   if (action === 'approved') {
-    void supabaseService
+    const { data: incOk } = await supabaseService
       .from('events')
       .update({ participants_count: (event.participants_count ?? 0) + 1 })
       .eq('id', eventId)
+      .eq('participants_count', event.participants_count ?? 0) // 동시 요청이 이미 증가했으면 0행 매칭
+      .select('id')
+      .maybeSingle()
+
+    if (!incOk) {
+      // 다른 동시 요청이 정원을 먼저 채움 — 승인 취소 (롤백)
+      await supabaseService
+        .from('event_participants')
+        .update({ status: 'pending' })
+        .eq('id', participantId)
+      return NextResponse.json({ error: 'Event is fully booked' }, { status: 409 })
+    }
   }
 
   // 신청자에게 알림 발송 (fire-and-forget)
