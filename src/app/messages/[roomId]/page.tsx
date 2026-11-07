@@ -50,23 +50,22 @@ export default function ChatPage() {
 
     setIsLoading(true)
     try {
-      // 채팅방 정보 가져오기
-      const rooms = await chatService.getUserChatRooms(user.id)
+      const [rooms, roomMessages] = await Promise.all([
+        chatService.getUserChatRooms(user.id),
+        chatService.getRoomMessages(params.roomId),
+      ])
       const currentRoom = rooms.find(room => room.id === params.roomId)
-      
+
       if (!currentRoom) {
         router.push('/messages')
         return
       }
 
       setChatRoom(currentRoom)
-
-      // 메시지 가져오기
-      const roomMessages = await chatService.getRoomMessages(params.roomId)
       setMessages(roomMessages)
 
-      // 메시지 읽음 처리
-      await chatService.markMessagesAsRead(params.roomId, user.id)
+      // 읽음 처리 — fire-and-forget (UX 차단 불필요)
+      void chatService.markMessagesAsRead(params.roomId, user.id)
     } catch (error) {
       console.error('Error loading chat data:', error)
     } finally {

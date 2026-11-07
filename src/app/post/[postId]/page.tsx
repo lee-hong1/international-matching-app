@@ -31,17 +31,18 @@ export default function PostDetailPage() {
     if (!postId) return
     async function load() {
       setLoadingPost(true)
-      const data = await postsService.getPost(postId)
+      setLoadingComments(true)
+      const [data, cmts] = await Promise.all([
+        postsService.getPost(postId),
+        postsService.getComments(postId),
+      ])
       if (data) {
         setPost(data)
         setIsLiked(data.is_liked ?? false)
         setLikesCount(data.likes_count)
       }
-      setLoadingPost(false)
-
-      setLoadingComments(true)
-      const cmts = await postsService.getComments(postId)
       setComments(cmts)
+      setLoadingPost(false)
       setLoadingComments(false)
     }
     load()
