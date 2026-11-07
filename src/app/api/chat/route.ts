@@ -93,10 +93,12 @@ export async function POST(req: NextRequest) {
 
   // ── 외부 플랫폼 유도 감지 ──────────────────────────────────────────────
   if (detectExternalPlatform(content)) {
+    // TODO: replace with supabaseService.rpc('increment_violation_count', { p_user_id: user.id })
+    // once supabase/violation_count_atomic.sql migration is applied.
+    // Current approach has a read-modify-write race (parallel requests may undercount).
     const currentCount = (profile?.violation_count ?? 0) + 1
     const willSuspend = currentCount >= 3
 
-    // violation_count 증가 + 필요 시 정지 (원자적 UPDATE)
     await supabaseService
       .from('profiles')
       .update({
