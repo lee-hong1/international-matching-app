@@ -93,7 +93,7 @@ export async function POST(request: NextRequest) {
         Authorization: `Basic ${basicAuth}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ paymentKey, orderId, amount }),
+      body: JSON.stringify({ paymentKey, orderId, amount: paymentRecord.amount }),
     })
 
     if (!tossRes.ok) {

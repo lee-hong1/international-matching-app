@@ -77,7 +77,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     // 구독 플랜 정보 가져오기
     const { data: plan } = await supabaseService
       .from('subscription_plans')
-      .select('*')
+      .select('id, name, price, duration_months')
       .eq('id', planId)
       .single()
 
