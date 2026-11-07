@@ -1,7 +1,10 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { postsService, type Post, type CreatePostData } from '@/lib/posts'
+
+const MAX_IMAGE_BYTES = 20 * 1024 * 1024   // 20MB
+const MAX_VIDEO_BYTES = 200 * 1024 * 1024  // 200MB
 
 interface CreatePostProps {
   onClose: () => void
@@ -17,10 +20,28 @@ export default function CreatePost({ onClose, onPostCreated }: CreatePostProps) 
   const [error, setError] = useState('')
   const fileRef = useRef<HTMLInputElement>(null)
 
+  // Revoke object URLs on unmount to prevent memory leaks
+  useEffect(() => {
+    return () => { previews.forEach((url) => URL.revokeObjectURL(url)) }
+  }, [previews])
+
   function handleFiles(selected: FileList | null) {
     if (!selected) return
-    const accepted = Array.from(selected).filter((f) => f.type.startsWith('image/') || f.type.startsWith('video/'))
+    const errors: string[] = []
+    const accepted = Array.from(selected).filter((f) => {
+      if (!f.type.startsWith('image/') && !f.type.startsWith('video/')) return false
+      const limit = f.type.startsWith('video/') ? MAX_VIDEO_BYTES : MAX_IMAGE_BYTES
+      if (f.size > limit) {
+        const mb = Math.round(limit / 1024 / 1024)
+        errors.push(`${f.name}: 최대 ${mb}MB`)
+        return false
+      }
+      return true
+    })
+    if (errors.length > 0) { setError(errors.join(', ')); return }
     if (accepted.length === 0) return
+    // Revoke previous previews before creating new ones
+    previews.forEach((url) => URL.revokeObjectURL(url))
     const newFiles = [...files, ...accepted].slice(0, 10)
     setFiles(newFiles)
     setPreviews(newFiles.map((f) => URL.createObjectURL(f)))

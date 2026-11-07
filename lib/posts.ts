@@ -145,6 +145,50 @@ export const postsService = {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return { post: null, error: new Error('인증이 필요합니다') }
 
+    // MIME 타입 → 허용 확장자 (파일명에서 추출하지 않음 — 위장 실행파일 방지)
+    const ALLOWED_TYPES: Record<string, string> = {
+      'image/jpeg': 'jpg', 'image/png': 'png', 'image/gif': 'gif', 'image/webp': 'webp',
+      'video/mp4': 'mp4', 'video/webm': 'webm', 'video/quicktime': 'mov',
+    }
+    const MAX_IMAGE_BYTES = 20 * 1024 * 1024
+    const MAX_VIDEO_BYTES = 200 * 1024 * 1024
+
+    for (const file of postData.mediaFiles) {
+      if (!(file.type in ALLOWED_TYPES)) {
+        return { post: null, error: new Error(`지원하지 않는 파일 형식: ${file.type}`) }
+      }
+      const limit = file.type.startsWith('video/') ? MAX_VIDEO_BYTES : MAX_IMAGE_BYTES
+      if (file.size > limit) {
+        return { post: null, error: new Error(`파일 크기 초과 (최대 ${Math.round(limit / 1024 / 1024)}MB): ${file.name}`) }
+      }
+    }
+
+    // 1. 파일을 먼저 업로드 (post 행 삽입 전) — orphan post 방지
+    //    업로드 실패 시 성공한 파일을 롤백하고 에러 반환
+    const uploadBase = `${user.id}/${Date.now()}`
+    const uploadResults = await Promise.all(
+      postData.mediaFiles.map(async (file, i) => {
+        const ext = ALLOWED_TYPES[file.type]
+        const filePath = `${uploadBase}-${i}.${ext}`
+        const { error: uploadError } = await supabase.storage
+          .from('post-media')
+          .upload(filePath, file, { contentType: file.type, upsert: false })
+        if (uploadError) return { filePath, publicUrl: null, error: uploadError, file }
+        const { data: { publicUrl } } = supabase.storage.from('post-media').getPublicUrl(filePath)
+        return { filePath, publicUrl, error: null, file }
+      })
+    )
+
+    const failed = uploadResults.filter((r) => r.error)
+    if (failed.length > 0) {
+      const successPaths = uploadResults.filter((r) => !r.error).map((r) => r.filePath)
+      if (successPaths.length > 0) {
+        await supabase.storage.from('post-media').remove(successPaths)
+      }
+      return { post: null, error: failed[0].error }
+    }
+
+    // 2. 모든 파일 업로드 성공 후 post 행 삽입
     const { data: post, error: postError } = await supabase
       .from('posts')
       .insert({
@@ -156,27 +200,19 @@ export const postsService = {
       .select()
       .single()
 
-    if (postError || !post) return { post: null, error: postError }
+    if (postError || !post) {
+      // post 삽입 실패 시 업로드한 파일 전부 롤백
+      await supabase.storage.from('post-media').remove(uploadResults.map((r) => r.filePath))
+      return { post: null, error: postError }
+    }
 
-    // 미디어 병렬 업로드 (순차→병렬로 최대 10x 빠름)
-    const uploadResults = await Promise.all(
-      postData.mediaFiles.map(async (file, i) => {
-        const fileExt = file.name.split('.').pop()
-        const fileName = `${user.id}/${post.id}/${Date.now()}-${i}.${fileExt}`
-        const { error: uploadError } = await supabase.storage
-          .from('post-media')
-          .upload(fileName, file)
-        if (uploadError) return null
-        const { data: { publicUrl } } = supabase.storage.from('post-media').getPublicUrl(fileName)
-        return {
-          post_id: post.id,
-          media_url: publicUrl,
-          media_type: file.type.startsWith('video/') ? 'video' : 'image',
-          order_index: i,
-        }
-      })
-    )
-    const mediaInserts = uploadResults.filter(Boolean) as NonNullable<(typeof uploadResults)[number]>[]
+    // 3. post_media 행 삽입
+    const mediaInserts = uploadResults.map((r, i) => ({
+      post_id: post.id,
+      media_url: r.publicUrl!,
+      media_type: r.file.type.startsWith('video/') ? 'video' : 'image',
+      order_index: i,
+    }))
 
     if (mediaInserts.length > 0) {
       await supabase.from('post_media').insert(mediaInserts)

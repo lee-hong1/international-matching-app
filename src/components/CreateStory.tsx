@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 
 interface CreateStoryProps {
   onClose: () => void
@@ -15,6 +15,11 @@ export default function CreateStory({ onClose, onStoryCreated }: CreateStoryProp
   const [error, setError] = useState('')
   const fileRef = useRef<HTMLInputElement>(null)
 
+  // Revoke object URL on unmount to prevent memory leak
+  useEffect(() => {
+    return () => { if (preview) URL.revokeObjectURL(preview) }
+  }, [preview])
+
   function handleFile(selected: File | null) {
     if (!selected) return
     if (!selected.type.startsWith('image/') && !selected.type.startsWith('video/')) {
@@ -25,6 +30,7 @@ export default function CreateStory({ onClose, onStoryCreated }: CreateStoryProp
       setError('파일 크기는 50MB 이하여야 합니다.')
       return
     }
+    if (preview) URL.revokeObjectURL(preview)
     setFile(selected)
     setPreview(URL.createObjectURL(selected))
     setError('')
