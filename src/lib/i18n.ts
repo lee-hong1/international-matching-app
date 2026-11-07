@@ -771,6 +771,7 @@ const MESSAGES: Messages = {
   'dashboard.time_2h_ago': { ko: '2시간 전', en: '2 hours ago', ja: '2時間前', zh: '2小时前' },
   'dashboard.time_4h_ago': { ko: '4시간 전', en: '4 hours ago', ja: '4時間前', zh: '4小时前' },
   'dashboard.time_1d_ago': { ko: '1일 전', en: '1 day ago', ja: '1日前', zh: '1天前' },
+  'dashboard.no_notifications': { ko: '최근 알림이 없습니다', en: 'No recent activity', ja: '最近の通知はありません', zh: '暂无最近通知' },
   'dashboard.profile_completion': { ko: '프로필 완성도', en: 'Profile Completion', ja: 'プロフィール完成度', zh: '资料完成度' },
   'dashboard.completion_cta': { ko: '프로필을 완성하여 더 많은 매칭 기회를 얻으세요!', en: 'Complete your profile to get more matches!', ja: 'プロフィールを完成させてより多くのマッチングチャンスを！', zh: '完善您的资料以获得更多配对机会！' },
   'dashboard.complete_profile': { ko: '프로필 완성하기', en: 'Complete Profile', ja: 'プロフィールを完成させる', zh: '完善资料' },

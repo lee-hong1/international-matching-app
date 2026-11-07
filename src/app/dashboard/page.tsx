@@ -15,11 +15,39 @@ interface DashboardStats {
   events: number
 }
 
+interface Notification {
+  id: string
+  type: string
+  title: string
+  created_at: string
+}
+
+function relativeTime(iso: string, lang: string): string {
+  const diff = Date.now() - new Date(iso).getTime()
+  const mins = Math.floor(diff / 60000)
+  if (mins < 1) return lang === 'ko' ? '방금 전' : lang === 'ja' ? 'たった今' : lang === 'zh' ? '刚刚' : 'just now'
+  if (mins < 60) return lang === 'ko' ? `${mins}분 전` : lang === 'ja' ? `${mins}分前` : lang === 'zh' ? `${mins}分钟前` : `${mins}m ago`
+  const hours = Math.floor(mins / 60)
+  if (hours < 24) return lang === 'ko' ? `${hours}시간 전` : lang === 'ja' ? `${hours}時間前` : lang === 'zh' ? `${hours}小时前` : `${hours}h ago`
+  const days = Math.floor(hours / 24)
+  return lang === 'ko' ? `${days}일 전` : lang === 'ja' ? `${days}日前` : lang === 'zh' ? `${days}天前` : `${days}d ago`
+}
+
+const NOTIFICATION_DOT_COLOR: Record<string, string> = {
+  match: 'bg-green-400',
+  message: 'bg-blue-400',
+  like: 'bg-pink-400',
+  profile_view: 'bg-purple-400',
+  system: 'bg-gray-400',
+}
+
 export default function Dashboard() {
   const { user, loading } = useAuth()
   const router = useRouter()
   const { locale: lang } = useLanguage()
   const [stats, setStats] = useState<DashboardStats | null>(null)
+  const [notifications, setNotifications] = useState<Notification[] | null>(null)
+  const [completion, setCompletion] = useState<number | null>(null)
 
   useEffect(() => {
     if (!loading && !user) {
@@ -30,7 +58,7 @@ export default function Dashboard() {
   useEffect(() => {
     if (!user) return
     ;(async () => {
-      const [profileRes, chatRes, eventRes] = await Promise.all([
+      const [profileRes, chatRes, eventRes, profileFieldsRes, notifRes] = await Promise.all([
         supabase
           .from('creator_profiles')
           .select('followers_count, following_count')
@@ -44,6 +72,17 @@ export default function Dashboard() {
           .from('event_participants')
           .select('id', { count: 'exact', head: true })
           .eq('user_id', user.id),
+        supabase
+          .from('profiles')
+          .select('display_name, avatar_url, bio, country, gender, is_adult')
+          .eq('id', user.id)
+          .single(),
+        supabase
+          .from('notifications')
+          .select('id, type, title, created_at')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(3),
       ])
       setStats({
         followers: profileRes.data?.followers_count ?? 0,
@@ -51,6 +90,14 @@ export default function Dashboard() {
         chatRooms: chatRes.count ?? 0,
         events: eventRes.count ?? 0,
       })
+      setNotifications(notifRes.data ?? [])
+      const pf = profileFieldsRes.data
+      if (pf) {
+        const filled = [pf.display_name, pf.avatar_url, pf.bio, pf.country, pf.gender, pf.is_adult].filter(Boolean).length
+        setCompletion(Math.round((filled / 6) * 100))
+      } else {
+        setCompletion(0)
+      }
     })()
   }, [user])
 
@@ -189,27 +236,21 @@ export default function Dashboard() {
           <div className="bg-white rounded-lg shadow p-6">
             <h2 className="text-xl font-semibold text-gray-900 mb-4">{t('dashboard.recent_activity', lang)}</h2>
             <div className="space-y-4">
-              <div className="flex items-start space-x-3">
-                <div className="w-2 h-2 bg-green-400 rounded-full mt-2"></div>
-                <div>
-                  <p className="text-gray-900">{t('dashboard.activity_new_match', lang)}</p>
-                  <p className="text-sm text-gray-600">{t('dashboard.time_2h_ago', lang)}</p>
-                </div>
-              </div>
-              <div className="flex items-start space-x-3">
-                <div className="w-2 h-2 bg-blue-400 rounded-full mt-2"></div>
-                <div>
-                  <p className="text-gray-900">{t('dashboard.activity_profile_view', lang)}</p>
-                  <p className="text-sm text-gray-600">{t('dashboard.time_4h_ago', lang)}</p>
-                </div>
-              </div>
-              <div className="flex items-start space-x-3">
-                <div className="w-2 h-2 bg-purple-400 rounded-full mt-2"></div>
-                <div>
-                  <p className="text-gray-900">{t('dashboard.activity_new_message', lang)}</p>
-                  <p className="text-sm text-gray-600">{t('dashboard.time_1d_ago', lang)}</p>
-                </div>
-              </div>
+              {notifications === null ? (
+                <p className="text-gray-400 text-sm">—</p>
+              ) : notifications.length === 0 ? (
+                <p className="text-gray-400 text-sm">{t('dashboard.no_notifications', lang)}</p>
+              ) : (
+                notifications.map((n) => (
+                  <div key={n.id} className="flex items-start space-x-3">
+                    <div className={`w-2 h-2 rounded-full mt-2 flex-shrink-0 ${NOTIFICATION_DOT_COLOR[n.type] ?? 'bg-gray-400'}`}></div>
+                    <div>
+                      <p className="text-gray-900">{n.title}</p>
+                      <p className="text-sm text-gray-600">{relativeTime(n.created_at, lang)}</p>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
           </div>
         </div>
@@ -220,10 +261,10 @@ export default function Dashboard() {
           <div className="flex items-center space-x-4">
             <div className="flex-1">
               <div className="bg-white bg-opacity-20 rounded-full h-3">
-                <div className="bg-white rounded-full h-3" style={{ width: '75%' }}></div>
+                <div className="bg-white rounded-full h-3" style={{ width: `${completion ?? 0}%` }}></div>
               </div>
             </div>
-            <span className="text-lg font-semibold">75%</span>
+            <span className="text-lg font-semibold">{completion === null ? '—' : `${completion}%`}</span>
           </div>
           <p className="mt-4 text-white text-opacity-90">
             {t('dashboard.completion_cta', lang)}
