@@ -13,7 +13,10 @@ function PaymentSuccessContent() {
   const [status, setStatus] = useState<'confirming' | 'success' | 'error'>('confirming')
   const [errorMessage, setErrorMessage] = useState('')
 
-  const eventId = searchParams.get('eventId')
+  const rawEventId = searchParams.get('eventId')
+  const eventId = rawEventId && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(rawEventId)
+    ? rawEventId
+    : null
 
   useEffect(() => {
     const paymentKey = searchParams.get('paymentKey')

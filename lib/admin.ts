@@ -185,4 +185,46 @@ export const adminService = {
     }
     return res.json()
   },
+
+  async getPosts(page: number = 1, limit: number = 12, search?: string): Promise<{ posts: unknown[]; total: number }> {
+    const authHeaders = await getAuthHeaders()
+    const params = new URLSearchParams({ page: String(page), limit: String(limit) })
+    if (search) params.set('search', search)
+    const res = await fetch(`/api/admin/posts-list?${params}`, {
+      credentials: 'include',
+      headers: authHeaders,
+    })
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}))
+      throw new Error((data as { error?: string }).error ?? 'Failed to fetch posts')
+    }
+    return res.json()
+  },
+
+  async deletePost(postId: string): Promise<void> {
+    const authHeaders = await getAuthHeaders()
+    const res = await fetch(`/api/admin/posts/${postId}`, {
+      method: 'DELETE',
+      credentials: 'include',
+      headers: authHeaders,
+    })
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}))
+      throw new Error((data as { error?: string }).error ?? 'Failed to delete post')
+    }
+  },
+
+  async togglePostVisibility(postId: string, isPublic: boolean): Promise<void> {
+    const authHeaders = await getAuthHeaders()
+    const res = await fetch(`/api/admin/posts/${postId}`, {
+      method: 'PATCH',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json', ...authHeaders },
+      body: JSON.stringify({ is_public: isPublic }),
+    })
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}))
+      throw new Error((data as { error?: string }).error ?? 'Failed to toggle post visibility')
+    }
+  },
 }

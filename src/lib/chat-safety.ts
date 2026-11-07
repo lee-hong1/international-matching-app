@@ -7,7 +7,7 @@ const EXTERNAL_PLATFORM_PATTERNS: readonly string[] = [
   'meet.google',
   'kakaotalk',
   '카카오톡',
-  'kakao.com',
+  'open.kakao.com',
   'line.me',
   'line.naver',
   '라인으로',

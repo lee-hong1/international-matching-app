@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import Image from 'next/image'
-import { supabase } from '@/lib/supabase'
+import { adminService } from '@/lib/admin'
 
 interface AdminPost {
   id: string
@@ -30,25 +30,11 @@ export default function AdminPostsPage() {
   const load = useCallback(async (p = page) => {
     setLoading(true)
     try {
-      let query = supabase
-        .from('posts')
-        .select(`
-          id, user_id, caption, is_public, likes_count, comments_count, created_at,
-          profiles!posts_user_id_fkey (full_name, email, avatar_url),
-          post_media (media_url, media_type)
-        `, { count: 'exact' })
-        .order('created_at', { ascending: false })
-        .range((p - 1) * LIMIT, p * LIMIT - 1)
-
-      if (search) {
-        query = query.ilike('caption', `%${search}%`)
-      }
-
-      const { data, count, error } = await query
-      if (!error) {
-        setPosts((data ?? []) as unknown as AdminPost[])
-        setTotal(count ?? 0)
-      }
+      const { posts: data, total: t } = await adminService.getPosts(p, LIMIT, search || undefined)
+      setPosts(data as AdminPost[])
+      setTotal(t)
+    } catch {
+      // 에러 시 빈 상태 유지
     } finally {
       setLoading(false)
     }
@@ -60,23 +46,24 @@ export default function AdminPostsPage() {
     if (!confirm('이 게시물을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) return
     setDeleteLoading(postId)
     try {
-      await supabase.from('posts').delete().eq('id', postId)
+      await adminService.deletePost(postId)
       setPosts((prev) => prev.filter((p) => p.id !== postId))
       setTotal((t) => t - 1)
       if (preview?.id === postId) setPreview(null)
+    } catch {
+      // 에러 시 상태 유지
     } finally {
       setDeleteLoading(null)
     }
   }
 
   async function handleTogglePublic(post: AdminPost) {
-    const { error } = await supabase
-      .from('posts')
-      .update({ is_public: !post.is_public })
-      .eq('id', post.id)
-    if (!error) {
+    try {
+      await adminService.togglePostVisibility(post.id, !post.is_public)
       setPosts((prev) => prev.map((p) => p.id === post.id ? { ...p, is_public: !post.is_public } : p))
       if (preview?.id === post.id) setPreview((p) => p ? { ...p, is_public: !post.is_public } : p)
+    } catch {
+      // 에러 시 상태 유지
     }
   }
 
