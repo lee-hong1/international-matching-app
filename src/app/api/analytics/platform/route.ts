@@ -31,7 +31,7 @@ export async function GET(req: NextRequest) {
     ] = await Promise.all([
       supabaseService.from('profiles').select('id', { count: 'exact', head: true }),
       supabaseService.from('bookings').select('id', { count: 'exact', head: true }),
-      supabaseService.from('profiles').select('id', { count: 'exact', head: true }).eq('is_adult', true),
+      supabaseService.from('profiles').select('id', { count: 'exact', head: true }).eq('is_host', true),
     ])
 
     return NextResponse.json({
