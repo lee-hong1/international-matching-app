@@ -138,8 +138,13 @@ export async function PATCH(
     return NextResponse.json({ error: 'Payment amount mismatch' }, { status: 400 })
   }
 
-  // 멱등성: 이미 결제 완료된 boost는 재처리 없이 성공 반환
+  // 멱등성: 이미 결제 완료된 boost → entity update 재적용 후 성공 반환
+  // (boost DB 업데이트 성공 후 events 업데이트가 실패한 경우 보정)
   if (boost.status === 'paid') {
+    await supabaseService.from('events').update({
+      is_featured: true,
+      boost_expires_at: boost.expires_at,
+    }).eq('id', eventId)
     return NextResponse.json({ success: true, expiresAt: boost.expires_at })
   }
 

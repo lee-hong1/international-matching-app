@@ -117,6 +117,11 @@ export async function POST(
       .maybeSingle()
 
     if (existing) {
+      // payment 기록 성공 후 entity update가 실패했을 경우 재적용 (멱등성 보정)
+      await supabaseService
+        .from('host_shop_links')
+        .update({ is_featured: true, boost_expires_at: existing.boost_ends_at })
+        .eq('id', linkId)
       return NextResponse.json(
         { message: 'Boost already applied', boost_ends_at: existing.boost_ends_at },
         { status: 200 },
