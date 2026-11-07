@@ -957,6 +957,36 @@ const MESSAGES: Messages = {
   'analytics.trends_title': { ko: '트렌드 분析', en: 'Trend Analysis', ja: 'トレンド分析', zh: '趋势分析' },
   'analytics.trends_placeholder': { ko: '트렌드 차트가 여기에 표시됩니다.', en: 'Trend charts will be displayed here.', ja: 'トレンドチャートがここに表示されます。', zh: '趋势图表将在此处显示。' },
   'analytics.trends_placeholder2': { ko: 'Chart.js 또는 다른 차트 라이브러리를 통합하여 시각적 분析을 제공할 수 있습니다.', en: 'Integrate Chart.js or another chart library to provide visual analytics.', ja: 'Chart.jsまたは他のチャートライブラリを統合して視覚的な分析を提供できます。', zh: '可以集成Chart.js或其他图表库来提供可视化分析。' },
+
+  // ── Bottom nav ─────────────────────────────────────────────────────────────
+  'nav_home':    { ko: '홈',    en: 'Home',    ja: 'ホーム',   zh: '首页' },
+  'nav_explore': { ko: '탐색',  en: 'Explore', ja: '探索',     zh: '探索' },
+  'nav_match':   { ko: '매칭',  en: 'Match',   ja: 'マッチ',   zh: '匹配' },
+  'nav_events':  { ko: '이벤트', en: 'Events',  ja: 'イベント', zh: '活动' },
+  'nav_profile': { ko: '프로필', en: 'Profile', ja: 'プロフィール', zh: '个人' },
+
+  // ── Events list page ───────────────────────────────────────────────────────
+  'events_title':          { ko: '이벤트',           en: 'Events',              ja: 'イベント',               zh: '活动' },
+  'events_create':         { ko: '이벤트 만들기',    en: 'Create Event',        ja: 'イベント作成',           zh: '创建活动' },
+  'events_all':            { ko: '전체',             en: 'All',                 ja: 'すべて',                 zh: '全部' },
+  'events_drink':          { ko: '술',               en: 'Drinks',              ja: 'ドリンク',               zh: '饮酒' },
+  'events_meal':           { ko: '식사',             en: 'Meal',                ja: '食事',                   zh: '用餐' },
+  'events_party':          { ko: '파티',             en: 'Party',               ja: 'パーティー',             zh: '派对' },
+  'events_empty':          { ko: '이벤트가 없습니다', en: 'No events yet',      ja: 'イベントがありません',   zh: '暂无活动' },
+  'events_empty_sub':      { ko: '첫 번째 이벤트를 만들어 보세요!', en: 'Be the first to create one!', ja: '最初のイベントを作成しましょう！', zh: '快来创建第一个活动吧！' },
+  'events_free':           { ko: '무료',             en: 'Free',                ja: '無料',                   zh: '免费' },
+  'events_full':           { ko: '마감',             en: 'Full',                ja: '満員',                   zh: '已满' },
+  'events_closed':         { ko: '마감됨',           en: 'Closed',              ja: 'クローズ',               zh: '已关闭' },
+  'events_partner_venue':  { ko: '파트너 장소',      en: 'Partner Venue',       ja: 'パートナー会場',         zh: '合作场地' },
+  'events_persons':        { ko: '명',               en: ' spots',              ja: '名',                     zh: '人' },
+
+  // ── Event detail error messages ────────────────────────────────────────────
+  'detail_apply_failed':          { ko: '신청에 실패했습니다',   en: 'Application failed',           ja: '申込に失敗しました',       zh: '申请失败' },
+  'detail_payment_failed':        { ko: '결제에 실패했습니다',   en: 'Payment failed',               ja: '支払いに失敗しました',     zh: '支付失败' },
+  'detail_payment_module_failed': { ko: '결제 모듈 로드 실패',  en: 'Failed to load payment module', ja: '決済モジュールの読込失敗', zh: '加载支付模块失败' },
+
+  // ── Host dashboard ─────────────────────────────────────────────────────────
+  'availability.empty': { ko: '가용 시간을 등록하면 예약을 받을 수 있어요', en: 'Add availability slots to start receiving bookings', ja: '予約可能時間を追加すると予約を受け付けられます', zh: '添加时段以开始接受预订' },
 }
 
 /** 언어 코드를 지원 언어로 정규화 */
