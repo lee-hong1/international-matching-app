@@ -3,11 +3,14 @@
 import { Suspense } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
+import { useLanguage } from '@/contexts/LanguageContext'
+import { t } from '@src/lib/i18n'
 
 function PaymentFailContent() {
   const searchParams = useSearchParams()
   const eventId = searchParams.get('eventId')
   const message = searchParams.get('message')
+  const { locale: lang } = useLanguage()
 
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 text-center max-w-sm w-full">
@@ -16,10 +19,10 @@ function PaymentFailContent() {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
         </svg>
       </div>
-      <h3 className="font-semibold text-gray-900 mb-2">결제가 취소되었습니다</h3>
-      <p className="text-sm text-gray-500 mb-4">{message ?? '결제가 진행되지 않았습니다.'}</p>
+      <h3 className="font-semibold text-gray-900 mb-2">{t('payment.cancelled', lang)}</h3>
+      <p className="text-sm text-gray-500 mb-4">{message ?? t('payment.not_proceeded', lang)}</p>
       <Link href={eventId ? `/events/${eventId}` : '/events'} className="inline-block px-4 py-2 bg-gray-100 text-gray-700 text-sm font-semibold rounded-xl">
-        모임으로 돌아가기
+        {t('payment.back_to_event', lang)}
       </Link>
     </div>
   )

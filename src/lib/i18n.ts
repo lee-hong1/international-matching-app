@@ -777,6 +777,26 @@ const MESSAGES: Messages = {
   'events.create.fee_hint': { ko: '참가비에서 플랫폼 수수료가 차감된 금액이 호스트에게 정산됩니다.', en: 'Platform fee is deducted from the amount settled to the host.', ja: 'プラットフォーム手数料が差し引かれた金額がホストに精算されます。', zh: '平台手续费扣除后，剩余金额结算给主办方。' },
   'events.create.submitting': { ko: '생성 중...', en: 'Creating...', ja: '作成中...', zh: '创建中...' },
   'events.create.submit': { ko: '모임 만들기', en: 'Create Event', ja: 'イベント作成', zh: '创建活动' },
+
+  // ── 크리에이터 ───────────────────────────────────────────────────────────────
+  'creator.back_to_feed': { ko: '피드로 돌아가기', en: 'Back to Feed', ja: 'フィードに戻る', zh: '返回动态' },
+
+  // ── 결제 실패 ───────────────────────────────────────────────────────────────
+  'payment.cancelled': { ko: '결제가 취소되었습니다', en: 'Payment Cancelled', ja: '決済がキャンセルされました', zh: '支付已取消' },
+  'payment.not_proceeded': { ko: '결제가 진행되지 않았습니다.', en: 'Payment was not completed.', ja: '決済が完了しませんでした。', zh: '支付未完成。' },
+  'payment.back_to_event': { ko: '모임으로 돌아가기', en: 'Back to Event', ja: 'イベントに戻る', zh: '返回活动' },
+
+  // ── 이메일 수신 거부 ─────────────────────────────────────────────────────────
+  'unsubscribe.success_title': { ko: '수신 거부 완료', en: 'Unsubscribed', ja: '配信停止完了', zh: '取消订阅成功' },
+  'unsubscribe.success_body': { ko: '이메일 수신 거부가 성공적으로 처리되었습니다.', en: 'You have been successfully unsubscribed.', ja: 'メールの配信停止が正常に処理されました。', zh: '您已成功取消订阅。' },
+  'unsubscribe.success_detail': { ko: '더 이상 해당 유형의 이메일을 받지 않습니다.', en: 'You will no longer receive this type of email.', ja: 'このタイプのメールは今後届きません。', zh: '您将不再收到此类电子邮件。' },
+  'unsubscribe.error_title': { ko: '처리 실패', en: 'Failed', ja: '処理失敗', zh: '处理失败' },
+  'unsubscribe.error_body': { ko: '수신 거부 처리 중 오류가 발생했습니다.', en: 'An error occurred while processing your request.', ja: '配信停止の処理中にエラーが発生しました。', zh: '处理您的请求时发生错误。' },
+  'unsubscribe.error_detail': { ko: '다시 시도하거나 고객 지원팀에 문의해 주세요.', en: 'Please try again or contact our support team.', ja: '再試行するか、サポートチームにお問い合わせください。', zh: '请重试或联系我们的支持团队。' },
+  'unsubscribe.go_home': { ko: '홈으로 돌아가기', en: 'Go Home', ja: 'ホームへ戻る', zh: '返回首页' },
+  'unsubscribe.contact_support': { ko: '고객 지원팀 문의', en: 'Contact Support', ja: 'サポートに問い合わせ', zh: '联系支持' },
+  'unsubscribe.login_tip': { ko: '계정이 있으시다면 로그인하여 이메일 설정을 더 자세히 관리할 수 있습니다.', en: 'If you have an account, log in to manage your email settings in detail.', ja: 'アカウントをお持ちの場合は、ログインしてメール設定を詳しく管理できます。', zh: '如果您有账户，请登录以详细管理您的电子邮件设置。' },
+  'unsubscribe.login': { ko: '로그인하기 →', en: 'Log in →', ja: 'ログイン →', zh: '登录 →' },
 }
 
 /** 언어 코드를 지원 언어로 정규화 */

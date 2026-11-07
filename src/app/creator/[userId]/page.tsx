@@ -114,7 +114,7 @@ export default function CreatorProfilePage() {
     return (
       <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center gap-4">
         <p className="text-gray-500">{t('creator.not_found', lang)}</p>
-        <Link href="/feed" className="text-pink-500 font-semibold">피드로 돌아가기</Link>
+        <Link href="/feed" className="text-pink-500 font-semibold">{t('creator.back_to_feed', lang)}</Link>
       </div>
     )
   }
