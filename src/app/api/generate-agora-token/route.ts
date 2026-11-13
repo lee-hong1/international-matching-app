@@ -12,10 +12,10 @@ import { RtcTokenBuilder, RtcRole } from 'agora-token'
  *   AGORA_APP_ID        — Agora 프로젝트 App ID
  *   AGORA_APP_CERTIFICATE — Agora 프로젝트 App Certificate (비밀)
  *
- * 토큰 TTL: 24시간. 클라이언트는 만료 1시간 전 재발급해야 함.
+ * 토큰 TTL: 1시간. 클라이언트는 만료 10분 전 재발급해야 함.
  */
 
-const TOKEN_EXPIRY_SEC = 86400 // 24시간
+const TOKEN_EXPIRY_SEC = 3600 // 1시간 — 정지 계정이 만료된 토큰으로 계속 통화하는 것을 방지
 
 export async function POST(req: NextRequest) {
   const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
