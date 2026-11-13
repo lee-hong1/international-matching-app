@@ -5,6 +5,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { postsService, type Post } from '@/lib/posts'
 import { formatDistanceToNow } from '@/lib/dateUtils'
+import { t, detectLangFromNavigator } from '@src/lib/i18n'
 
 interface PostCardProps {
   post: Post
@@ -18,8 +19,9 @@ export default function PostCard({ post, currentUserId, onPostDeleted }: PostCar
   const [liking, setLiking] = useState(false)
   const [showMenu, setShowMenu] = useState(false)
 
+  const lang = detectLangFromNavigator()
   const isOwner = currentUserId === post.user_id
-  const displayName = post.profiles?.creator_profiles?.display_name ?? post.profiles?.full_name ?? '익명'
+  const displayName = post.profiles?.creator_profiles?.display_name ?? post.profiles?.full_name ?? t('post.anonymous', lang)
   const avatarUrl = post.profiles?.avatar_url
   const firstMedia = post.post_media?.sort((a, b) => a.order_index - b.order_index)[0]
 
@@ -93,7 +95,7 @@ export default function PostCard({ post, currentUserId, onPostDeleted }: PostCar
           {firstMedia.media_type === 'video' ? (
             <video src={firstMedia.media_url} className="w-full h-full object-cover" controls playsInline />
           ) : (
-            <img src={firstMedia.media_url} alt={post.caption ?? '게시물 이미지'} className="w-full h-full object-cover" />
+            <img src={firstMedia.media_url} alt={post.caption ?? t('post.image_alt', lang)} className="w-full h-full object-cover" />
           )}
         </div>
       )}
@@ -103,7 +105,7 @@ export default function PostCard({ post, currentUserId, onPostDeleted }: PostCar
         <button
           onClick={handleLike}
           disabled={liking}
-          aria-label={liked ? '좋아요 취소' : '좋아요'}
+          aria-label={liked ? t('post.unlike', lang) : t('post.like', lang)}
           className="flex items-center gap-1 text-sm font-medium transition-colors"
           style={{ color: liked ? '#ec4899' : '#9ca3af' }}
         >

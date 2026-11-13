@@ -53,7 +53,7 @@ export async function GET(req: NextRequest) {
   }
 
   // ── 크리덴셜 생성 (TURN_SECRET 절대 응답에 포함 안 됨) ─────────────────
-  const TTL = 86400 // 24시간
+  const TTL = 3600 // 1시간 — 정지 계정이 만료된 크리덴셜로 계속 연결하는 것을 방지
   const expiry = Math.floor(Date.now() / 1000) + TTL
   const username = `${expiry}:${user.id}`
   const credential = createHmac('sha1', turnSecret)
