@@ -210,7 +210,7 @@ export default function SignUpPage() {
         <div className="text-center mb-6">
           <Link href="/" className="inline-block">
             <h1 className="text-3xl font-extrabold bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
-              FanWorld
+              GlobalMatch
             </h1>
           </Link>
         </div>

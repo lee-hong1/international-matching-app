@@ -101,7 +101,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </div>
             <div>
               <p className="text-sm font-bold text-gray-900">Admin Panel</p>
-              <p className="text-xs text-gray-400">FanWorld</p>
+              <p className="text-xs text-gray-400">GlobalMatch</p>
             </div>
           </div>
         </div>

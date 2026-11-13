@@ -91,7 +91,7 @@ export default function LoginPage() {
         <div className="text-center mb-8">
           <Link href="/" className="inline-block">
             <h1 className="text-3xl font-extrabold bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
-              FanWorld
+              GlobalMatch
             </h1>
             <p className="text-sm text-gray-500 mt-1">{t('auth.tagline', lang)}</p>
           </Link>

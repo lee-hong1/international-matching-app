@@ -78,7 +78,7 @@ export default function FeedPage() {
       <header className="bg-white border-b border-gray-100 sticky top-0 z-40">
         <div className="max-w-lg mx-auto px-4 h-14 flex items-center justify-between">
           <Link href="/" className="text-xl font-bold bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
-            FanWorld
+            GlobalMatch
           </Link>
           <div className="flex items-center gap-2">
             <LanguageSwitcher />
