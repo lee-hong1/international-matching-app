@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { supabaseService, ALLOWED_DOMAINS, isAllowedUrl, getAuthUser, hasForbiddenContent, isValidUuid } from '@src/lib/commerce'
 import { isSuspended } from '@src/lib/suspended-check'
 import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
+import { detectExternalPlatform } from '@src/lib/chat-safety'
 
 // 호스트 외부 쇼핑 링크 목록
 export async function GET(req: NextRequest) {
@@ -85,10 +86,13 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    // 금지 콘텐츠 필터 (도박/성인/불법)
+    // 금지 콘텐츠 필터 (도박/성인/불법) + 외부 플랫폼 유도 방지
     const contentToCheck = `${title} ${description ?? ''}`
     if (hasForbiddenContent(contentToCheck)) {
       return NextResponse.json({ error: 'Content violates platform rules' }, { status: 400 })
+    }
+    if (detectExternalPlatform(contentToCheck)) {
+      return NextResponse.json({ error: 'External platform references not allowed in shop content' }, { status: 400 })
     }
 
     // 호스트 1인 활성 링크 최대 20개 제한

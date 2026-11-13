@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { supabaseService, isAllowedUrl, getAuthUser, hasForbiddenContent, isValidUuid } from '@src/lib/commerce'
 import { isSuspended } from '@src/lib/suspended-check'
 import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
+import { detectExternalPlatform } from '@src/lib/chat-safety'
 
 // 판매 이벤트/공구 공지 목록 (발견 피드)
 export async function GET(req: NextRequest) {
@@ -114,10 +115,13 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // 금지 콘텐츠 필터 (도박/성인/불법)
+    // 금지 콘텐츠 필터 (도박/성인/불법) + 외부 플랫폼 유도 방지
     const contentToCheck = `${title} ${description ?? ''}`
     if (hasForbiddenContent(contentToCheck)) {
       return NextResponse.json({ error: 'Content violates platform rules' }, { status: 400 })
+    }
+    if (detectExternalPlatform(contentToCheck)) {
+      return NextResponse.json({ error: 'External platform references not allowed in event content' }, { status: 400 })
     }
 
     if (original_price !== undefined && original_price !== null) {
