@@ -167,6 +167,14 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json({ error: 'Valid storyId (UUID) is required' }, { status: 400 })
   }
 
+  // 스토리 조회 → media_url 추출 (Storage 파일 삭제용)
+  const { data: storyRecord } = await supabaseService
+    .from('stories')
+    .select('media_url')
+    .eq('id', storyId)
+    .eq('user_id', user.id)
+    .single()
+
   const { error } = await supabaseService
     .from('stories')
     .delete()
@@ -176,6 +184,20 @@ export async function DELETE(request: NextRequest) {
   if (error) {
     console.error('[stories DELETE] db error:', error.code)
     return NextResponse.json({ error: 'Failed to delete story' }, { status: 500 })
+  }
+
+  // DB 삭제 성공 후 Storage 파일 삭제 (fire-and-forget — 실패해도 DB 삭제는 완료)
+  if (storyRecord?.media_url) {
+    try {
+      const url = new URL(storyRecord.media_url)
+      // /storage/v1/object/public/stories/<user_id>/<filename>
+      const pathMatch = url.pathname.match(/\/storage\/v1\/object\/public\/stories\/(.+)$/)
+      if (pathMatch?.[1]) {
+        void supabaseService.storage.from('stories').remove([decodeURIComponent(pathMatch[1])])
+      }
+    } catch {
+      // URL 파싱 실패는 무시 — DB 삭제는 이미 완료됨
+    }
   }
 
   return NextResponse.json({ success: true })

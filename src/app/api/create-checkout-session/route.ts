@@ -81,9 +81,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Plan not found' }, { status: 404 })
     }
 
-    // Stripe 고객 생성 또는 조회
+    // Stripe 고객 생성 또는 조회 — userId 메타데이터 기반 (이메일 조회는 중복 가능)
     let customer
-    const existingCustomers = await stripe.customers.list({ email: profile.email, limit: 1 })
+    const existingCustomers = await stripe.customers.search({
+      query: `metadata['userId']:'${user.id}'`,
+      limit: 1,
+    })
     if (existingCustomers.data.length > 0) {
       customer = existingCustomers.data[0]
     } else {
