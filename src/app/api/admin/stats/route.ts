@@ -45,13 +45,15 @@ export async function GET(req: NextRequest) {
         .gte('last_active', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()),
       supabaseService.from('profiles').select('id', { count: 'exact', head: true })
         .gte('created_at', todayStart.toISOString()),
-      supabaseService.from('payments').select('amount').eq('payment_status', 'completed'),
+      // aggregate: PostgREST sum to avoid row-limit truncation on large datasets
+      supabaseService.from('payments').select('amount.sum(), amount.count()').eq('payment_status', 'completed').single(),
       supabaseService.from('reports').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
     ])
 
-    const payments = (revenueQuery.data ?? []) as { amount: number }[]
-    const totalRevenue = payments.reduce((sum, p) => sum + p.amount, 0)
-    const avgOrderValue = payments.length > 0 ? Math.round(totalRevenue / payments.length) : 0
+    const revenueData = revenueQuery.data as { sum: number | null; count: number | null } | null
+    const totalRevenue = revenueData?.sum ?? 0
+    const paymentCount = revenueData?.count ?? 0
+    const avgOrderValue = paymentCount > 0 ? Math.round(totalRevenue / paymentCount) : 0
 
     return NextResponse.json({
       totalUsers: totalUsersQuery.count ?? 0,
