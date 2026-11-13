@@ -809,6 +809,13 @@ const MESSAGES: Messages = {
   'profile.saved': { ko: '프로필이 업데이트되었습니다.', en: 'Profile updated.', ja: 'プロフィールを更新しました。', zh: '资料已更新。' },
   'profile.saving': { ko: '저장 중…', en: 'Saving…', ja: '保存中…', zh: '保存中…' },
   'profile.select_country': { ko: '국가를 선택하세요', en: 'Select a country', ja: '国を選択してください', zh: '选择国家' },
+  'profile.danger_zone': { ko: '위험 구역', en: 'Danger Zone', ja: '危険エリア', zh: '危险区域' },
+  'profile.delete_account': { ko: '계정 삭제', en: 'Delete Account', ja: 'アカウント削除', zh: '删除账号' },
+  'profile.delete_account_desc': { ko: '계정을 삭제하면 모든 데이터가 영구적으로 제거됩니다. 이 작업은 되돌릴 수 없습니다.', en: 'Deleting your account permanently removes all your data. This action cannot be undone.', ja: 'アカウントを削除すると、すべてのデータが永久に削除されます。この操作は元に戻せません。', zh: '删除账号将永久删除您的所有数据，此操作无法撤销。' },
+  'profile.delete_confirm_placeholder': { ko: '"삭제"를 입력하세요', en: 'Type "delete" to confirm', ja: '"削除"と入力してください', zh: '请输入"删除"以确认' },
+  'profile.delete_confirm_btn': { ko: '계정 영구 삭제', en: 'Permanently Delete Account', ja: 'アカウントを完全に削除', zh: '永久删除账号' },
+  'profile.deleting': { ko: '삭제 중…', en: 'Deleting…', ja: '削除中…', zh: '删除中…' },
+  'profile.delete_error': { ko: '계정 삭제에 실패했습니다. 고객센터에 문의해 주세요.', en: 'Failed to delete account. Please contact support.', ja: 'アカウントの削除に失敗しました。サポートにお問い合わせください。', zh: '删除账号失败，请联系客服。' },
 
   // ── 대시보드 ─────────────────────────────────────────────────────────────
   'dashboard.title': { ko: '대시보드', en: 'Dashboard', ja: 'ダッシュボード', zh: '仪表板' },

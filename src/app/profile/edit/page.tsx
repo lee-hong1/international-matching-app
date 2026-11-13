@@ -51,7 +51,7 @@ interface ProfileData {
 }
 
 export default function ProfileEditPage() {
-  const { user, loading: authLoading } = useAuth()
+  const { user, loading: authLoading, signOut } = useAuth()
   const router = useRouter()
   const { locale: lang } = useLanguage()
 
@@ -68,6 +68,9 @@ export default function ProfileEditPage() {
   const [isSaving, setIsSaving] = useState(false)
   const [successMsg, setSuccessMsg] = useState('')
   const [errorMsg, setErrorMsg] = useState('')
+  const [deleteConfirm, setDeleteConfirm] = useState('')
+  const [isDeleting, setIsDeleting] = useState(false)
+  const [deleteError, setDeleteError] = useState('')
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -98,6 +101,30 @@ export default function ProfileEditPage() {
       setIsLoading(false)
     })()
   }, [user])
+
+  async function handleDeleteAccount() {
+    setIsDeleting(true)
+    setDeleteError('')
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      const token = session?.access_token
+      if (!token) { setDeleteError(t('profile.delete_error', lang)); setIsDeleting(false); return }
+      const res = await fetch('/api/account/delete', {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      if (res.ok) {
+        await signOut()
+        router.push('/')
+      } else {
+        setDeleteError(t('profile.delete_error', lang))
+      }
+    } catch {
+      setDeleteError(t('profile.delete_error', lang))
+    } finally {
+      setIsDeleting(false)
+    }
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -279,6 +306,30 @@ export default function ProfileEditPage() {
             {isSaving ? t('profile.saving', lang) : t('profile.save', lang)}
           </button>
         </form>
+
+        {/* Danger Zone */}
+        <div className="mt-8 bg-white rounded-lg shadow border border-red-100 p-6">
+          <h2 className="text-base font-semibold text-red-600 mb-1">{t('profile.danger_zone', lang)}</h2>
+          <p className="text-sm text-gray-500 mb-4">{t('profile.delete_account_desc', lang)}</p>
+          <input
+            type="text"
+            value={deleteConfirm}
+            onChange={e => setDeleteConfirm(e.target.value)}
+            placeholder={t('profile.delete_confirm_placeholder', lang)}
+            className="w-full border border-red-200 rounded-lg px-3 py-2 text-sm mb-3 focus:outline-none focus:ring-2 focus:ring-red-400"
+          />
+          {deleteError && (
+            <p className="text-red-500 text-xs mb-2">{deleteError}</p>
+          )}
+          <button
+            type="button"
+            onClick={handleDeleteAccount}
+            disabled={isDeleting || deleteConfirm.toLowerCase() !== 'delete'}
+            className="w-full py-2.5 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed text-sm"
+          >
+            {isDeleting ? t('profile.deleting', lang) : t('profile.delete_confirm_btn', lang)}
+          </button>
+        </div>
       </main>
     </div>
   )
