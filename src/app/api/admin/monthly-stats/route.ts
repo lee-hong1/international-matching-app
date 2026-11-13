@@ -29,11 +29,12 @@ export async function GET(req: NextRequest) {
     const startDate = new Date()
     startDate.setMonth(endDate.getMonth() - months)
 
+    // High explicit limits prevent silent PostgREST row-limit truncation on large datasets
     const [usersQuery, matchesQuery, revenueQuery] = await Promise.all([
-      supabaseService.from('profiles').select('created_at').gte('created_at', startDate.toISOString()),
-      supabaseService.from('matches').select('created_at').gte('created_at', startDate.toISOString()),
+      supabaseService.from('profiles').select('created_at').gte('created_at', startDate.toISOString()).limit(100000),
+      supabaseService.from('matches').select('created_at').gte('created_at', startDate.toISOString()).limit(100000),
       supabaseService.from('payments').select('amount, created_at')
-        .eq('payment_status', 'completed').gte('created_at', startDate.toISOString()),
+        .eq('payment_status', 'completed').gte('created_at', startDate.toISOString()).limit(100000),
     ])
 
     const monthlyData = []

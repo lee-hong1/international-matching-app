@@ -22,7 +22,17 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const { data, error } = await supabaseService.from('profiles').select('country')
+    // Use RPC for server-side aggregation; avoids PostgREST row-limit truncation
+    const rpcResult = await supabaseService.rpc('analytics_countries_rpc')
+    if (!rpcResult.error && rpcResult.data) {
+      return NextResponse.json(rpcResult.data)
+    }
+
+    // Fallback: fetch with a high explicit limit to avoid silent 1000-row truncation
+    const { data, error } = await supabaseService
+      .from('profiles')
+      .select('country')
+      .limit(100000)
     if (error) {
       return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
     }
