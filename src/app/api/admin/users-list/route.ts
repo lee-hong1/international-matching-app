@@ -60,9 +60,10 @@ export async function GET(req: NextRequest) {
       userIds.length > 0
         ? supabaseService.from('matches').select('user1_id, user2_id')
             .or(userIds.flatMap((id) => [`user1_id.eq.${id}`, `user2_id.eq.${id}`]).join(','))
+            .limit(100000)
         : Promise.resolve({ data: [] as { user1_id: string; user2_id: string }[] }),
       userIds.length > 0
-        ? supabaseService.from('messages').select('sender_id').in('sender_id', userIds)
+        ? supabaseService.from('messages').select('sender_id').in('sender_id', userIds).limit(100000)
         : Promise.resolve({ data: [] as { sender_id: string }[] }),
     ])
 
