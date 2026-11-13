@@ -1,5 +1,8 @@
 'use client'
 
+import { useLanguage } from '@/contexts/LanguageContext'
+import { t } from '@src/lib/i18n'
+
 interface EventShareCardProps {
   eventId: string
   title: string
@@ -10,12 +13,13 @@ interface EventShareCardProps {
 }
 
 export function EventShareCard({ eventId, title, date, location, fee, hostName }: EventShareCardProps) {
+  const { locale: lang } = useLanguage()
   const shareUrl = typeof window !== 'undefined' ? `${window.location.origin}/events/${eventId}` : `/events/${eventId}`
 
   async function handleCopy() {
     try {
       await navigator.clipboard.writeText(shareUrl)
-      alert('링크가 복사되었습니다!')
+      alert(t('event_share.copied', lang))
     } catch {
       // 복사 실패 시 선택 fallback
       const el = document.createElement('input')
@@ -38,7 +42,7 @@ export function EventShareCard({ eventId, title, date, location, fee, hostName }
       }}
     >
       <p style={{ margin: 0, fontSize: '0.875rem', fontWeight: 600, color: '#374151', marginBottom: '0.5rem' }}>
-        이벤트 공유
+        {t('event_share.title', lang)}
       </p>
       <div
         style={{
@@ -54,8 +58,8 @@ export function EventShareCard({ eventId, title, date, location, fee, hostName }
         <div><strong style={{ color: '#374151' }}>{title}</strong></div>
         <div>📅 {date}</div>
         <div>📍 {location}</div>
-        <div>💰 {fee > 0 ? `${fee.toLocaleString('ko-KR')}원/인` : '무료'}</div>
-        <div>👤 호스트: {hostName}</div>
+        <div>💰 {fee > 0 ? `${fee.toLocaleString()}${t('event_share.fee_per_person', lang)}` : t('event_share.free', lang)}</div>
+        <div>👤 {t('event_share.host', lang)} {hostName}</div>
       </div>
       <div style={{ display: 'flex', gap: '0.5rem' }}>
         <input
@@ -88,7 +92,7 @@ export function EventShareCard({ eventId, title, date, location, fee, hostName }
             whiteSpace: 'nowrap',
           }}
         >
-          복사
+          {t('event_share.copy', lang)}
         </button>
       </div>
     </div>

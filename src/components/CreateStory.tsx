@@ -110,7 +110,7 @@ export default function CreateStory({ onClose, onStoryCreated }: CreateStoryProp
               file?.type.startsWith('video/') ? (
                 <video src={preview} style={{ width: '100%', maxHeight: 300, objectFit: 'cover' }} />
               ) : (
-                <img src={preview} alt="스토리 미리보기" style={{ width: '100%', maxHeight: 300, objectFit: 'cover' }} />
+                <img src={preview} alt={t('create_story.preview_alt', lang)} style={{ width: '100%', maxHeight: 300, objectFit: 'cover' }} />
               )
             ) : (
               <div style={{ textAlign: 'center', color: '#9ca3af', padding: '1rem' }}>

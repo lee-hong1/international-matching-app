@@ -1135,6 +1135,15 @@ const MESSAGES: Messages = {
   'create_story.invalid_type_error': { ko: '이미지 또는 영상 파일만 업로드할 수 있습니다.', en: 'Only image or video files are allowed.', ja: '画像または動画ファイルのみアップロードできます。', zh: '只能上传图片或视频文件。' },
   'create_story.size_error':        { ko: '파일 크기는 50MB 이하여야 합니다.', en: 'File size must be 50MB or less.', ja: 'ファイルサイズは50MB以下にしてください。', zh: '文件大小必须在50MB以下。' },
   'create_story.fail_error':        { ko: '스토리 등록에 실패했습니다.', en: 'Failed to upload story.',  ja: 'ストーリーのアップロードに失敗しました。', zh: '故事上传失败。' },
+  'create_story.preview_alt':       { ko: '스토리 미리보기',            en: 'Story preview',             ja: 'ストーリーのプレビュー',      zh: '故事预览' },
+
+  // ── 이벤트 공유 카드 ───────────────────────────────────────────────────
+  'event_share.title':              { ko: '이벤트 공유',               en: 'Share Event',               ja: 'イベントをシェア',            zh: '分享活动' },
+  'event_share.free':               { ko: '무료',                     en: 'Free',                      ja: '無料',                     zh: '免费' },
+  'event_share.host':               { ko: '호스트:',                   en: 'Host:',                     ja: 'ホスト:',                   zh: '主持人:' },
+  'event_share.fee_per_person':     { ko: '/인',                      en: '/person',                   ja: '/人',                      zh: '/人' },
+  'event_share.copy':               { ko: '복사',                     en: 'Copy',                      ja: 'コピー',                    zh: '复制' },
+  'event_share.copied':             { ko: '링크가 복사되었습니다!',       en: 'Link copied!',              ja: 'リンクをコピーしました！',      zh: '链接已复制！' },
 }
 
 /** 언어 코드를 지원 언어로 정규화 */
