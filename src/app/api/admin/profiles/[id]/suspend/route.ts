@@ -111,9 +111,16 @@ export async function PATCH(
   // 감사 로그 기록 (fire-and-forget — 로그 실패가 응답에 영향 없음)
   void (async () => {
     try {
-      const adminKeyHash = adminKey
-        ? createHash('sha256').update(adminKey).digest('hex').substring(0, 16)
-        : 'email-auth'
+      let adminKeyHash: string
+      if (adminKey && req.headers.get('x-admin-key')) {
+        adminKeyHash = createHash('sha256').update(adminKey).digest('hex').substring(0, 16)
+      } else {
+        // email 기반 인증: 관리자 user.id 해시로 감사 추적 (이메일 직접 저장 금지)
+        const adminUser = await getAuthUser(req)
+        adminKeyHash = adminUser?.id
+          ? 'email:' + createHash('sha256').update(adminUser.id).digest('hex').substring(0, 16)
+          : 'email-auth-unknown'
+      }
       await supabaseService.from('admin_actions').insert({
         admin_key_hash: adminKeyHash,
         target_user_id: id,
