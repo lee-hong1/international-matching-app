@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
+import { t, detectLangFromNavigator } from '@src/lib/i18n'
 
 interface Story {
   id: string
@@ -19,6 +20,7 @@ interface StoryBarProps {
 export default function StoryBar({ onAddStory }: StoryBarProps) {
   const { user } = useAuth()
   const [stories, setStories] = useState<Story[]>([])
+  const lang = detectLangFromNavigator()
 
   useEffect(() => {
     fetch('/api/stories?limit=20')
@@ -43,7 +45,7 @@ export default function StoryBar({ onAddStory }: StoryBarProps) {
           border: 'none',
           padding: 0,
         }}
-        aria-label="스토리 추가"
+        aria-label={t('story.add_aria', lang)}
       >
         <div style={{
           width: 56,
@@ -79,12 +81,12 @@ export default function StoryBar({ onAddStory }: StoryBarProps) {
             border: '2px solid #fff',
           }}>+</span>
         </div>
-        <span style={{ fontSize: '0.7rem', color: '#6b7280', maxWidth: 56, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>내 스토리</span>
+        <span style={{ fontSize: '0.7rem', color: '#6b7280', maxWidth: 56, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t('story.my_story', lang)}</span>
       </button>
 
       {/* 팔로우한 사용자 스토리 */}
       {stories.map((story) => {
-        const name = story.profiles?.full_name ?? '사용자'
+        const name = story.profiles?.full_name ?? t('story.anonymous', lang)
         const avatar = story.profiles?.avatar_url
         return (
           <button
@@ -100,7 +102,7 @@ export default function StoryBar({ onAddStory }: StoryBarProps) {
               border: 'none',
               padding: 0,
             }}
-            aria-label={`${name}의 스토리`}
+            aria-label={name}
           >
             <div style={{
               width: 56,

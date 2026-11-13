@@ -727,6 +727,11 @@ const MESSAGES: Messages = {
   'post.add_comment': { ko: '게시', en: 'Post', ja: '投稿', zh: '发布' },
   'post.loading': { ko: '게시물 로딩 중...', en: 'Loading post...', ja: '投稿を読み込み中...', zh: '加载帖子中...' },
 
+  // ── 스토리 바 ─────────────────────────────────────────────────────────────
+  'story.my_story': { ko: '내 스토리', en: 'My Story', ja: 'マイストーリー', zh: '我的故事' },
+  'story.add_aria': { ko: '스토리 추가', en: 'Add story', ja: 'ストーリーを追加', zh: '添加故事' },
+  'story.anonymous': { ko: '사용자', en: 'User', ja: 'ユーザー', zh: '用户' },
+
   // ── 탐색(Explore) 페이지 ──────────────────────────────────────────────────
   'explore.tab_posts': { ko: '게시물', en: 'Posts', ja: '投稿', zh: '帖子' },
   'explore.tab_creators': { ko: '크리에이터', en: 'Creators', ja: 'クリエイター', zh: '创作者' },
