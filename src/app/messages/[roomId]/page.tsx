@@ -105,12 +105,12 @@ export default function ChatPage() {
     try {
       const sent = await chatService.sendMessage(params.roomId, user.id, newMessage.trim())
       if (sent) setNewMessage('')
-      else setSendError('Failed to send message. Please try again.')
+      else setSendError(t('messages.send_error', lang))
     } catch (error: unknown) {
       const redirect = (error as { redirect?: string }).redirect
       if (redirect) { router.push(redirect); return }
       console.error('Error sending message:', error)
-      setSendError('Failed to send message. Please try again.')
+      setSendError(t('messages.send_error', lang))
     } finally {
       setIsSending(false)
     }
@@ -118,10 +118,11 @@ export default function ChatPage() {
 
   const formatMessageTime = (dateString: string) => {
     const date = new Date(dateString)
-    return date.toLocaleTimeString('ko-KR', { 
-      hour: '2-digit', 
+    const locale = lang === 'ko' ? 'ko-KR' : lang === 'ja' ? 'ja-JP' : lang === 'zh' ? 'zh-CN' : 'en-US'
+    return date.toLocaleTimeString(locale, {
+      hour: '2-digit',
       minute: '2-digit',
-      hour12: false 
+      hour12: false
     })
   }
 

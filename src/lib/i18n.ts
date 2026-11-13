@@ -786,6 +786,7 @@ const MESSAGES: Messages = {
   'messages.today': { ko: '오늘', en: 'Today', ja: '今日', zh: '今天' },
   'messages.yesterday': { ko: '어제', en: 'Yesterday', ja: '昨日', zh: '昨天' },
   'messages.input_placeholder': { ko: '메시지를 입력하세요...', en: 'Type a message...', ja: 'メッセージを入力...', zh: '输入消息...' },
+  'messages.send_error': { ko: '메시지 전송 실패. 다시 시도해 주세요.', en: 'Failed to send message. Please try again.', ja: 'メッセージの送信に失敗しました。もう一度お試しください。', zh: '发送消息失败，请重试。' },
 
   // ── 헤더 네비게이션 (추가) ──────────────────────────────────────────────
   'nav.dashboard': { ko: '대시보드', en: 'Dashboard', ja: 'ダッシュボード', zh: '仪表板' },
