@@ -2,8 +2,11 @@
 
 import React, { useState, useEffect } from 'react'
 import { PlatformStatistics, CountryStats } from '@/lib/analytics'
+import { useLanguage } from '@/contexts/LanguageContext'
+import { t } from '@src/lib/i18n'
 
 export default function AnalyticsPage() {
+  const { locale: lang } = useLanguage()
   const [platformStats, setPlatformStats] = useState<PlatformStatistics | null>(null)
   const [countryStats, setCountryStats] = useState<CountryStats[]>([])
   const [loading, setLoading] = useState(true)
@@ -47,7 +50,7 @@ export default function AnalyticsPage() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="w-12 h-12 border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">분석 데이터를 불러오는 중...</p>
+          <p className="text-gray-600">{t('analytics.loading', lang)}</p>
         </div>
       </div>
     )
@@ -62,7 +65,7 @@ export default function AnalyticsPage() {
             onClick={loadAnalytics}
             className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700"
           >
-            다시 시도
+            {t('analytics.retry', lang)}
           </button>
         </div>
       </div>
@@ -73,8 +76,8 @@ export default function AnalyticsPage() {
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">플랫폼 분석</h1>
-          <p className="text-gray-600">사용자 행동 및 플랫폼 성과 분석 대시보드</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">{t('analytics.title', lang)}</h1>
+          <p className="text-gray-600">{t('analytics.subtitle', lang)}</p>
         </div>
 
         {/* 탭 메뉴 */}
@@ -82,9 +85,9 @@ export default function AnalyticsPage() {
           <div className="border-b border-gray-200">
             <nav className="-mb-px flex space-x-8">
               {[
-                { key: 'overview', label: '전체 개요' },
-                { key: 'countries', label: '국가별 통계' },
-                { key: 'trends', label: '트렌드 분석' }
+                { key: 'overview', label: t('analytics.tab_overview', lang) },
+                { key: 'countries', label: t('analytics.tab_countries', lang) },
+                { key: 'trends', label: t('analytics.tab_trends', lang) }
               ].map((tab) => (
                 <button
                   key={tab.key}
@@ -115,7 +118,7 @@ export default function AnalyticsPage() {
                     </svg>
                   </div>
                   <div className="ml-4">
-                    <h3 className="text-lg font-semibold text-gray-900">전체 사용자</h3>
+                    <h3 className="text-lg font-semibold text-gray-900">{t('analytics.total_users', lang)}</h3>
                     <p className="text-2xl font-bold text-blue-600">{platformStats.total_users.toLocaleString()}</p>
                   </div>
                 </div>
@@ -129,7 +132,7 @@ export default function AnalyticsPage() {
                     </svg>
                   </div>
                   <div className="ml-4">
-                    <h3 className="text-lg font-semibold text-gray-900">이번 달 활성 사용자</h3>
+                    <h3 className="text-lg font-semibold text-gray-900">{t('analytics.active_month', lang)}</h3>
                     <p className="text-2xl font-bold text-green-600">{platformStats.active_users_month.toLocaleString()}</p>
                   </div>
                 </div>
@@ -143,7 +146,7 @@ export default function AnalyticsPage() {
                     </svg>
                   </div>
                   <div className="ml-4">
-                    <h3 className="text-lg font-semibold text-gray-900">총 매칭</h3>
+                    <h3 className="text-lg font-semibold text-gray-900">{t('analytics.total_matches', lang)}</h3>
                     <p className="text-2xl font-bold text-purple-600">{platformStats.total_matches.toLocaleString()}</p>
                   </div>
                 </div>
@@ -157,7 +160,7 @@ export default function AnalyticsPage() {
                     </svg>
                   </div>
                   <div className="ml-4">
-                    <h3 className="text-lg font-semibold text-gray-900">이번 달 수익</h3>
+                    <h3 className="text-lg font-semibold text-gray-900">{t('analytics.revenue_month', lang)}</h3>
                     <p className="text-2xl font-bold text-yellow-600">₩{platformStats.revenue_month.toLocaleString()}</p>
                   </div>
                 </div>
@@ -167,44 +170,44 @@ export default function AnalyticsPage() {
             {/* 상세 통계 */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <div className="bg-white p-6 rounded-lg shadow-sm border">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">사용자 활동</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('analytics.user_activity', lang)}</h3>
                 <div className="space-y-4">
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-600">오늘 활성 사용자</span>
+                    <span className="text-gray-600">{t('analytics.active_today', lang)}</span>
                     <span className="font-semibold">{platformStats.active_users_today.toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-600">이번 주 활성 사용자</span>
+                    <span className="text-gray-600">{t('analytics.active_week', lang)}</span>
                     <span className="font-semibold">{platformStats.active_users_week.toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-600">프리미엄 사용자</span>
+                    <span className="text-gray-600">{t('analytics.premium_users', lang)}</span>
                     <span className="font-semibold text-purple-600">{platformStats.premium_users.toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-600">전환율</span>
+                    <span className="text-gray-600">{t('analytics.conversion_rate', lang)}</span>
                     <span className="font-semibold">{platformStats.conversion_rate.toFixed(1)}%</span>
                   </div>
                 </div>
               </div>
 
               <div className="bg-white p-6 rounded-lg shadow-sm border">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">매칭 & 메시지</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('analytics.matching_messages', lang)}</h3>
                 <div className="space-y-4">
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-600">오늘 매칭</span>
+                    <span className="text-gray-600">{t('analytics.matches_today', lang)}</span>
                     <span className="font-semibold">{platformStats.matches_today.toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-600">총 메시지</span>
+                    <span className="text-gray-600">{t('analytics.total_messages', lang)}</span>
                     <span className="font-semibold">{platformStats.total_messages.toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-600">오늘 메시지</span>
+                    <span className="text-gray-600">{t('analytics.messages_today', lang)}</span>
                     <span className="font-semibold">{platformStats.messages_today.toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-600">7일 유지율</span>
+                    <span className="text-gray-600">{t('analytics.retention_7d', lang)}</span>
                     <span className="font-semibold text-green-600">{platformStats.retention_rate_7d.toFixed(1)}%</span>
                   </div>
                 </div>
@@ -217,18 +220,18 @@ export default function AnalyticsPage() {
         {activeTab === 'countries' && (
           <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
             <div className="px-6 py-4 border-b border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-900">국가별 사용자 통계</h3>
+              <h3 className="text-lg font-semibold text-gray-900">{t('analytics.country_stats_title', lang)}</h3>
             </div>
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">국가</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">총 사용자</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">활성 사용자</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">매칭 수</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">프리미엄 사용자</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">평균 참여도</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('analytics.col_country', lang)}</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('analytics.col_total_users', lang)}</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('analytics.col_active_users', lang)}</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('analytics.col_matches', lang)}</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('analytics.col_premium', lang)}</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('analytics.col_engagement', lang)}</th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
@@ -271,13 +274,13 @@ export default function AnalyticsPage() {
         {/* 트렌드 분석 탭 */}
         {activeTab === 'trends' && (
           <div className="bg-white p-6 rounded-lg shadow-sm border">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">트렌드 분석</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('analytics.trends_title', lang)}</h3>
             <div className="text-center py-12 text-gray-500">
               <svg className="w-16 h-16 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
               </svg>
-              <p>트렌드 차트가 여기에 표시됩니다.</p>
-              <p className="text-sm mt-2">Chart.js 또는 다른 차트 라이브러리를 통합하여 시각적 분석을 제공할 수 있습니다.</p>
+              <p>{t('analytics.trends_placeholder', lang)}</p>
+              <p className="text-sm mt-2">{t('analytics.trends_placeholder2', lang)}</p>
             </div>
           </div>
         )}

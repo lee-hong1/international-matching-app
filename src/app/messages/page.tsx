@@ -6,10 +6,13 @@ import { useRouter } from 'next/navigation'
 import { chatService, ChatRoom } from '@/lib/chat'
 import Link from 'next/link'
 import Image from 'next/image'
+import { useLanguage } from '@/contexts/LanguageContext'
+import { t } from '@src/lib/i18n'
 
 export default function MessagesPage() {
   const { user, loading } = useAuth()
   const router = useRouter()
+  const { locale: lang } = useLanguage()
   const [chatRooms, setChatRooms] = useState<ChatRoom[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
@@ -43,20 +46,14 @@ export default function MessagesPage() {
     const date = new Date(dateString)
     const now = new Date()
     const diffInHours = Math.abs(now.getTime() - date.getTime()) / (1000 * 60 * 60)
+    const locale = lang === 'ko' ? 'ko-KR' : lang === 'ja' ? 'ja-JP' : lang === 'zh' ? 'zh-CN' : 'en-US'
 
     if (diffInHours < 24) {
-      return date.toLocaleTimeString('ko-KR', { 
-        hour: '2-digit', 
-        minute: '2-digit',
-        hour12: false 
-      })
+      return date.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit', hour12: false })
     } else if (diffInHours < 24 * 7) {
-      return date.toLocaleDateString('ko-KR', { weekday: 'short' })
+      return date.toLocaleDateString(locale, { weekday: 'short' })
     } else {
-      return date.toLocaleDateString('ko-KR', { 
-        month: 'short', 
-        day: 'numeric' 
-      })
+      return date.toLocaleDateString(locale, { month: 'short', day: 'numeric' })
     }
   }
 
@@ -88,10 +85,10 @@ export default function MessagesPage() {
               </Link>
             </div>
             <nav className="flex items-center space-x-6">
-              <Link href="/dashboard" className="text-gray-600 hover:text-purple-600">대시보드</Link>
-              <Link href="/discover" className="text-gray-600 hover:text-purple-600">탐색</Link>
-              <Link href="/matches" className="text-gray-600 hover:text-purple-600">매칭</Link>
-              <span className="text-purple-600 font-medium">메시지</span>
+              <Link href="/dashboard" className="text-gray-600 hover:text-purple-600">{t('nav.dashboard', lang)}</Link>
+              <Link href="/discover" className="text-gray-600 hover:text-purple-600">{t('nav.discover', lang)}</Link>
+              <Link href="/matches" className="text-gray-600 hover:text-purple-600">{t('nav.matching', lang)}</Link>
+              <span className="text-purple-600 font-medium">{t('nav.messages', lang)}</span>
             </nav>
           </div>
         </div>
@@ -103,12 +100,12 @@ export default function MessagesPage() {
           {/* 헤더 */}
           <div className="border-b border-gray-200 px-6 py-4">
             <div className="flex items-center justify-between">
-              <h1 className="text-2xl font-bold text-gray-900">메시지</h1>
+              <h1 className="text-2xl font-bold text-gray-900">{t('messages.title', lang)}</h1>
               <div className="flex items-center space-x-4">
                 <div className="relative">
                   <input
                     type="text"
-                    placeholder="대화 상대 검색..."
+                    placeholder={t('messages.search_placeholder', lang)}
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
@@ -127,17 +124,17 @@ export default function MessagesPage() {
               <div className="text-center py-12">
                 <div className="text-6xl mb-4">💬</div>
                 <h3 className="text-lg font-medium text-gray-900 mb-2">
-                  {searchTerm ? '검색 결과가 없습니다' : '아직 대화가 없습니다'}
+                  {searchTerm ? t('messages.empty_search', lang) : t('messages.empty_no_matches', lang)}
                 </h3>
                 <p className="text-gray-600 mb-6">
-                  {searchTerm ? '다른 검색어를 시도해보세요' : '새로운 사람들과 매칭되면 여기에서 대화할 수 있습니다'}
+                  {searchTerm ? t('messages.empty_hint_search', lang) : t('messages.empty_hint_match', lang)}
                 </p>
                 {!searchTerm && (
                   <Link
                     href="/discover"
                     className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700"
                   >
-                    새로운 사람 찾기
+                    {t('messages.find_people', lang)}
                   </Link>
                 )}
               </div>
@@ -173,9 +170,9 @@ export default function MessagesPage() {
                           <p className="text-sm font-medium text-gray-900 truncate">
                             {room.partner?.full_name}
                           </p>
-                          {room.last_message && (
+                          {room.last_message_at && (
                             <p className="text-xs text-gray-500">
-                              {formatMessageTime(room.last_message.created_at)}
+                              {formatMessageTime(room.last_message_at)}
                             </p>
                           )}
                         </div>
@@ -186,24 +183,20 @@ export default function MessagesPage() {
                               📍 {room.partner?.country}
                             </p>
                           </div>
+                          {(room.unread_count ?? 0) > 0 && (
+                            <span className="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-purple-600 rounded-full">
+                              {room.unread_count! > 99 ? '99+' : room.unread_count}
+                            </span>
+                          )}
                         </div>
 
                         {room.last_message && (
                           <p className="text-sm text-gray-600 truncate mt-1">
-                            {room.last_message.sender_id === user.id ? '나: ' : ''}
                             {room.last_message.content}
                           </p>
                         )}
                       </div>
 
-                      {/* 온라인 상태 및 읽지 않은 메시지 */}
-                      <div className="flex-shrink-0 flex flex-col items-end space-y-1">
-                        <div className="w-3 h-3 bg-green-400 rounded-full"></div>
-                        {/* TODO: 읽지 않은 메시지 카운트 */}
-                        {/* <div className="bg-purple-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                          2
-                        </div> */}
-                      </div>
                     </div>
                   </div>
                 </Link>
@@ -214,12 +207,12 @@ export default function MessagesPage() {
 
         {/* 도움말 섹션 */}
         <div className="mt-8 bg-purple-50 rounded-lg p-6">
-          <h3 className="text-lg font-medium text-purple-900 mb-2">💡 채팅 팁</h3>
+          <h3 className="text-lg font-medium text-purple-900 mb-2">💡 {t('messages.tips_title', lang)}</h3>
           <ul className="text-sm text-purple-800 space-y-1">
-            <li>• 정중하고 친근한 대화로 시작해보세요</li>
-            <li>• 상대방의 프로필을 참고해서 공통 관심사를 찾아보세요</li>
-            <li>• 번역 기능을 사용해 언어 장벽을 극복하세요</li>
-            <li>• 개인정보는 충분히 알게 된 후에 공유하세요</li>
+            <li>• {t('messages.tip_1', lang)}</li>
+            <li>• {t('messages.tip_2', lang)}</li>
+            <li>• {t('messages.tip_3', lang)}</li>
+            <li>• {t('messages.tip_4', lang)}</li>
           </ul>
         </div>
       </main>

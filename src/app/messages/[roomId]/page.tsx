@@ -2,19 +2,25 @@
 
 import React, { useState, useEffect, useRef } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
-import { useRouter } from 'next/navigation'
+import { useRouter, useParams } from 'next/navigation'
 import { chatService, Message, ChatRoom } from '@/lib/chat'
 import Image from 'next/image'
 import { RealtimeChannel } from '@supabase/supabase-js'
+import { useLanguage } from '@/contexts/LanguageContext'
+import { t } from '@src/lib/i18n'
 
-export default function ChatPage({ params }: { params: { roomId: string } }) {
+export default function ChatPage() {
   const { user, loading } = useAuth()
+  const { locale: lang } = useLanguage()
   const router = useRouter()
+  const rawParams = useParams()
+  const params = { roomId: rawParams.roomId as string }
   const [messages, setMessages] = useState<Message[]>([])
   const [chatRoom, setChatRoom] = useState<ChatRoom | null>(null)
   const [newMessage, setNewMessage] = useState('')
   const [isLoading, setIsLoading] = useState(true)
   const [isSending, setIsSending] = useState(false)
+  const [sendError, setSendError] = useState('')
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const subscription = useRef<RealtimeChannel | null>(null)
 
@@ -45,23 +51,22 @@ export default function ChatPage({ params }: { params: { roomId: string } }) {
 
     setIsLoading(true)
     try {
-      // 채팅방 정보 가져오기
-      const rooms = await chatService.getUserChatRooms(user.id)
+      const [rooms, roomMessages] = await Promise.all([
+        chatService.getUserChatRooms(user.id),
+        chatService.getRoomMessages(params.roomId),
+      ])
       const currentRoom = rooms.find(room => room.id === params.roomId)
-      
+
       if (!currentRoom) {
         router.push('/messages')
         return
       }
 
       setChatRoom(currentRoom)
-
-      // 메시지 가져오기
-      const roomMessages = await chatService.getRoomMessages(params.roomId)
       setMessages(roomMessages)
 
-      // 메시지 읽음 처리
-      await chatService.markMessagesAsRead(params.roomId, user.id)
+      // 읽음 처리 — fire-and-forget (UX 차단 불필요)
+      void chatService.markMessagesAsRead(params.roomId, user.id)
     } catch (error) {
       console.error('Error loading chat data:', error)
     } finally {
@@ -96,11 +101,16 @@ export default function ChatPage({ params }: { params: { roomId: string } }) {
     if (!user || !newMessage.trim() || isSending) return
 
     setIsSending(true)
+    setSendError('')
     try {
-      await chatService.sendMessage(params.roomId, user.id, newMessage.trim())
-      setNewMessage('')
-    } catch (error) {
+      const sent = await chatService.sendMessage(params.roomId, user.id, newMessage.trim())
+      if (sent) setNewMessage('')
+      else setSendError(t('messages.send_error', lang))
+    } catch (error: unknown) {
+      const redirect = (error as { redirect?: string }).redirect
+      if (redirect) { router.push(redirect); return }
       console.error('Error sending message:', error)
+      setSendError(t('messages.send_error', lang))
     } finally {
       setIsSending(false)
     }
@@ -108,10 +118,11 @@ export default function ChatPage({ params }: { params: { roomId: string } }) {
 
   const formatMessageTime = (dateString: string) => {
     const date = new Date(dateString)
-    return date.toLocaleTimeString('ko-KR', { 
-      hour: '2-digit', 
+    const locale = lang === 'ko' ? 'ko-KR' : lang === 'ja' ? 'ja-JP' : lang === 'zh' ? 'zh-CN' : 'en-US'
+    return date.toLocaleTimeString(locale, {
+      hour: '2-digit',
       minute: '2-digit',
-      hour12: false 
+      hour12: false
     })
   }
 
@@ -122,15 +133,12 @@ export default function ChatPage({ params }: { params: { roomId: string } }) {
     yesterday.setDate(today.getDate() - 1)
 
     if (date.toDateString() === today.toDateString()) {
-      return '오늘'
+      return t('messages.today', lang)
     } else if (date.toDateString() === yesterday.toDateString()) {
-      return '어제'
+      return t('messages.yesterday', lang)
     } else {
-      return date.toLocaleDateString('ko-KR', { 
-        year: 'numeric', 
-        month: 'long', 
-        day: 'numeric' 
-      })
+      const locale = lang === 'ko' ? 'ko-KR' : lang === 'ja' ? 'ja-JP' : lang === 'zh' ? 'zh-CN' : 'en-US'
+      return date.toLocaleDateString(locale, { year: 'numeric', month: 'long', day: 'numeric' })
     }
   }
 
@@ -291,13 +299,16 @@ export default function ChatPage({ params }: { params: { roomId: string } }) {
       {/* 메시지 입력 */}
       <div className="bg-white border-t p-4">
         <div className="max-w-4xl mx-auto">
+          {sendError && (
+            <p className="text-xs text-red-500 mb-2 px-1">{sendError}</p>
+          )}
           <form onSubmit={handleSendMessage} className="flex items-end space-x-3">
             <div className="flex-1">
               <div className="relative">
                 <textarea
                   value={newMessage}
                   onChange={(e) => setNewMessage(e.target.value)}
-                  placeholder="메시지를 입력하세요..."
+                  placeholder={t('messages.input_placeholder', lang)}
                   rows={1}
                   className="w-full px-4 py-3 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 resize-none"
                   style={{ minHeight: '44px', maxHeight: '120px' }}

@@ -1,0 +1,157 @@
+'use client'
+
+import { useState, useRef, useEffect } from 'react'
+import { useLanguage } from '@/contexts/LanguageContext'
+import { t } from '@src/lib/i18n'
+
+interface CreateStoryProps {
+  onClose: () => void
+  onStoryCreated: () => void
+}
+
+export default function CreateStory({ onClose, onStoryCreated }: CreateStoryProps) {
+  const { locale: lang } = useLanguage()
+  const [file, setFile] = useState<File | null>(null)
+  const [preview, setPreview] = useState<string | null>(null)
+  const [caption, setCaption] = useState('')
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState('')
+  const fileRef = useRef<HTMLInputElement>(null)
+
+  // Revoke object URL on unmount to prevent memory leak
+  useEffect(() => {
+    return () => { if (preview) URL.revokeObjectURL(preview) }
+  }, [preview])
+
+  function handleFile(selected: File | null) {
+    if (!selected) return
+    if (!selected.type.startsWith('image/') && !selected.type.startsWith('video/')) {
+      setError(t('create_story.invalid_type_error', lang))
+      return
+    }
+    if (selected.size > 50 * 1024 * 1024) {
+      setError(t('create_story.size_error', lang))
+      return
+    }
+    if (preview) URL.revokeObjectURL(preview)
+    setFile(selected)
+    setPreview(URL.createObjectURL(selected))
+    setError('')
+  }
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    if (!file) { setError(t('create_story.no_file_error', lang)); return }
+    setSubmitting(true)
+    setError('')
+    try {
+      const form = new FormData()
+      form.append('media', file)
+      if (caption.trim()) form.append('caption', caption.trim())
+      const res = await fetch('/api/stories', { method: 'POST', body: form })
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}))
+        throw new Error(err.error ?? t('create_story.fail_error', lang))
+      }
+      onStoryCreated()
+    } catch (err) {
+      setError(err instanceof Error ? err.message : t('create_story.fail_error', lang))
+      setSubmitting(false)
+    }
+  }
+
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label={t('create_story.title', lang)}
+      style={{
+        position: 'fixed',
+        inset: 0,
+        background: 'rgba(0,0,0,0.7)',
+        zIndex: 100,
+        display: 'flex',
+        alignItems: 'flex-end',
+        justifyContent: 'center',
+      }}
+      onClick={(e) => { if (e.target === e.currentTarget) onClose() }}
+    >
+      <div style={{
+        background: '#fff',
+        borderRadius: '1.25rem 1.25rem 0 0',
+        width: '100%',
+        maxWidth: 480,
+        maxHeight: '90vh',
+        overflowY: 'auto',
+        padding: '1.25rem',
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
+          <h2 style={{ margin: 0, fontSize: '1rem', fontWeight: 700 }}>{t('create_story.title', lang)}</h2>
+          <button onClick={onClose} aria-label={t('create_post.close', lang)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.5rem', color: '#9ca3af', lineHeight: 1 }}>×</button>
+        </div>
+        <p style={{ margin: '0 0 1rem', fontSize: '0.825rem', color: '#6b7280' }}>{t('create_story.subtitle', lang)}</p>
+
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '0.875rem' }}>
+          <div
+            onClick={() => fileRef.current?.click()}
+            style={{
+              borderRadius: 12,
+              border: '2px dashed #e5e7eb',
+              height: preview ? undefined : 200,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              overflow: 'hidden',
+              background: '#f9fafb',
+            }}
+          >
+            {preview ? (
+              file?.type.startsWith('video/') ? (
+                <video src={preview} style={{ width: '100%', maxHeight: 300, objectFit: 'cover' }} />
+              ) : (
+                <img src={preview} alt={t('create_story.preview_alt', lang)} style={{ width: '100%', maxHeight: 300, objectFit: 'cover' }} />
+              )
+            ) : (
+              <div style={{ textAlign: 'center', color: '#9ca3af', padding: '1rem' }}>
+                <svg style={{ width: 40, height: 40, margin: '0 auto 8px' }} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M15 10l4.553-2.069A1 1 0 0121 8.869v6.262a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+                <p style={{ fontSize: '0.85rem', margin: 0 }}>{t('create_story.select_media', lang)}</p>
+                <p style={{ fontSize: '0.75rem', margin: '4px 0 0', color: '#d1d5db' }}>{t('create_story.max_size', lang)}</p>
+              </div>
+            )}
+          </div>
+          <input ref={fileRef} type="file" accept="image/*,video/*" onChange={(e) => handleFile(e.target.files?.[0] ?? null)} style={{ display: 'none' }} />
+
+          <input
+            value={caption}
+            onChange={(e) => setCaption(e.target.value)}
+            maxLength={200}
+            placeholder={t('create_story.caption_placeholder', lang)}
+            style={{ padding: '0.625rem', borderRadius: 8, border: '1px solid #e5e7eb', fontSize: '0.9rem' }}
+          />
+
+          {error && (
+            <p style={{ margin: 0, fontSize: '0.875rem', color: '#dc2626', background: '#fee2e2', padding: '0.5rem 0.75rem', borderRadius: 6 }}>{error}</p>
+          )}
+
+          <button
+            type="submit"
+            disabled={submitting || !file}
+            style={{
+              padding: '0.75rem',
+              background: submitting || !file ? '#9ca3af' : 'linear-gradient(135deg, #f97316, #ec4899)',
+              color: '#fff',
+              border: 'none',
+              borderRadius: 10,
+              fontWeight: 700,
+              fontSize: '0.95rem',
+              cursor: submitting || !file ? 'default' : 'pointer',
+            }}
+          >
+            {submitting ? t('create_story.submitting', lang) : t('create_story.submit', lang)}
+          </button>
+        </form>
+      </div>
+    </div>
+  )
+}

@@ -1,0 +1,77 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
+import { isValidUuid, getAuthUser, supabaseService, hasForbiddenContent } from '@src/lib/commerce'
+import { isSuspended } from '@src/lib/suspended-check'
+import { detectExternalPlatform } from '@src/lib/chat-safety'
+
+// POST /api/posts/comments — 댓글 작성 (본인 user_id만 허용, IDOR 방지)
+export async function POST(request: NextRequest) {
+  const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
+  const rl = await checkRateLimit(`post-comment:${ip}`, 'general')
+  if (!rl.allowed) {
+    const r = rateLimitResponse(rl.resetAt)
+    return NextResponse.json(r.body, { status: r.status, headers: r.headers })
+  }
+
+  const user = await getAuthUser(request)
+  if (!user) {
+    return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
+  }
+
+  if (await isSuspended(user.id)) {
+    return NextResponse.json({ error: 'Account suspended' }, { status: 403 })
+  }
+
+  // 청소년보호법: 성인 플랫폼 댓글 작성은 성인 인증 필수
+  const { data: commenterProfile } = await supabaseService
+    .from('profiles').select('is_adult').eq('id', user.id).single()
+  if (!commenterProfile?.is_adult) {
+    return NextResponse.json({ error: 'Age verification required', redirect: '/onboarding/verify-age' }, { status: 403 })
+  }
+
+  const body = await request.json().catch(() => null)
+  if (!body) return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 })
+
+  const { post_id, content, parent_comment_id } = body
+
+  if (!post_id || !isValidUuid(post_id)) {
+    return NextResponse.json({ error: 'Invalid post_id' }, { status: 400 })
+  }
+  if (typeof content !== 'string' || content.trim().length === 0 || content.length > 500) {
+    return NextResponse.json({ error: 'content must be 1–500 characters' }, { status: 400 })
+  }
+  if (hasForbiddenContent(content)) {
+    return NextResponse.json({ error: 'Comment contains prohibited content' }, { status: 400 })
+  }
+  if (detectExternalPlatform(content)) {
+    return NextResponse.json({ error: 'External platform references are not allowed in comments' }, { status: 400 })
+  }
+  if (parent_comment_id && !isValidUuid(parent_comment_id)) {
+    return NextResponse.json({ error: 'Invalid parent_comment_id' }, { status: 400 })
+  }
+
+  const { data: post } = await supabaseService.from('posts').select('id').eq('id', post_id).single()
+  if (!post) return NextResponse.json({ error: 'Post not found' }, { status: 404 })
+
+  const insertRow: Record<string, unknown> = {
+    post_id,
+    user_id: user.id,
+    content: content.trim(),
+  }
+  if (parent_comment_id) insertRow.parent_comment_id = parent_comment_id
+
+  const { data: comment, error } = await supabaseService
+    .from('post_comments')
+    .insert(insertRow)
+    .select('id, post_id, user_id, content, likes_count, created_at, profiles!post_comments_user_id_fkey (id, full_name, avatar_url)')
+    .single()
+
+  if (error || !comment) {
+    return NextResponse.json({ error: 'Failed to add comment' }, { status: 500 })
+  }
+
+  // comments_count 증가
+  await supabaseService.rpc('increment_comments_count', { p_post_id: post_id })
+
+  return NextResponse.json({ comment }, { status: 201 })
+}
