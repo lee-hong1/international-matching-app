@@ -158,7 +158,8 @@ export async function PATCH(
   const tossRes = await fetch('https://api.tosspayments.com/v1/payments/confirm', {
     method: 'POST',
     headers: { Authorization: `Basic ${basicAuth}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ paymentKey, orderId, amount }),
+    // boost.amount: DB에서 가져온 금액 사용 (클라이언트 조작 방지 이중 보호)
+    body: JSON.stringify({ paymentKey, orderId, amount: boost.amount }),
   })
 
   if (!tossRes.ok) {

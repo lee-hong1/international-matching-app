@@ -140,13 +140,25 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    if (new Date(ends_at) <= new Date()) {
+    // 날짜 형식 검증: new Date("invalid") 는 NaN → 비교 항상 false → 무효 날짜 통과 위험
+    const endsAtDate = new Date(ends_at)
+    if (typeof ends_at !== 'string' || isNaN(endsAtDate.getTime())) {
+      return NextResponse.json({ error: 'ends_at must be a valid ISO date string' }, { status: 400 })
+    }
+    if (endsAtDate <= new Date()) {
       return NextResponse.json({ error: 'ends_at must be a future date' }, { status: 400 })
+    }
+
+    if (starts_at !== undefined && starts_at !== null) {
+      const startsAtDate = new Date(starts_at)
+      if (typeof starts_at !== 'string' || isNaN(startsAtDate.getTime())) {
+        return NextResponse.json({ error: 'starts_at must be a valid ISO date string' }, { status: 400 })
+      }
     }
 
     const startsAt = starts_at ?? new Date().toISOString()
 
-    if (new Date(ends_at) <= new Date(startsAt)) {
+    if (endsAtDate <= new Date(startsAt)) {
       return NextResponse.json({ error: 'ends_at must be after starts_at' }, { status: 400 })
     }
 
