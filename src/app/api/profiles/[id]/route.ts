@@ -77,14 +77,20 @@ export async function DELETE(
 
   // Storage 파일 삭제 — GDPR Art.17 준수 (auth 삭제 전 처리)
   // avatars 버킷: 경로 패턴 `{userId}/avatar.*` 또는 `avatar_{userId}.*`
+  // 1000개 초과 시 누락 방지: while 루프 페이지네이션 (GDPR Article 17)
+  const STORAGE_PAGE_SIZE = 1000
   try {
-    const { data: avatarFiles } = await supabaseService.storage
-      .from('avatars')
-      .list(id)
-    if (avatarFiles && avatarFiles.length > 0) {
+    let avatarOffset = 0
+    while (true) {
+      const { data: avatarFiles } = await supabaseService.storage
+        .from('avatars')
+        .list(id, { limit: STORAGE_PAGE_SIZE, offset: avatarOffset })
+      if (!avatarFiles?.length) break
       await supabaseService.storage
         .from('avatars')
         .remove(avatarFiles.map((f) => `${id}/${f.name}`))
+      if (avatarFiles.length < STORAGE_PAGE_SIZE) break
+      avatarOffset += STORAGE_PAGE_SIZE
     }
     // 루트에 직접 업로드된 경우도 커버
     const { data: rootFiles } = await supabaseService.storage
@@ -130,13 +136,17 @@ export async function DELETE(
 
   // Stories 미디어 스토리지 삭제 — GDPR Art.17 (업로드 경로: {userId}/{timestamp}.{ext})
   try {
-    const { data: storyFiles } = await supabaseService.storage
-      .from('stories')
-      .list(id)
-    if (storyFiles && storyFiles.length > 0) {
+    let storyOffset = 0
+    while (true) {
+      const { data: storyFiles } = await supabaseService.storage
+        .from('stories')
+        .list(id, { limit: STORAGE_PAGE_SIZE, offset: storyOffset })
+      if (!storyFiles?.length) break
       await supabaseService.storage
         .from('stories')
         .remove(storyFiles.map((f) => `${id}/${f.name}`))
+      if (storyFiles.length < STORAGE_PAGE_SIZE) break
+      storyOffset += STORAGE_PAGE_SIZE
     }
   } catch {
     // best-effort
@@ -145,13 +155,17 @@ export async function DELETE(
   // Post 미디어 스토리지 삭제 (버킷 이름 'post_media' 또는 'posts')
   for (const bucket of ['post_media', 'posts']) {
     try {
-      const { data: postFiles } = await supabaseService.storage
-        .from(bucket)
-        .list(id)
-      if (postFiles && postFiles.length > 0) {
+      let postOffset = 0
+      while (true) {
+        const { data: postFiles } = await supabaseService.storage
+          .from(bucket)
+          .list(id, { limit: STORAGE_PAGE_SIZE, offset: postOffset })
+        if (!postFiles?.length) break
         await supabaseService.storage
           .from(bucket)
           .remove(postFiles.map((f) => `${id}/${f.name}`))
+        if (postFiles.length < STORAGE_PAGE_SIZE) break
+        postOffset += STORAGE_PAGE_SIZE
       }
     } catch {
       // bucket이 없거나 파일 없으면 무시 (best-effort)
