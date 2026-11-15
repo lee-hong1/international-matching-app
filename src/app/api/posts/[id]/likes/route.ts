@@ -30,8 +30,11 @@ export async function POST(
   }
 
   // 자신의 게시물에 좋아요 금지 (지표 오염 방지)
-  const { data: post } = await supabaseService.from('posts').select('user_id').eq('id', postId).single()
-  if (post?.user_id === user.id) {
+  const { data: post, error: postErr } = await supabaseService.from('posts').select('user_id').eq('id', postId).single()
+  if (postErr || !post) {
+    return NextResponse.json({ error: 'Post not found' }, { status: 404 })
+  }
+  if (post.user_id === user.id) {
     return NextResponse.json({ error: 'Cannot like your own post' }, { status: 400 })
   }
 
