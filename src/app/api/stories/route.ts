@@ -106,14 +106,17 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'External platform references not allowed in caption' }, { status: 400 })
   }
 
-  const isVideo = media.type.startsWith('video/')
-  // SVG 차단: image/svg+xml 은 <script> 실행 가능 → XSS 벡터
-  const isImage = media.type.startsWith('image/') && media.type !== 'image/svg+xml'
-  if (!isVideo && !isImage) {
-    return NextResponse.json({ error: 'Only image or video files are allowed (SVG not permitted)' }, { status: 400 })
+  // MIME 화이트리스트: 허용 타입만 명시 (블랙리스트 방식은 disguise 공격에 취약)
+  const ALLOWED_MIME: Record<string, string> = {
+    'image/jpeg': 'jpg', 'image/png': 'png', 'image/gif': 'gif', 'image/webp': 'webp',
+    'video/mp4': 'mp4', 'video/webm': 'webm', 'video/quicktime': 'mov',
   }
-
-  const ext = media.type.split('/')[1]?.split(';')[0] ?? (isVideo ? 'mp4' : 'jpg')
+  const ext = ALLOWED_MIME[media.type]
+  if (!ext) {
+    return NextResponse.json({ error: 'Unsupported file type. Allowed: JPEG, PNG, GIF, WebP, MP4, WebM, MOV' }, { status: 400 })
+  }
+  const isVideo = media.type.startsWith('video/')
+  const isImage = !isVideo
   const fileName = `${user.id}/${Date.now()}.${ext}`
 
   const { error: uploadError } = await supabaseService.storage
