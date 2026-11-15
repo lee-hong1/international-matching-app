@@ -16,11 +16,11 @@ const OPTIONAL_ENV_VARS = [
 
 export async function GET() {
   const missing = REQUIRED_ENV_VARS.filter((key) => !process.env[key])
-  const optionalMissing = OPTIONAL_ENV_VARS.filter((key) => !process.env[key])
 
   if (missing.length > 0) {
+    // 환경변수 이름은 외부에 노출하지 않음 (OWASP A03: 민감 데이터 노출 방지)
     return NextResponse.json(
-      { status: 'error', missing_required: missing },
+      { status: 'error', reason: 'missing_required_config' },
       { status: 503 }
     )
   }
@@ -28,6 +28,5 @@ export async function GET() {
   return NextResponse.json({
     status: 'ok',
     timestamp: new Date().toISOString(),
-    missing_optional: optionalMissing.length > 0 ? optionalMissing : undefined,
   })
 }
