@@ -55,17 +55,25 @@ export async function DELETE(req: NextRequest) {
   }
 
   // ── 2. Storage 파일 삭제 ──────────────────────────────────────────────────
+  // GDPR Article 17: 모든 파일을 삭제해야 하므로 1000개 초과 시 페이지네이션 필요
   const STORAGE_BUCKETS = ['avatars', 'posts', 'stories']
+  const PAGE_SIZE = 1000
   for (const bucket of STORAGE_BUCKETS) {
     try {
-      const { data: files } = await supabaseService.storage
-        .from(bucket)
-        .list(user.id, { limit: 1000 })
+      let offset = 0
+      while (true) {
+        const { data: files } = await supabaseService.storage
+          .from(bucket)
+          .list(user.id, { limit: PAGE_SIZE, offset })
 
-      if (files?.length) {
+        if (!files?.length) break
+
         await supabaseService.storage
           .from(bucket)
           .remove(files.map((f) => `${user.id}/${f.name}`))
+
+        if (files.length < PAGE_SIZE) break
+        offset += PAGE_SIZE
       }
     } catch (e) {
       // 파일 삭제 실패해도 계정 삭제 진행 (오브젝트만 남음)
