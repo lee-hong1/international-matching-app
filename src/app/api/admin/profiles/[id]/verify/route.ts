@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseService, isValidUuid, getAuthUser } from '@src/lib/commerce'
 import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
-import { timingSafeEqual } from 'crypto'
+import { timingSafeEqual, createHash } from 'crypto'
 
 /**
  * PATCH /api/admin/profiles/:id/verify
@@ -75,6 +75,29 @@ export async function PATCH(
     console.error('[admin verify] update error:', updateErr.code)
     return NextResponse.json({ error: 'Failed to update verification status' }, { status: 500 })
   }
+
+  // 감사 로그 기록 (fire-and-forget — 로그 실패가 응답에 영향 없음)
+  void (async () => {
+    try {
+      let adminKeyHash: string
+      if (adminKey && req.headers.get('x-admin-key')) {
+        adminKeyHash = createHash('sha256').update(adminKey).digest('hex').substring(0, 16)
+      } else {
+        const adminUser = await getAuthUser(req)
+        adminKeyHash = adminUser?.id
+          ? 'email:' + createHash('sha256').update(adminUser.id).digest('hex').substring(0, 16)
+          : 'email-auth-unknown'
+      }
+      await supabaseService.from('admin_actions').insert({
+        admin_key_hash: adminKeyHash,
+        target_user_id: id,
+        action: `verify:${status}`,
+        reason: null,
+      })
+    } catch (e) {
+      console.error('[admin verify] audit log error:', (e as Error).message)
+    }
+  })()
 
   return NextResponse.json({ success: true, userId: id, status })
 }
