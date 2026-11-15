@@ -110,8 +110,10 @@ export async function POST(req: NextRequest) {
     }
 
     if (images !== undefined) {
-      if (!Array.isArray(images) || images.length > 10 || images.some((img: unknown) => typeof img !== 'string' || img.length > 2048)) {
-        return NextResponse.json({ error: 'images must be an array of up to 10 URL strings' }, { status: 400 })
+      if (!Array.isArray(images) || images.length > 10 ||
+        images.some((img: unknown) => typeof img !== 'string' || img.length > 2048 ||
+          !/^https:\/\//i.test(img as string))) {
+        return NextResponse.json({ error: 'images must be an array of up to 10 HTTPS URL strings' }, { status: 400 })
       }
     }
 

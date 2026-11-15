@@ -53,6 +53,15 @@ export async function POST(request: NextRequest) {
   const { data: post } = await supabaseService.from('posts').select('id').eq('id', post_id).single()
   if (!post) return NextResponse.json({ error: 'Post not found' }, { status: 404 })
 
+  // parent_comment_id가 같은 게시물의 댓글인지 검증 (cross-post parent 오염 방지)
+  if (parent_comment_id) {
+    const { data: parentComment } = await supabaseService
+      .from('post_comments').select('post_id').eq('id', parent_comment_id).single()
+    if (!parentComment || parentComment.post_id !== post_id) {
+      return NextResponse.json({ error: 'Invalid parent_comment_id' }, { status: 400 })
+    }
+  }
+
   const insertRow: Record<string, unknown> = {
     post_id,
     user_id: user.id,

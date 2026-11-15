@@ -74,8 +74,10 @@ export async function POST(req: NextRequest) {
     }
 
     if (images !== undefined && images !== null) {
-      if (!Array.isArray(images) || images.length > 10 || images.some((img: unknown) => typeof img !== 'string' || (img as string).length > 500)) {
-        return NextResponse.json({ error: 'images must be an array of up to 10 URL strings (max 500 chars each)' }, { status: 400 })
+      if (!Array.isArray(images) || images.length > 10 ||
+        images.some((img: unknown) => typeof img !== 'string' || (img as string).length > 500 ||
+          !/^https:\/\//i.test(img as string))) {
+        return NextResponse.json({ error: 'images must be an array of up to 10 HTTPS URL strings (max 500 chars each)' }, { status: 400 })
       }
     }
 
