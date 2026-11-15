@@ -1,3 +1,4 @@
+import { createHash } from 'crypto'
 import { NextRequest, NextResponse } from 'next/server'
 import { supabaseService, getAuthUser, isValidUuid } from '@src/lib/commerce'
 import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
@@ -47,6 +48,21 @@ export async function PATCH(
   try {
     const { error } = await supabaseService.from('posts').update({ is_public: body.is_public }).eq('id', id)
     if (error) return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+
+    void (async () => {
+      try {
+        const adminKeyHash = 'email:' + createHash('sha256').update(user.id).digest('hex').substring(0, 16)
+        await supabaseService.from('admin_actions').insert({
+          admin_key_hash: adminKeyHash,
+          target_user_id: id,
+          action: `post-visibility:${body.is_public}`,
+          reason: `Admin set post is_public=${body.is_public}`,
+        })
+      } catch (e) {
+        console.error('[admin/posts/[id] PATCH] audit log error:', (e as Error).message)
+      }
+    })()
+
     return NextResponse.json({ success: true })
   } catch {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
@@ -75,6 +91,21 @@ export async function DELETE(
   try {
     const { error } = await supabaseService.from('posts').delete().eq('id', id)
     if (error) return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+
+    void (async () => {
+      try {
+        const adminKeyHash = 'email:' + createHash('sha256').update(user.id).digest('hex').substring(0, 16)
+        await supabaseService.from('admin_actions').insert({
+          admin_key_hash: adminKeyHash,
+          target_user_id: id,
+          action: 'post-delete',
+          reason: 'Admin deleted post',
+        })
+      } catch (e) {
+        console.error('[admin/posts/[id] DELETE] audit log error:', (e as Error).message)
+      }
+    })()
+
     return NextResponse.json({ success: true })
   } catch {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
