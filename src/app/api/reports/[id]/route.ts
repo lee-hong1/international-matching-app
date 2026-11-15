@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthUser, supabaseService, isValidUuid } from '@src/lib/commerce'
 import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
+import { createHash } from 'crypto'
 
 const VALID_REPORT_STATUSES = new Set(['pending', 'reviewing', 'resolved', 'dismissed'])
 
@@ -67,6 +68,23 @@ export async function PATCH(
     if (error) {
       return NextResponse.json({ error: 'Failed to process report' }, { status: 500 })
     }
+
+    // 감사 로그 기록 (fire-and-forget — 로그 실패가 응답에 영향 없음)
+    void (async () => {
+      try {
+        const adminKeyHash = user.id
+          ? 'email:' + createHash('sha256').update(user.id).digest('hex').substring(0, 16)
+          : 'email-auth-unknown'
+        await supabaseService.from('admin_actions').insert({
+          admin_key_hash: adminKeyHash,
+          target_user_id: reportId,
+          action: `report-status:${status}`,
+          reason: resolutionNotes.substring(0, 200),
+        })
+      } catch (e) {
+        console.error('[reports/[id]] audit log error:', (e as Error).message)
+      }
+    })()
 
     return NextResponse.json({ success: true })
   } catch (error: unknown) {
