@@ -11,15 +11,10 @@ const ALLOWED_REPORT_TYPES = [
 const ALLOWED_STATUS = ['pending', 'reviewed', 'resolved', 'dismissed']
 const ALLOWED_PRIORITY = ['low', 'medium', 'high', 'critical']
 
-async function isAdmin(userId: string): Promise<boolean> {
+function isAdmin(email: string): boolean {
   const adminEmails = (process.env.ADMIN_EMAILS ?? '')
     .split(',').map(e => e.trim().toLowerCase()).filter(Boolean)
-  const { data } = await supabaseService
-    .from('profiles')
-    .select('email')
-    .eq('id', userId)
-    .single()
-  return data?.email ? adminEmails.includes(data.email.toLowerCase()) : false
+  return adminEmails.length > 0 && adminEmails.includes(email.toLowerCase())
 }
 
 // 신고 생성 — reporter_id는 JWT에서 추출 (IDOR 방지)
@@ -130,7 +125,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
   }
 
-  const admin = await isAdmin(user.id)
+  const admin = isAdmin(user.email ?? '')
   if (!admin) {
     return NextResponse.json({ error: 'Admin access required' }, { status: 403 })
   }

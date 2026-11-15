@@ -43,8 +43,11 @@ export async function POST(req: NextRequest) {
   if (!user_id || !isValidUuid(user_id)) {
     return NextResponse.json({ error: 'Invalid user_id' }, { status: 400 })
   }
-  if (!photo_url || typeof photo_url !== 'string') {
+  if (!photo_url || typeof photo_url !== 'string' || photo_url.length > 2048) {
     return NextResponse.json({ error: 'photo_url required' }, { status: 400 })
+  }
+  if (!photo_url.startsWith('https://')) {
+    return NextResponse.json({ error: 'photo_url must use HTTPS' }, { status: 400 })
   }
   if (typeof is_approved !== 'boolean') {
     return NextResponse.json({ error: 'is_approved must be boolean' }, { status: 400 })
