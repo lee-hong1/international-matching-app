@@ -2,13 +2,18 @@
 
 import { useState } from 'react'
 import { useLanguage } from '@/contexts/LanguageContext'
-import type { Locale } from '@/lib/i18n'
+import { type Locale, LOCALE_LABELS, LOCALE_FLAG } from '@/lib/i18n'
 
-const LANGS = [
-  { code: 'ko' as Locale, label: '한국어' },
-  { code: 'en' as Locale, label: 'English' },
-  { code: 'ja' as Locale, label: '日本語' },
-  { code: 'zh' as Locale, label: '中文' },
+const LANGS: { code: Locale; flag: string; label: string }[] = [
+  { code: 'ko', flag: LOCALE_FLAG.ko, label: LOCALE_LABELS.ko },
+  { code: 'en', flag: LOCALE_FLAG.en, label: LOCALE_LABELS.en },
+  { code: 'ja', flag: LOCALE_FLAG.ja, label: LOCALE_LABELS.ja },
+  { code: 'zh', flag: LOCALE_FLAG.zh, label: LOCALE_LABELS.zh },
+  { code: 'vi', flag: LOCALE_FLAG.vi, label: LOCALE_LABELS.vi },
+  { code: 'th', flag: LOCALE_FLAG.th, label: LOCALE_LABELS.th },
+  { code: 'es', flag: LOCALE_FLAG.es, label: LOCALE_LABELS.es },
+  { code: 'id', flag: LOCALE_FLAG.id, label: LOCALE_LABELS.id },
+  { code: 'pt', flag: LOCALE_FLAG.pt, label: LOCALE_LABELS.pt },
 ]
 
 interface LanguageSwitcherProps {
@@ -47,7 +52,7 @@ export function LanguageSwitcher({ current, onChange }: LanguageSwitcherProps) {
         aria-haspopup="listbox"
         aria-expanded={open}
       >
-        🌐 {currentLang.label}
+        {currentLang.flag} {currentLang.label}
         <span style={{ fontSize: '0.6rem', marginLeft: 2 }}>▼</span>
       </button>
       {open && (
@@ -83,7 +88,7 @@ export function LanguageSwitcher({ current, onChange }: LanguageSwitcherProps) {
                 fontWeight: l.code === activeLang ? 600 : 400,
               }}
             >
-              {l.label}
+              {l.flag} {l.label}
             </li>
           ))}
         </ul>

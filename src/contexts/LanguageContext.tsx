@@ -21,6 +21,11 @@ function detectBrowserLocale(): Locale {
   if (lang.startsWith('zh')) return 'zh'
   if (lang.startsWith('ja')) return 'ja'
   if (lang.startsWith('ko')) return 'ko'
+  if (lang.startsWith('vi')) return 'vi'
+  if (lang.startsWith('th')) return 'th'
+  if (lang.startsWith('es')) return 'es'
+  if (lang.startsWith('id')) return 'id'
+  if (lang.startsWith('pt')) return 'pt'
   return 'en'
 }
 

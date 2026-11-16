@@ -75,11 +75,16 @@ function BookingForm({ serviceId }: { serviceId: string }) {
       .catch(() => {})
   }, [resolvedHostId])
 
-  const DOW_NAMES: Record<Lang, string[]> = {
+  const DOW_NAMES: Partial<Record<Lang, string[]>> = {
     ko: ['일', '월', '화', '수', '목', '금', '토'],
     en: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
     ja: ['日', '月', '火', '水', '木', '金', '土'],
     zh: ['日', '一', '二', '三', '四', '五', '六'],
+    vi: ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'],
+    th: ['อา', 'จ', 'อ', 'พ', 'พฤ', 'ศ', 'ส'],
+    es: ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'],
+    id: ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'],
+    pt: ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'],
   }
 
   // Generate selectable time options from availability slots for a given date
@@ -197,7 +202,7 @@ function BookingForm({ serviceId }: { serviceId: string }) {
 
         {slots.length > 0 && (
           <div style={{ marginBottom: 12, fontSize: '0.85rem', color: '#555' }}>
-            {t('book.available_days', lang)}: {slots.map(s => DOW_NAMES[lang][s.day_of_week]).join(', ')}
+            {t('book.available_days', lang)}: {slots.map(s => (DOW_NAMES[lang] ?? DOW_NAMES.en ?? [])[s.day_of_week]).join(', ')}
           </div>
         )}
 

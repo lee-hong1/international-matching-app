@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react'
 import { detectLangFromNavigator, t } from '@src/lib/i18n'
 
 export default function VerifyEmailPage() {
-  const [lang, setLang] = useState<'ko' | 'en' | 'ja' | 'zh'>('ko')
+  const [lang, setLang] = useState<import('@src/lib/i18n').Lang>('ko')
 
   useEffect(() => {
     setLang(detectLangFromNavigator())
@@ -46,7 +46,7 @@ export default function VerifyEmailPage() {
     },
   }
 
-  const c = content[lang] ?? content.ko
+  const c = content[lang as keyof typeof content] ?? content.ko
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-purple-50 flex items-center justify-center p-4">

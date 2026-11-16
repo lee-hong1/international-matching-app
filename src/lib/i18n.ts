@@ -1,14 +1,16 @@
 /**
  * 경량 i18n 유틸리티.
- * 외부 라이브러리 없이 ko/en/ja/zh 4개 언어 지원.
+ * ko/en/ja/zh/vi/th/es/id/pt 9개 언어 지원.
+ * 번역 미존재 시 → 영어(en) → 키 순서로 fallback.
  *
  * 서버: Accept-Language 헤더에서 감지
  * 클라이언트: navigator.language 에서 감지
  */
 
-export type Lang = 'ko' | 'en' | 'ja' | 'zh'
+export type Lang = 'ko' | 'en' | 'ja' | 'zh' | 'vi' | 'th' | 'es' | 'id' | 'pt'
 export type Locale = Lang
-export type Messages = Record<string, Record<Lang, string>>
+// 신규 언어는 번역이 점진적으로 추가되므로 Partial 허용
+export type Messages = Record<string, Partial<Record<Lang, string>>>
 // LanguageContext에서 사용하는 타입 — MESSAGES의 키 집합
 export type TranslationKeys = Record<string, string>
 
@@ -17,42 +19,77 @@ const MESSAGES: Messages = {
   'profile.host_since': {
     ko: '호스트 등록일',
     en: 'Host since',
+    vi: 'Thành viên từ',
+    th: 'โฮสต์ตั้งแต่',
+    es: 'Anfitrión desde',
+    id: 'Host sejak',
+    pt: 'Anfitrião desde',
     ja: 'ホスト登録日',
     zh: '主持人注册日期',
   },
   'profile.reviews': {
     ko: '리뷰',
     en: 'reviews',
+    vi: 'đánh giá',
+    th: 'รีวิว',
+    es: 'reseñas',
+    id: 'ulasan',
+    pt: 'avaliações',
     ja: 'レビュー',
     zh: '评价',
   },
   'profile.verified': {
     ko: '인증됨',
     en: 'Verified',
+    vi: 'Đã xác minh',
+    th: 'ยืนยันแล้ว',
+    es: 'Verificado',
+    id: 'Terverifikasi',
+    pt: 'Verificado',
     ja: '認証済み',
     zh: '已认证',
   },
   'profile.premium': {
     ko: '프리미엄',
     en: 'Premium',
+    vi: 'Cao cấp',
+    th: 'พรีเมียม',
+    es: 'Premium',
+    id: 'Premium',
+    pt: 'Premium',
     ja: 'プレミアム',
     zh: '高级会员',
   },
   'profile.elite': {
     ko: '엘리트',
     en: 'Elite',
+    vi: 'Ưu tú',
+    th: 'เอลิท',
+    es: 'Élite',
+    id: 'Elite',
+    pt: 'Elite',
     ja: 'エリート',
     zh: '精英会员',
   },
   'profile.book_now': {
     ko: '예약하기',
     en: 'Book Now',
+    vi: 'Đặt ngay',
+    th: 'จองเลย',
+    es: 'Reservar',
+    id: 'Pesan sekarang',
+    pt: 'Reservar',
     ja: '予約する',
     zh: '立即预约',
   },
   'profile.send_message': {
     ko: '메시지 보내기',
     en: 'Send Message',
+    vi: 'Nhắn tin',
+    th: 'ส่งข้อความ',
+    es: 'Enviar mensaje',
+    id: 'Kirim pesan',
+    pt: 'Enviar mensagem',
     ja: 'メッセージを送る',
     zh: '发送消息',
   },
@@ -60,18 +97,33 @@ const MESSAGES: Messages = {
   'booking.confirmed': {
     ko: '예약 확정',
     en: 'Booking Confirmed',
+    vi: 'Đặt lịch OK',
+    th: 'ยืนยันการจองแล้ว',
+    es: 'Reserva confirmada',
+    id: 'Pemesanan dikonfirmasi',
+    pt: 'Reserva confirmada',
     ja: '予約確定',
     zh: '预约已确认',
   },
   'booking.cancelled': {
     ko: '예약 취소',
     en: 'Booking Cancelled',
+    vi: 'Đã hủy lịch',
+    th: 'ยกเลิกการจองแล้ว',
+    es: 'Reserva cancelada',
+    id: 'Pemesanan dibatalkan',
+    pt: 'Reserva cancelada',
     ja: '予約キャンセル',
     zh: '预约已取消',
   },
   'booking.pending': {
     ko: '예약 대기',
     en: 'Pending',
+    vi: 'Đang chờ',
+    th: 'รอดำเนินการ',
+    es: 'Pendiente',
+    id: 'Menunggu',
+    pt: 'Pendente',
     ja: '承認待ち',
     zh: '等待确认',
   },
@@ -92,18 +144,33 @@ const MESSAGES: Messages = {
   'shop.buy_now': {
     ko: '구매하기',
     en: 'Buy Now',
+    vi: 'Mua ngay',
+    th: 'ซื้อเลย',
+    es: 'Comprar ahora',
+    id: 'Beli sekarang',
+    pt: 'Comprar agora',
     ja: '購入する',
     zh: '立即购买',
   },
   'shop.event_ongoing': {
     ko: '진행 중',
     en: 'Ongoing',
+    vi: 'Đang diễn ra',
+    th: 'กำลังดำเนินการ',
+    es: 'En curso',
+    id: 'Sedang berlangsung',
+    pt: 'Em andamento',
     ja: '開催中',
     zh: '进行中',
   },
   'shop.event_ended': {
     ko: '종료',
     en: 'Ended',
+    vi: 'Đã kết thúc',
+    th: 'สิ้นสุดแล้ว',
+    es: 'Terminado',
+    id: 'Sudah berakhir',
+    pt: 'Encerrado',
     ja: '終了',
     zh: '已结束',
   },
@@ -123,6 +190,11 @@ const MESSAGES: Messages = {
   'discover.reload': {
     ko: '다시 로드하기',
     en: 'Reload',
+    vi: 'Tải lại',
+    th: 'โหลดใหม่',
+    es: 'Recargar',
+    id: 'Muat ulang',
+    pt: 'Recarregar',
     ja: '再読み込み',
     zh: '重新加载',
   },
@@ -1002,7 +1074,12 @@ const MESSAGES: Messages = {
   'events_party':          { ko: '파티',             en: 'Party',               ja: 'パーティー',             zh: '派对' },
   'events_empty':          { ko: '이벤트가 없습니다', en: 'No events yet',      ja: 'イベントがありません',   zh: '暂无活动' },
   'events_empty_sub':      { ko: '첫 번째 이벤트를 만들어 보세요!', en: 'Be the first to create one!', ja: '最初のイベントを作成しましょう！', zh: '快来创建第一个活动吧！' },
-  'events_free':           { ko: '무료',             en: 'Free',                ja: '無料',                   zh: '免费' },
+  'events_free':           { ko: '무료',             en: 'Free',
+    vi: 'Miễn phí',
+    th: 'ฟรี',
+    es: 'Gratis',
+    id: 'Gratis',
+    pt: 'Grátis',                ja: '無料',                   zh: '免费' },
   'events_full':           { ko: '마감',             en: 'Full',                ja: '満員',                   zh: '已满' },
   'events_closed':         { ko: '마감됨',           en: 'Closed',              ja: 'クローズ',               zh: '已关闭' },
   'events_partner_venue':  { ko: '파트너 장소',      en: 'Partner Venue',       ja: 'パートナー会場',         zh: '合作场地' },
@@ -1122,7 +1199,12 @@ const MESSAGES: Messages = {
 
   // create post
   'create_post.title':              { ko: '새 게시물',              en: 'New Post',                  ja: '新しい投稿',               zh: '新帖子' },
-  'create_post.close':              { ko: '닫기',                   en: 'Close',                     ja: '閉じる',                   zh: '关闭' },
+  'create_post.close':              { ko: '닫기',                   en: 'Close',
+    vi: 'Đóng',
+    th: 'ปิด',
+    es: 'Cerrar',
+    id: 'Tutup',
+    pt: 'Fechar',                     ja: '閉じる',                   zh: '关闭' },
   'create_post.add_media':          { ko: '사진/영상 추가 (최대 10개)', en: 'Add photos/videos (max 10)', ja: '写真/動画を追加（最大10枚）', zh: '添加照片/视频（最多10张）' },
   'create_post.caption_placeholder': { ko: '문구를 입력하세요... (선택)', en: 'Write a caption... (optional)', ja: 'キャプションを入力... (任意)', zh: '输入说明...（可选）' },
   'create_post.location_placeholder': { ko: '위치 추가 (선택)',        en: 'Add location (optional)',   ja: '場所を追加 (任意)',          zh: '添加位置（可选）' },
@@ -1154,6 +1236,30 @@ const MESSAGES: Messages = {
   'event_share.copied':             { ko: '링크가 복사되었습니다!',       en: 'Link copied!',              ja: 'リンクをコピーしました！',      zh: '链接已复制！' },
 }
 
+export const LOCALE_LABELS: Record<Lang, string> = {
+  ko: '한국어',
+  en: 'English',
+  ja: '日本語',
+  zh: '中文',
+  vi: 'Tiếng Việt',
+  th: 'ภาษาไทย',
+  es: 'Español',
+  id: 'Bahasa Indonesia',
+  pt: 'Português',
+}
+
+export const LOCALE_FLAG: Record<Lang, string> = {
+  ko: '🇰🇷',
+  en: '🌐',
+  ja: '🇯🇵',
+  zh: '🇨🇳',
+  vi: '🇻🇳',
+  th: '🇹🇭',
+  es: '🇪🇸',
+  id: '🇮🇩',
+  pt: '🇧🇷',
+}
+
 /** 언어 코드를 지원 언어로 정규화 */
 export function normalizeLang(raw: string | null | undefined): Lang {
   if (!raw) return 'ko'
@@ -1161,6 +1267,11 @@ export function normalizeLang(raw: string | null | undefined): Lang {
   if (prefix === 'ja') return 'ja'
   if (prefix === 'zh') return 'zh'
   if (prefix === 'en') return 'en'
+  if (prefix === 'vi') return 'vi'
+  if (prefix === 'th') return 'th'
+  if (prefix === 'es') return 'es'
+  if (prefix === 'id') return 'id'
+  if (prefix === 'pt') return 'pt'
   return 'ko'
 }
 

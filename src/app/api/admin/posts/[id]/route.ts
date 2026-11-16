@@ -9,12 +9,10 @@ function isAdmin(email: string): boolean {
   return adminEmails.length > 0 && adminEmails.includes(email.toLowerCase())
 }
 
-async function checkAdminAuth(req: NextRequest): Promise<NextResponse | null> {
+async function getAdminUser(req: NextRequest) {
   const user = await getAuthUser(req)
-  if (!user?.email || !isAdmin(user.email)) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-  return null
+  if (!user?.email || !isAdmin(user.email)) return null
+  return user
 }
 
 export async function PATCH(
@@ -28,8 +26,8 @@ export async function PATCH(
     return NextResponse.json(r.body, { status: r.status, headers: r.headers })
   }
 
-  const authErr = await checkAdminAuth(req)
-  if (authErr) return authErr
+  const adminUser = await getAdminUser(req)
+  if (!adminUser) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const { id } = await params
   if (!id || !isValidUuid(id)) {
@@ -51,7 +49,7 @@ export async function PATCH(
 
     void (async () => {
       try {
-        const adminKeyHash = 'email:' + createHash('sha256').update(user.id).digest('hex').substring(0, 16)
+        const adminKeyHash = 'email:' + createHash('sha256').update(adminUser.id).digest('hex').substring(0, 16)
         await supabaseService.from('admin_actions').insert({
           admin_key_hash: adminKeyHash,
           target_user_id: id,
@@ -80,8 +78,8 @@ export async function DELETE(
     return NextResponse.json(r.body, { status: r.status, headers: r.headers })
   }
 
-  const authErr = await checkAdminAuth(req)
-  if (authErr) return authErr
+  const adminUser = await getAdminUser(req)
+  if (!adminUser) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const { id } = await params
   if (!id || !isValidUuid(id)) {
@@ -94,7 +92,7 @@ export async function DELETE(
 
     void (async () => {
       try {
-        const adminKeyHash = 'email:' + createHash('sha256').update(user.id).digest('hex').substring(0, 16)
+        const adminKeyHash = 'email:' + createHash('sha256').update(adminUser.id).digest('hex').substring(0, 16)
         await supabaseService.from('admin_actions').insert({
           admin_key_hash: adminKeyHash,
           target_user_id: id,

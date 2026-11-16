@@ -1,10 +1,15 @@
-export type Locale = 'ko' | 'en' | 'zh' | 'ja'
+export type Locale = 'ko' | 'en' | 'zh' | 'ja' | 'vi' | 'th' | 'es' | 'id' | 'pt'
 
 export const LOCALE_LABELS: Record<Locale, string> = {
   ko: '한국어',
   en: 'English',
   zh: '中文',
   ja: '日本語',
+  vi: 'Tiếng Việt',
+  th: 'ภาษาไทย',
+  es: 'Español',
+  id: 'Bahasa Indonesia',
+  pt: 'Português',
 }
 
 export const LOCALE_FLAG: Record<Locale, string> = {
@@ -12,6 +17,11 @@ export const LOCALE_FLAG: Record<Locale, string> = {
   en: '🇺🇸',
   zh: '🇨🇳',
   ja: '🇯🇵',
+  vi: '🇻🇳',
+  th: '🇹🇭',
+  es: '🇪🇸',
+  id: '🇮🇩',
+  pt: '🇧🇷',
 }
 
 export type TranslationKeys = {
@@ -591,9 +601,9 @@ const ja: TranslationKeys = {
   'notification.cancelled.title': '予約がキャンセルされました', 'notification.cancelled.body': '予約 #{booking_id} がキャンセルされました。',
 }
 
-export const translations: Record<Locale, TranslationKeys> = { ko, en, zh, ja }
+export const translations: Partial<Record<Locale, TranslationKeys>> = { ko, en, zh, ja }
 
-const LOCALES: readonly string[] = ['ko', 'en', 'zh', 'ja']
+const LOCALES: readonly string[] = ['ko', 'en', 'zh', 'ja', 'vi', 'th', 'es', 'id', 'pt']
 
 export function t(localeOrKey: string, keyOrLocale: string, vars?: Record<string, string>): string {
   let locale: Locale
@@ -605,8 +615,8 @@ export function t(localeOrKey: string, keyOrLocale: string, vars?: Record<string
     locale = keyOrLocale as Locale
     key = localeOrKey as keyof TranslationKeys
   }
-  const dict = translations[locale] ?? translations.ko
-  let result = (dict[key] ?? translations.ko[key] ?? key) as string
+  const dict = translations[locale] ?? translations.en!
+  let result = (dict[key] ?? translations.en![key] ?? key) as string
   if (vars) {
     result = result.replace(/\{(\w+)\}/g, (_, k) => vars[k] ?? `{${k}}`)
   }
@@ -618,6 +628,11 @@ export function detectLangFromHeader(acceptLanguage: string): Locale {
   if (primary.startsWith('ko')) return 'ko'
   if (primary.startsWith('zh')) return 'zh'
   if (primary.startsWith('ja')) return 'ja'
+  if (primary.startsWith('vi')) return 'vi'
+  if (primary.startsWith('th')) return 'th'
+  if (primary.startsWith('es')) return 'es'
+  if (primary.startsWith('id')) return 'id'
+  if (primary.startsWith('pt')) return 'pt'
   return 'en'
 }
 
@@ -629,5 +644,10 @@ export function normalizeLang(lang: string | null | undefined): Lang {
   if (l.startsWith('ko')) return 'ko'
   if (l.startsWith('zh')) return 'zh'
   if (l.startsWith('ja')) return 'ja'
+  if (l.startsWith('vi')) return 'vi'
+  if (l.startsWith('th')) return 'th'
+  if (l.startsWith('es')) return 'es'
+  if (l.startsWith('id')) return 'id'
+  if (l.startsWith('pt')) return 'pt'
   return 'en'
 }

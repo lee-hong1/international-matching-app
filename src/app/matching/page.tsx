@@ -17,7 +17,7 @@ const WHY_CARDS = [
   { titleKey: 'match.w3_title', descKey: 'match.w3_desc' },
 ]
 
-const HOW_STEPS: Record<string, { ko: string; en: string; ja: string; zh: string }[]> = {
+const HOW_STEPS: Record<string, Record<string, string>[]> = {
   ko: [
     { ko: 'Discover 페이지에서 관심 있는 분을 팔로우하세요.', en: '', ja: '', zh: '' },
     { ko: '상대방이 팔로우백하면 <strong>매칭</strong>이 성립됩니다.', en: '', ja: '', zh: '' },
