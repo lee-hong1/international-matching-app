@@ -185,6 +185,11 @@ export async function GET(req: NextRequest) {
   const locale = lang === 'ko' ? 'ko-KR'
     : lang === 'ja' ? 'ja-JP'
     : lang === 'zh' ? 'zh-CN'
+    : lang === 'vi' ? 'vi-VN'
+    : lang === 'th' ? 'th-TH'
+    : lang === 'es' ? 'es-ES'
+    : lang === 'id' ? 'id-ID'
+    : lang === 'pt' ? 'pt-BR'
     : 'en-US'
 
   const rows = bookings ?? []

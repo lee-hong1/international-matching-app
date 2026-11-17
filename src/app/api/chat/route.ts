@@ -132,12 +132,22 @@ export async function POST(req: NextRequest) {
           en: 'Account Suspended',
           ja: 'アカウント一時停止',
           zh: '账号暂停',
+          vi: 'Tài khoản bị tạm khóa',
+          th: 'บัญชีถูกระงับชั่วคราว',
+          es: 'Cuenta suspendida',
+          id: 'Akun Ditangguhkan',
+          pt: 'Conta suspensa',
         }
         const SUSPEND_BODIES: Record<string, string> = {
           ko: '외부 플랫폼 유도로 인한 임시 정지입니다.',
           en: 'Account suspended for directing to external platforms.',
           ja: '外部プラットフォームへの誘導により一時停止されました。',
           zh: '由于引导至外部平台，您的账号已被暂停。',
+          vi: 'Tài khoản bị tạm khóa do dẫn hướng đến nền tảng bên ngoài.',
+          th: 'บัญชีถูกระงับเนื่องจากแนะนำให้ใช้แพลตฟอร์มภายนอก',
+          es: 'Cuenta suspendida por dirigir a plataformas externas.',
+          id: 'Akun ditangguhkan karena mengarahkan ke platform eksternal.',
+          pt: 'Conta suspensa por direcionar para plataformas externas.',
         }
         // FCM 정지 알림 fire-and-forget (법적 고지 의무)
         void fetch(`${baseUrl}/api/send-notification`, {
