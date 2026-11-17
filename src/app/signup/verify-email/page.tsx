@@ -44,6 +44,46 @@ export default function VerifyEmailPage() {
       login: '前往登录页面',
       resend: '您可以在登录页面重新发送邮件。',
     },
+    vi: {
+      title: 'Kiểm tra email của bạn',
+      subtitle: 'Gần xong rồi!',
+      desc: 'Chúng tôi đã gửi liên kết xác minh đến email của bạn.\nNhấp vào liên kết để hoàn tất đăng ký.',
+      spam: 'Không tìm thấy email? Hãy kiểm tra thư mục spam.',
+      login: 'Đến trang đăng nhập',
+      resend: 'Bạn có thể gửi lại email từ màn hình đăng nhập.',
+    },
+    th: {
+      title: 'ตรวจสอบอีเมลของคุณ',
+      subtitle: 'ใกล้เสร็จแล้ว!',
+      desc: 'เราได้ส่งลิงก์ยืนยันไปยังอีเมลของคุณแล้ว\nคลิกลิงก์เพื่อดำเนินการลงทะเบียนให้เสร็จสมบูรณ์',
+      spam: 'ไม่พบอีเมล? ลองตรวจสอบโฟลเดอร์สแปม',
+      login: 'ไปที่หน้าเข้าสู่ระบบ',
+      resend: 'คุณสามารถส่งอีเมลอีกครั้งได้จากหน้าเข้าสู่ระบบ',
+    },
+    es: {
+      title: 'Revisa tu correo electrónico',
+      subtitle: '¡Ya casi terminamos!',
+      desc: 'Enviamos un enlace de verificación a tu correo.\nHaz clic en el enlace para completar tu registro.',
+      spam: '¿No encuentras el correo? Revisa tu carpeta de spam.',
+      login: 'Ir al inicio de sesión',
+      resend: 'Puedes reenviar el correo desde la pantalla de inicio de sesión.',
+    },
+    id: {
+      title: 'Periksa email Anda',
+      subtitle: 'Hampir selesai!',
+      desc: 'Kami mengirim tautan verifikasi ke email Anda.\nKlik tautan untuk menyelesaikan pendaftaran.',
+      spam: 'Tidak menemukan email? Periksa folder spam Anda.',
+      login: 'Ke halaman masuk',
+      resend: 'Anda dapat mengirim ulang email dari layar masuk.',
+    },
+    pt: {
+      title: 'Verifique seu e-mail',
+      subtitle: 'Quase lá!',
+      desc: 'Enviamos um link de verificação para o seu e-mail.\nClique no link para concluir seu cadastro.',
+      spam: 'Não encontrou o e-mail? Verifique sua pasta de spam.',
+      login: 'Ir para o login',
+      resend: 'Você pode reenviar o e-mail pela tela de login.',
+    },
   }
 
   const c = content[lang as keyof typeof content] ?? content.ko

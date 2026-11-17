@@ -25,6 +25,18 @@ const INTEREST_KEYS = [
 
 const LOCALE_BCP47: Record<string, string> = { ko: 'ko-KR', en: 'en-US', ja: 'ja-JP', zh: 'zh-CN' }
 
+const TRANSLATION_DISCLAIMER = {
+  ko: '이 플랫폼의 자동 번역 서비스는 편의 목적으로 제공됩니다. 번역의 정확성·완전성에 대해 플랫폼은 책임지지 않으며, 중요한 사항은 반드시 원문을 확인하시기 바랍니다.',
+  en: 'The automatic translation service on this platform is provided for convenience only. The platform is not responsible for the accuracy or completeness of any translation. Please refer to the original text for important matters.',
+  ja: '本プラットフォームの自動翻訳サービスは利便性のために提供されています。翻訳の正確性・完全性についてプラットフォームは責任を負いません。重要な事項は必ず原文をご確認ください。',
+  zh: '本平台的自动翻译服务仅为方便用户而提供。平台不对翻译的准确性或完整性承担责任。重要事项请务必参考原文。',
+  vi: 'Dịch vụ dịch tự động trên nền tảng này chỉ được cung cấp cho mục đích thuận tiện. Nền tảng không chịu trách nhiệm về độ chính xác hoặc đầy đủ của bản dịch. Vui lòng tham khảo văn bản gốc cho các vấn đề quan trọng.',
+  th: 'บริการแปลอัตโนมัติบนแพลตฟอร์มนี้มีไว้เพื่อความสะดวกเท่านั้น แพลตฟอร์มไม่รับผิดชอบต่อความถูกต้องหรือความครบถ้วนของการแปล กรุณาอ้างอิงข้อความต้นฉบับสำหรับเรื่องสำคัญ',
+  es: 'El servicio de traducción automática en esta plataforma se proporciona únicamente por conveniencia. La plataforma no es responsable de la exactitud o integridad de ninguna traducción. Consulte el texto original para asuntos importantes.',
+  id: 'Layanan terjemahan otomatis di platform ini disediakan hanya untuk kenyamanan. Platform tidak bertanggung jawab atas keakuratan atau kelengkapan terjemahan apa pun. Harap merujuk ke teks asli untuk hal-hal penting.',
+  pt: 'O serviço de tradução automática nesta plataforma é fornecido apenas para conveniência. A plataforma não é responsável pela precisão ou integridade de qualquer tradução. Consulte o texto original para assuntos importantes.',
+} as const
+
 interface FormData {
   email: string
   password: string
@@ -342,6 +354,11 @@ export default function SignUpPage() {
                   {t('signup.terms_agree', lang)}
                 </span>
               </label>
+
+              {/* 번역 책임 면책 고지 */}
+              <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-xs text-amber-800 leading-relaxed">
+                {TRANSLATION_DISCLAIMER[lang as keyof typeof TRANSLATION_DISCLAIMER] ?? TRANSLATION_DISCLAIMER.en}
+              </div>
 
               <button onClick={goNext} className="w-full py-3 bg-gradient-to-r from-pink-500 to-purple-600 text-white font-semibold rounded-xl hover:from-pink-600 hover:to-purple-700 transition-all shadow-md mt-2">
                 {t('signup.next_step', lang)}

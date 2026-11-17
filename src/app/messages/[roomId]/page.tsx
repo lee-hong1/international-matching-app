@@ -21,6 +21,8 @@ export default function ChatPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [isSending, setIsSending] = useState(false)
   const [sendError, setSendError] = useState('')
+  const [translating, setTranslating] = useState<Record<string, boolean>>({})
+  const [translations, setTranslations] = useState<Record<string, string>>({})
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const subscription = useRef<RealtimeChannel | null>(null)
 
@@ -139,6 +141,29 @@ export default function ChatPage() {
     } else {
       const locale = lang === 'ko' ? 'ko-KR' : lang === 'ja' ? 'ja-JP' : lang === 'zh' ? 'zh-CN' : 'en-US'
       return date.toLocaleDateString(locale, { year: 'numeric', month: 'long', day: 'numeric' })
+    }
+  }
+
+  const handleTranslate = async (messageId: string, text: string) => {
+    if (translations[messageId]) {
+      setTranslations(prev => { const n = { ...prev }; delete n[messageId]; return n })
+      return
+    }
+    setTranslating(prev => ({ ...prev, [messageId]: true }))
+    try {
+      const res = await fetch('/api/chat/translate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text, target_lang: lang, room_id: params.roomId }),
+      })
+      if (res.ok) {
+        const data = await res.json()
+        setTranslations(prev => ({ ...prev, [messageId]: data.translatedText }))
+      }
+    } catch {
+      // silent fail — translation is optional convenience
+    } finally {
+      setTranslating(prev => { const n = { ...prev }; delete n[messageId]; return n })
     }
   }
 
@@ -278,14 +303,27 @@ export default function ChatPage() {
                         }`}
                       >
                         <p className="text-sm">{message.content}</p>
+                        {translations[message.id] && (
+                          <p className="text-xs mt-1.5 pt-1.5 border-t border-gray-200 text-gray-500 italic">
+                            {translations[message.id]}
+                          </p>
+                        )}
                       </div>
-                      <p
-                        className={`text-xs text-gray-500 mt-1 ${
-                          isOwn ? 'text-right' : 'text-left'
-                        }`}
-                      >
-                        {formatMessageTime(message.created_at)}
-                      </p>
+                      <div className={`flex items-center gap-2 mt-1 ${isOwn ? 'justify-end' : 'justify-start'}`}>
+                        <p className="text-xs text-gray-500">
+                          {formatMessageTime(message.created_at)}
+                        </p>
+                        {!isOwn && (
+                          <button
+                            onClick={() => handleTranslate(message.id, message.content)}
+                            disabled={translating[message.id]}
+                            className="text-xs text-purple-400 hover:text-purple-600 transition-colors disabled:opacity-50"
+                            title={translations[message.id] ? t('messages.hide_translation', lang) : t('messages.translate', lang)}
+                          >
+                            {translating[message.id] ? '...' : translations[message.id] ? '↩' : '🌐'}
+                          </button>
+                        )}
+                      </div>
                     </div>
                   </div>
                 )
