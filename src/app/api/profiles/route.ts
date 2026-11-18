@@ -86,7 +86,7 @@ export async function PATCH(req: NextRequest) {
 
   if ('preferred_lang' in updates) {
     const l = updates.preferred_lang
-    if (!['ko', 'en', 'ja', 'zh'].includes(l as string)) {
+    if (!['ko', 'en', 'ja', 'zh', 'vi', 'th', 'es', 'id', 'pt'].includes(l as string)) {
       return NextResponse.json({ error: 'Invalid language' }, { status: 400 })
     }
   }

@@ -270,6 +270,11 @@ export default function ProfileEditPage() {
               <option value="en">English</option>
               <option value="ja">日本語</option>
               <option value="zh">中文</option>
+              <option value="vi">Tiếng Việt</option>
+              <option value="th">ภาษาไทย</option>
+              <option value="es">Español</option>
+              <option value="id">Bahasa Indonesia</option>
+              <option value="pt">Português</option>
             </select>
           </div>
 
