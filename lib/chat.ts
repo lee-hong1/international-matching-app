@@ -5,6 +5,7 @@ export interface ChatRoom {
   match_id: string
   created_at: string
   last_message_at: string
+  unread_count?: number
   partner?: {
     id: string
     full_name: string
@@ -95,27 +96,33 @@ export const chatService = {
     return data || []
   },
 
-  // 메시지 전송
+  // 메시지 전송 — /api/chat 경유 (외부 플랫폼 감지·정지 로직 포함)
   async sendMessage(roomId: string, senderId: string, content: string, messageType: 'text' | 'image' | 'file' = 'text') {
-    const { data, error } = await supabase
-      .from('messages')
-      .insert({
-        room_id: roomId,
-        sender_id: senderId,
-        content,
-        message_type: messageType
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      const token = session?.access_token
+
+      if (!token) {
+        return { data: null, error: new Error('인증이 필요합니다') }
+      }
+
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ room_id: roomId, content, message_type: messageType }),
       })
-      .select()
 
-    if (!error && data) {
-      // 채팅방의 마지막 메시지 시간 업데이트
-      await supabase
-        .from('chat_rooms')
-        .update({ last_message_at: new Date().toISOString() })
-        .eq('id', roomId)
+      const json = await res.json()
+
+      if (!res.ok) {
+        return { data: null, error: new Error(json.error ?? 'Send failed') }
+      }
+
+      const msg = json.message ?? json.data
+      return { data: msg ? [msg] : null, error: null }
+    } catch (err) {
+      return { data: null, error: err as Error }
     }
-
-    return { data, error }
   },
 
   // 메시지 읽음 처리
@@ -175,7 +182,8 @@ export const chatService = {
         async (payload) => {
           // 업데이트된 채팅방 정보 가져오기
           const rooms = await this.getUserChatRooms(userId)
-          const updatedRoom = rooms.find(room => room.id === payload.new?.id)
+          const newData = payload.new as { id?: string } | null
+          const updatedRoom = rooms.find(room => room.id === newData?.id)
           if (updatedRoom) {
             callback(updatedRoom)
           }
@@ -237,11 +245,28 @@ export const chatService = {
     return urlData.publicUrl
   },
 
-  // 번역 기능 (Google Translate API 사용 예정)
+  // 번역 기능 — /api/translate 서버 프록시 경유 (N+43)
   async translateMessage(text: string, targetLanguage: string): Promise<string> {
-    // TODO: Google Translate API 연동
-    // 현재는 임시로 원본 텍스트 반환
-    return text
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      const token = session?.access_token
+
+      const res = await fetch('/api/translate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({ text, targetLanguage }),
+      })
+
+      if (!res.ok) return text
+
+      const json = await res.json()
+      return json.translatedText ?? text
+    } catch {
+      return text
+    }
   },
 
   // 채팅방 차단
