@@ -25,6 +25,22 @@ export async function DELETE(req: NextRequest) {
     return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
   }
 
+  // ── 0. 활성 예약 차단 ─────────────────────────────────────────────────────
+  // pending/confirmed 예약이 있으면 삭제 불가.
+  // cascade 삭제 시 환불 없이 예약 기록이 소멸되는 것을 방지.
+  const { count: activeBookingCount } = await supabaseService
+    .from('bookings')
+    .select('id', { count: 'exact', head: true })
+    .or(`guest_id.eq.${user.id},host_id.eq.${user.id}`)
+    .in('status', ['pending', 'confirmed'])
+
+  if ((activeBookingCount ?? 0) > 0) {
+    return NextResponse.json(
+      { error: 'You have active bookings. Please cancel or complete all bookings before deleting your account.' },
+      { status: 409 }
+    )
+  }
+
   // ── 1. Stripe 구독 취소 ───────────────────────────────────────────────────
   const stripeKey = process.env.STRIPE_SECRET_KEY
   if (stripeKey) {

@@ -8,7 +8,7 @@ import { isSuspended } from '@src/lib/suspended-check'
  * GET /api/webrtc/turn-credentials
  * HMAC-SHA1 TTL 기반 동적 TURN 크리덴셜 발급 (RFC 5389 Long-term Credential).
  *
- * username = `${expiry}:${userId}`  (expiry: Unix epoch, TTL 24h)
+ * username = `${expiry}:${userId}`  (expiry: Unix epoch, TTL 1h)
  * credential = HMAC-SHA1(TURN_SECRET, username) base64
  *
  * 클라이언트는 만료 1시간 전에 재호출한다.
