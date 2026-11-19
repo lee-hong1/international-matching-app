@@ -9,9 +9,9 @@ const SUPPORTED_LANGS = new Set(['ko', 'en', 'zh', 'ja', 'es', 'fr', 'de', 'it',
 // GOOGLE_TRANSLATE_API_KEY (서버 전용, NEXT_PUBLIC_ 아님)를 사용하여 클라이언트 노출 방지
 export async function POST(request: NextRequest) {
   const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
-  const rl = await checkRateLimit(`translate:${ip}`, 'general')
-  if (!rl.allowed) {
-    const r = rateLimitResponse(rl.resetAt)
+  const ipRl = await checkRateLimit(`translate:${ip}`, 'general')
+  if (!ipRl.allowed) {
+    const r = rateLimitResponse(ipRl.resetAt)
     return NextResponse.json(r.body, { status: r.status, headers: r.headers })
   }
 
@@ -19,6 +19,13 @@ export async function POST(request: NextRequest) {
   const user = await getAuthUser(request)
   if (!user) {
     return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
+  }
+
+  // 사용자별 추가 rate limit — VPN/IP 우회 차단 (Google Translate 비용 제어)
+  const userRl = await checkRateLimit(`translate:user:${user.id}`, 'general')
+  if (!userRl.allowed) {
+    const r = rateLimitResponse(userRl.resetAt)
+    return NextResponse.json(r.body, { status: r.status, headers: r.headers })
   }
 
   if (await isSuspended(user.id)) {
