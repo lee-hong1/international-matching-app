@@ -8,6 +8,7 @@ import Image from 'next/image'
 import { RealtimeChannel } from '@supabase/supabase-js'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { t } from '@src/lib/i18n'
+import { resolveLocale } from '@src/lib/datetime'
 
 export default function ChatPage() {
   const { user, loading } = useAuth()
@@ -120,7 +121,7 @@ export default function ChatPage() {
 
   const formatMessageTime = (dateString: string) => {
     const date = new Date(dateString)
-    const locale = lang === 'ko' ? 'ko-KR' : lang === 'ja' ? 'ja-JP' : lang === 'zh' ? 'zh-CN' : 'en-US'
+    const locale = resolveLocale(lang)
     return date.toLocaleTimeString(locale, {
       hour: '2-digit',
       minute: '2-digit',
@@ -139,7 +140,7 @@ export default function ChatPage() {
     } else if (date.toDateString() === yesterday.toDateString()) {
       return t('messages.yesterday', lang)
     } else {
-      const locale = lang === 'ko' ? 'ko-KR' : lang === 'ja' ? 'ja-JP' : lang === 'zh' ? 'zh-CN' : 'en-US'
+      const locale = resolveLocale(lang)
       return date.toLocaleDateString(locale, { year: 'numeric', month: 'long', day: 'numeric' })
     }
   }

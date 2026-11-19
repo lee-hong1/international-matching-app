@@ -8,6 +8,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { t } from '@src/lib/i18n'
+import { resolveLocale } from '@src/lib/datetime'
 
 export default function MessagesPage() {
   const { user, loading } = useAuth()
@@ -46,7 +47,7 @@ export default function MessagesPage() {
     const date = new Date(dateString)
     const now = new Date()
     const diffInHours = Math.abs(now.getTime() - date.getTime()) / (1000 * 60 * 60)
-    const locale = lang === 'ko' ? 'ko-KR' : lang === 'ja' ? 'ja-JP' : lang === 'zh' ? 'zh-CN' : 'en-US'
+    const locale = resolveLocale(lang)
 
     if (diffInHours < 24) {
       return date.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit', hour12: false })

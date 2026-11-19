@@ -3,6 +3,15 @@ const LOCALE_MAP: Record<string, string> = {
   en: 'en-US',
   ja: 'ja-JP',
   zh: 'zh-CN',
+  vi: 'vi-VN',
+  th: 'th-TH',
+  es: 'es-ES',
+  id: 'id-ID',
+  pt: 'pt-BR',
+}
+
+export function resolveLocale(lang: string): string {
+  return LOCALE_MAP[lang] ?? 'en-US'
 }
 
 export function formatBookingTime(iso: string, tz: string, locale: string): string {

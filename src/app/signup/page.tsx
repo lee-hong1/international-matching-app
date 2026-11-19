@@ -23,7 +23,7 @@ const INTEREST_KEYS = [
   'beauty', 'dance', 'art', 'gaming', 'pets', 'nature', 'shopping', 'cafe',
 ] as const
 
-const LOCALE_BCP47: Record<string, string> = { ko: 'ko-KR', en: 'en-US', ja: 'ja-JP', zh: 'zh-CN' }
+import { resolveLocale } from '@src/lib/datetime'
 
 const TRANSLATION_DISCLAIMER = {
   ko: '이 플랫폼의 자동 번역 서비스는 편의 목적으로 제공됩니다. 번역의 정확성·완전성에 대해 플랫폼은 책임지지 않으며, 중요한 사항은 반드시 원문을 확인하시기 바랍니다.',
@@ -417,7 +417,7 @@ export default function SignUpPage() {
                 >
                   <option value="">{t('signup.label_country_placeholder', lang)}</option>
                   {COUNTRY_CODES.map((code) => {
-                    const bcp47 = LOCALE_BCP47[lang] ?? 'en-US'
+                    const bcp47 = resolveLocale(lang)
                     const label = code === 'OTHER'
                       ? t('signup.country_other', lang)
                       : (typeof Intl !== 'undefined' && Intl.DisplayNames

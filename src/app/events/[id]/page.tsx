@@ -22,11 +22,11 @@ declare global {
   }
 }
 
-const LOCALE_BCP47: Record<string, string> = { ko: 'ko-KR', en: 'en-US', ja: 'ja-JP', zh: 'zh-CN' }
+import { resolveLocale } from '@src/lib/datetime'
 
 function formatDateTime(value: string, locale = 'ko') {
   const date = new Date(value)
-  return date.toLocaleString(LOCALE_BCP47[locale] ?? 'ko-KR', {
+  return date.toLocaleString(resolveLocale(locale), {
     year: 'numeric',
     month: 'long',
     day: 'numeric',

@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { paymentService, SubscriptionPlan, UserSubscription } from '@/lib/stripe'
 import { useLanguage } from '@/contexts/LanguageContext'
 import { t } from '@src/lib/i18n'
+import { resolveLocale } from '@src/lib/datetime'
 
 export default function PremiumPage() {
   const { user, loading } = useAuth()
@@ -62,7 +63,7 @@ export default function PremiumPage() {
   }
 
   const formatPrice = (price: number) => {
-    const locale = lang === 'ko' ? 'ko-KR' : lang === 'ja' ? 'ja-JP' : lang === 'zh' ? 'zh-CN' : 'en-US'
+    const locale = resolveLocale(lang)
     return new Intl.NumberFormat(locale).format(price)
   }
 
@@ -71,7 +72,7 @@ export default function PremiumPage() {
   }
 
   const formatExpiryDate = (dateStr: string) => {
-    const locale = lang === 'ko' ? 'ko-KR' : lang === 'ja' ? 'ja-JP' : lang === 'zh' ? 'zh-CN' : 'en-US'
+    const locale = resolveLocale(lang)
     return new Date(dateStr).toLocaleDateString(locale)
   }
 
