@@ -174,9 +174,17 @@ export async function PATCH(
     return NextResponse.json({ error: 'Only host can mark booking as completed' }, { status: 403 })
   }
 
-  // completed 전환 시 결제 금액 필수 (수익 누수 방지: 외부 현금 거래 후 무수수료 완료 차단)
-  if (newStatus === 'completed' && (!booking.amount || Number(booking.amount) <= 0)) {
-    return NextResponse.json({ error: 'Payment must be completed before marking booking as done' }, { status: 400 })
+  // completed 전환 시 결제 금액 + 결제 완료 필수 (수익 누수 방지)
+  // amount 체크: 외부 현금 거래 후 무수수료 완료 차단
+  // payment_status 체크: 결제 미완료 예약에 커미션 발생 차단
+  if (newStatus === 'completed') {
+    if (!booking.amount || Number(booking.amount) <= 0) {
+      return NextResponse.json({ error: 'Payment must be completed before marking booking as done' }, { status: 400 })
+    }
+    const paymentStatus = (booking as Record<string, unknown>).payment_status as string | null
+    if (paymentStatus !== 'paid') {
+      return NextResponse.json({ error: 'Payment has not been confirmed for this booking' }, { status: 400 })
+    }
   }
 
   // ── 상태 업데이트 (atomic: current status 조건 추가로 race condition 방지) ──
