@@ -172,12 +172,14 @@ export async function DELETE(
     }
   }
 
-  // 미확정/확정 예약 취소 (호스트에게 cascade 알림은 webhook에서 처리)
+  // 미확정/확정 예약 취소 — guest AND host 양쪽 모두 처리
+  // guest 취소: 호스트 수익 미발생, host 취소: 게스트 환불 필요
+  // Stripe 환불은 bookings/[id]/status PATCH를 통해 처리되나 여기서는 DB 상태만 취소로 갱신
   try {
     await supabaseService
       .from('bookings')
       .update({ status: 'cancelled' })
-      .eq('guest_id', id)
+      .or(`guest_id.eq.${id},host_id.eq.${id}`)
       .in('status', ['pending', 'confirmed'])
   } catch {
     // best-effort
