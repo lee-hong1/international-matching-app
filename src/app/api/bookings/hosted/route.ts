@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthUser, supabaseService } from '@src/lib/commerce'
-import { formatBookingTime } from '@src/lib/datetime'
+import { formatBookingTime, resolveLocale } from '@src/lib/datetime'
 import { detectLangFromHeader } from '@src/lib/i18n'
 import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
 
@@ -41,10 +41,7 @@ export async function GET(req: NextRequest) {
   }
 
   const lang = detectLangFromHeader(req.headers.get('accept-language'))
-  const locale = lang === 'ko' ? 'ko-KR'
-    : lang === 'ja' ? 'ja-JP'
-    : lang === 'zh' ? 'zh-CN'
-    : 'en-US'
+  const locale = resolveLocale(lang)
 
   // ── DB 조회 ───────────────────────────────────────────────────────────────
   // host_id는 JWT userId — 쿼리 파라미터에서 절대 받지 않음

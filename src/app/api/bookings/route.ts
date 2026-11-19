@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthUser, supabaseService, isValidUuid } from '@src/lib/commerce'
-import { formatBookingTime } from '@src/lib/datetime'
+import { formatBookingTime, resolveLocale } from '@src/lib/datetime'
 import { detectLangFromHeader, t, type Lang } from '@src/lib/i18n'
 import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
 import { isSuspended } from '@src/lib/suspended-check'
@@ -182,15 +182,7 @@ export async function GET(req: NextRequest) {
   }
 
   // ── 타임존 변환 적용 ──────────────────────────────────────────────────────
-  const locale = lang === 'ko' ? 'ko-KR'
-    : lang === 'ja' ? 'ja-JP'
-    : lang === 'zh' ? 'zh-CN'
-    : lang === 'vi' ? 'vi-VN'
-    : lang === 'th' ? 'th-TH'
-    : lang === 'es' ? 'es-ES'
-    : lang === 'id' ? 'id-ID'
-    : lang === 'pt' ? 'pt-BR'
-    : 'en-US'
+  const locale = resolveLocale(lang)
 
   const rows = bookings ?? []
   const hasMore = rows.length > limit
