@@ -30,6 +30,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
   }
 
+  const rlUser = await checkRateLimit(`chat-post:user:${user.id}`, 'general')
+  if (!rlUser.allowed) {
+    const r = rateLimitResponse(rlUser.resetAt)
+    return NextResponse.json(r.body, { status: r.status, headers: r.headers })
+  }
+
   if (await isSuspended(user.id)) {
     return NextResponse.json({ error: 'Account suspended' }, { status: 403 })
   }
@@ -226,6 +232,12 @@ export async function GET(req: NextRequest) {
   const user = await getAuthUser(req)
   if (!user) {
     return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
+  }
+
+  const rlGetUser = await checkRateLimit(`chat-get:user:${user.id}`, 'general')
+  if (!rlGetUser.allowed) {
+    const r = rateLimitResponse(rlGetUser.resetAt)
+    return NextResponse.json(r.body, { status: r.status, headers: r.headers })
   }
 
   const { searchParams } = new URL(req.url)

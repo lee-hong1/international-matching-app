@@ -20,6 +20,12 @@ export async function GET(req: NextRequest) {
   const user = await getAuthUser(req)
   if (!user) return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
 
+  const rlUser = await checkRateLimit(`notifications-get:user:${user.id}`, 'general')
+  if (!rlUser.allowed) {
+    const r = rateLimitResponse(rlUser.resetAt)
+    return NextResponse.json(r.body, { status: r.status, headers: r.headers })
+  }
+
   const { searchParams } = new URL(req.url)
   const cursor = searchParams.get('cursor')
   const rawLimit = parseInt(searchParams.get('limit') ?? '20', 10)
@@ -132,6 +138,12 @@ export async function PATCH(req: NextRequest) {
   const user = await getAuthUser(req)
   if (!user) return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
 
+  const rlPatchUser = await checkRateLimit(`notifications-patch:user:${user.id}`, 'general')
+  if (!rlPatchUser.allowed) {
+    const r = rateLimitResponse(rlPatchUser.resetAt)
+    return NextResponse.json(r.body, { status: r.status, headers: r.headers })
+  }
+
   if (await isSuspended(user.id)) {
     return NextResponse.json({ error: 'Account suspended' }, { status: 403 })
   }
@@ -178,6 +190,12 @@ export async function DELETE(req: NextRequest) {
 
   const user = await getAuthUser(req)
   if (!user) return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
+
+  const rlDeleteUser = await checkRateLimit(`notifications-delete:user:${user.id}`, 'general')
+  if (!rlDeleteUser.allowed) {
+    const r = rateLimitResponse(rlDeleteUser.resetAt)
+    return NextResponse.json(r.body, { status: r.status, headers: r.headers })
+  }
 
   const { searchParams } = new URL(req.url)
   const id = searchParams.get('id')
