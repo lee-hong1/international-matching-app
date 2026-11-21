@@ -65,6 +65,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
   }
 
+  const rlStoryUser = await checkRateLimit(`stories-create:user:${user.id}`, 'general')
+  if (!rlStoryUser.allowed) {
+    const r = rateLimitResponse(rlStoryUser.resetAt)
+    return NextResponse.json(r.body, { status: r.status, headers: r.headers })
+  }
+
   if (await isSuspended(user.id)) {
     return NextResponse.json({ error: 'Account suspended' }, { status: 403 })
   }
@@ -161,6 +167,12 @@ export async function DELETE(request: NextRequest) {
   const user = await getAuthUser(request)
   if (!user) {
     return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
+  }
+
+  const rlDelUser = await checkRateLimit(`stories-delete:user:${user.id}`, 'general')
+  if (!rlDelUser.allowed) {
+    const r = rateLimitResponse(rlDelUser.resetAt)
+    return NextResponse.json(r.body, { status: r.status, headers: r.headers })
   }
 
   const { searchParams } = new URL(request.url)

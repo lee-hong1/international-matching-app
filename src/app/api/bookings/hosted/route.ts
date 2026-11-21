@@ -24,6 +24,12 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
   }
 
+  const rlUser = await checkRateLimit(`bookings-hosted:user:${user.id}`, 'general')
+  if (!rlUser.allowed) {
+    const r = rateLimitResponse(rlUser.resetAt)
+    return NextResponse.json(r.body, { status: r.status, headers: r.headers })
+  }
+
   // ── 쿼리 파라미터 ─────────────────────────────────────────────────────────
   const url = new URL(req.url)
   const status = url.searchParams.get('status')
