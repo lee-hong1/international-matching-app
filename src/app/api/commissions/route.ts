@@ -125,6 +125,12 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
   }
 
+  const userRl = await checkRateLimit(`commissions:user:${user.id}`, 'general')
+  if (!userRl.allowed) {
+    const r = rateLimitResponse(userRl.resetAt)
+    return NextResponse.json(r.body, { status: r.status, headers: r.headers })
+  }
+
   // 이번 달 첫째 날
   const now = new Date()
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString()

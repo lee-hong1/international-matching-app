@@ -29,6 +29,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Account suspended' }, { status: 403 })
   }
 
+  const userRl = await checkRateLimit(`checkout:user:${user.id}`, 'payment')
+  if (!userRl.allowed) {
+    const r = rateLimitResponse(userRl.resetAt)
+    return NextResponse.json(r.body, { status: r.status, headers: r.headers })
+  }
+
   // 청소년보호법: 결제는 성인 인증 필수
   const { data: agvProfile } = await supabaseService
     .from('profiles')

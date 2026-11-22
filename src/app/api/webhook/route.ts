@@ -165,7 +165,7 @@ async function handlePaymentSucceeded(paymentIntent: Stripe.PaymentIntent) {
 }
 
 async function handlePaymentFailed(paymentIntent: Stripe.PaymentIntent) {
-  console.log('Payment failed:', paymentIntent.id)
+  console.error('[webhook] payment_intent.payment_failed:', paymentIntent.id.substring(0, 12))
 
   // pending 상태인 결제만 failed로 전환 (completed 덮어쓰기 방지)
   const { error } = await supabaseService

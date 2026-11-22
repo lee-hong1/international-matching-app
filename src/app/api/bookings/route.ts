@@ -90,6 +90,12 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
   }
 
+  const getUserRl = await checkRateLimit(`bookings-get:user:${user.id}`, 'general')
+  if (!getUserRl.allowed) {
+    const r = rateLimitResponse(getUserRl.resetAt)
+    return NextResponse.json(r.body, { status: r.status, headers: r.headers })
+  }
+
   // ── 쿼리 파라미터 ─────────────────────────────────────────────────────────
   const url = new URL(req.url)
   const status = url.searchParams.get('status') // 'pending'|'confirmed'|'cancelled'|'completed'
@@ -237,6 +243,12 @@ export async function POST(req: NextRequest) {
 
   if (await isSuspended(user.id)) {
     return NextResponse.json({ error: 'Account suspended' }, { status: 403 })
+  }
+
+  const postUserRl = await checkRateLimit(`bookings-post:user:${user.id}`, 'payment')
+  if (!postUserRl.allowed) {
+    const r = rateLimitResponse(postUserRl.resetAt)
+    return NextResponse.json(r.body, { status: r.status, headers: r.headers })
   }
 
   // ── 성인 인증 필수 (청소년보호법) ────────────────────────────────────────

@@ -22,6 +22,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Account suspended' }, { status: 403 })
   }
 
+  const userRl = await checkRateLimit(`payments-confirm:user:${user.id}`, 'payment')
+  if (!userRl.allowed) {
+    const r = rateLimitResponse(userRl.resetAt)
+    return NextResponse.json(r.body, { status: r.status, headers: r.headers })
+  }
+
   let paymentKey!: string, orderId!: string, amount!: number
   try {
     const body = await request.json()

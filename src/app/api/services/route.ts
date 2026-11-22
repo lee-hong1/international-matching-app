@@ -76,6 +76,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Account suspended' }, { status: 403 })
   }
 
+  const userRl = await checkRateLimit(`services-post:user:${user.id}`, 'general')
+  if (!userRl.allowed) {
+    const r = rateLimitResponse(userRl.resetAt)
+    return NextResponse.json(r.body, { status: r.status, headers: r.headers })
+  }
+
   // ── 입력 파싱 ─────────────────────────────────────────────────────────────
   let body: Record<string, unknown>
   try {

@@ -70,6 +70,12 @@ export async function PATCH(
     return NextResponse.json({ error: 'Account suspended' }, { status: 403 })
   }
 
+  const patchUserRl = await checkRateLimit(`services-id-patch:user:${user.id}`, 'general')
+  if (!patchUserRl.allowed) {
+    const r = rateLimitResponse(patchUserRl.resetAt)
+    return NextResponse.json(r.body, { status: r.status, headers: r.headers })
+  }
+
   // 소유권 확인 (IDOR 방지)
   const { data: existing, error: fetchErr } = await supabaseService
     .from('services')
@@ -179,6 +185,12 @@ export async function DELETE(
 
   if (await isSuspended(user.id)) {
     return NextResponse.json({ error: 'Account suspended' }, { status: 403 })
+  }
+
+  const deleteUserRl = await checkRateLimit(`services-id-delete:user:${user.id}`, 'general')
+  if (!deleteUserRl.allowed) {
+    const r = rateLimitResponse(deleteUserRl.resetAt)
+    return NextResponse.json(r.body, { status: r.status, headers: r.headers })
   }
 
   // 소유권 확인
