@@ -21,6 +21,12 @@ export async function GET(req: NextRequest) {
   const user = await getAuthUser(req)
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
+  const rlUser = await checkRateLimit(`profiles-me:user:${user.id}`, 'general')
+  if (!rlUser.allowed) {
+    const ru = rateLimitResponse(rlUser.resetAt)
+    return NextResponse.json(ru.body, { status: ru.status, headers: ru.headers })
+  }
+
   // birth_date는 애초에 조회 제외 (민감 정보, DB에서 전송 자체 차단)
   const { data, error } = await supabase
     .from('profiles')
@@ -46,6 +52,12 @@ export async function PATCH(req: NextRequest) {
 
   const user = await getAuthUser(req)
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+  const rlPatchUser = await checkRateLimit(`profiles-patch:user:${user.id}`, 'general')
+  if (!rlPatchUser.allowed) {
+    const rpu = rateLimitResponse(rlPatchUser.resetAt)
+    return NextResponse.json(rpu.body, { status: rpu.status, headers: rpu.headers })
+  }
 
   if (await isSuspended(user.id)) {
     return NextResponse.json({ error: 'Account suspended' }, { status: 403 })

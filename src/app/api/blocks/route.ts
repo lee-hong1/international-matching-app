@@ -18,6 +18,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
   }
 
+  const rlUser = await checkRateLimit(`blocks:user:${user.id}`, 'general')
+  if (!rlUser.allowed) {
+    const ru = rateLimitResponse(rlUser.resetAt)
+    return NextResponse.json(ru.body, { status: ru.status, headers: ru.headers })
+  }
+
   if (await isSuspended(user.id)) {
     return NextResponse.json({ error: 'Account suspended' }, { status: 403 })
   }
@@ -71,6 +77,12 @@ export async function GET(req: NextRequest) {
   const user = await getAuthUser(req)
   if (!user) {
     return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
+  }
+
+  const rlGetUser = await checkRateLimit(`blocks-get:user:${user.id}`, 'general')
+  if (!rlGetUser.allowed) {
+    const rgu = rateLimitResponse(rlGetUser.resetAt)
+    return NextResponse.json(rgu.body, { status: rgu.status, headers: rgu.headers })
   }
 
   try {

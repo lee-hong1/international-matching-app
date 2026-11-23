@@ -19,6 +19,12 @@ export async function DELETE(
     return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
   }
 
+  const rlUser = await checkRateLimit(`blocks-delete:user:${user.id}`, 'general')
+  if (!rlUser.allowed) {
+    const ru = rateLimitResponse(rlUser.resetAt)
+    return NextResponse.json(ru.body, { status: ru.status, headers: ru.headers })
+  }
+
   const { id: blockedUserId } = await params
 
   if (!isValidUuid(blockedUserId)) {

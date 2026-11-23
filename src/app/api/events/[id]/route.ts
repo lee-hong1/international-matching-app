@@ -18,6 +18,12 @@ export async function GET(
     return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
   }
 
+  const rlUser = await checkRateLimit(`events-id-get:user:${user.id}`, 'general')
+  if (!rlUser.allowed) {
+    const ru = rateLimitResponse(rlUser.resetAt)
+    return NextResponse.json(ru.body, { status: ru.status, headers: ru.headers })
+  }
+
   const { id } = await params
   if (!isValidUuid(id)) {
     return NextResponse.json({ error: 'Invalid event id' }, { status: 400 })

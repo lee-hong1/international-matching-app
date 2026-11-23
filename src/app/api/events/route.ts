@@ -20,6 +20,12 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
   }
 
+  const rlUser = await checkRateLimit(`events-get:user:${user.id}`, 'general')
+  if (!rlUser.allowed) {
+    const ru = rateLimitResponse(rlUser.resetAt)
+    return NextResponse.json(ru.body, { status: ru.status, headers: ru.headers })
+  }
+
   const { searchParams } = new URL(request.url)
   const eventType = searchParams.get('type')
   const rawLimit = parseInt(searchParams.get('limit') ?? '20', 10)
@@ -69,6 +75,12 @@ export async function POST(request: NextRequest) {
   const user = await getAuthUser(request)
   if (!user) {
     return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
+  }
+
+  const rlPostUser = await checkRateLimit(`events-post:user:${user.id}`, 'general')
+  if (!rlPostUser.allowed) {
+    const rpu = rateLimitResponse(rlPostUser.resetAt)
+    return NextResponse.json(rpu.body, { status: rpu.status, headers: rpu.headers })
   }
 
   if (await isSuspended(user.id)) {
