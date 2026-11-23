@@ -77,6 +77,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
   }
 
+  const postRlUser = await checkRateLimit(`posts-post:user:${user.id}`, 'general')
+  if (!postRlUser.allowed) {
+    const r = rateLimitResponse(postRlUser.resetAt)
+    return NextResponse.json(r.body, { status: r.status, headers: r.headers })
+  }
+
   if (await isSuspended(user.id)) {
     return NextResponse.json({ error: 'Account suspended' }, { status: 403 })
   }

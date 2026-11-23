@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthUser, supabaseService, isValidUuid, hasForbiddenContent } from '@src/lib/commerce'
 import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
+import { detectExternalPlatform } from '@src/lib/chat-safety'
 
 // GET /api/posts/:id — 단건 게시물 조회
 // is_public=true: 비인증도 허용. is_adult 콘텐츠: 인증 + is_adult 프로필 필요.
@@ -86,6 +87,12 @@ export async function PATCH(
     return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
   }
 
+  const rlPatchUser = await checkRateLimit(`posts-patch:user:${user.id}`, 'general')
+  if (!rlPatchUser.allowed) {
+    const r = rateLimitResponse(rlPatchUser.resetAt)
+    return NextResponse.json(r.body, { status: r.status, headers: r.headers })
+  }
+
   const { id } = await params
   if (!id || !isValidUuid(id)) {
     return NextResponse.json({ error: 'Invalid post id' }, { status: 400 })
@@ -125,6 +132,9 @@ export async function PATCH(
     const caption = typeof body.caption === 'string' ? body.caption.slice(0, 2200) : null
     if (caption && hasForbiddenContent(caption)) {
       return NextResponse.json({ error: 'Caption contains prohibited content' }, { status: 400 })
+    }
+    if (caption && detectExternalPlatform(caption)) {
+      return NextResponse.json({ error: 'External platform references are not allowed' }, { status: 400 })
     }
     updates.caption = caption
   }
@@ -170,6 +180,12 @@ export async function DELETE(
   const user = await getAuthUser(req)
   if (!user) {
     return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
+  }
+
+  const rlDeleteUser = await checkRateLimit(`posts-delete:user:${user.id}`, 'general')
+  if (!rlDeleteUser.allowed) {
+    const r = rateLimitResponse(rlDeleteUser.resetAt)
+    return NextResponse.json(r.body, { status: r.status, headers: r.headers })
   }
 
   const { id } = await params
