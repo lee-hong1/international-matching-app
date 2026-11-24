@@ -71,6 +71,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Account suspended' }, { status: 403 })
   }
 
+  const userRl = await checkRateLimit(`sales-events-post:user:${user.id}`, 'general')
+  if (!userRl.allowed) {
+    const r = rateLimitResponse(userRl.resetAt)
+    return NextResponse.json(r.body, { status: r.status, headers: r.headers })
+  }
+
   // 청소년보호법: 판매 이벤트 생성은 성인 인증 필수
   const { data: saleCreatorProfile } = await supabaseService
     .from('profiles').select('is_adult').eq('id', user.id).single()

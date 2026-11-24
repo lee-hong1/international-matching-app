@@ -34,11 +34,16 @@ export async function GET(req: NextRequest) {
     )
   }
 
-  // ── rate limit: payment window(5/min) 재활용 ─────────────────────────────
+  // ── rate limit: IP + user ─────────────────────────────────────────────────
   const ip = req.headers.get('x-forwarded-for')?.split(',')[0].trim() ?? 'unknown'
   const rl = await checkRateLimit(`webrtc-turn:${ip}`, 'payment')
   if (!rl.allowed) {
     const r = rateLimitResponse(rl.resetAt)
+    return NextResponse.json(r.body, { status: r.status, headers: r.headers })
+  }
+  const userRl = await checkRateLimit(`webrtc-turn:user:${user.id}`, 'payment')
+  if (!userRl.allowed) {
+    const r = rateLimitResponse(userRl.resetAt)
     return NextResponse.json(r.body, { status: r.status, headers: r.headers })
   }
 

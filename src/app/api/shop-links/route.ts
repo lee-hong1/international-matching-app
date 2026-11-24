@@ -54,6 +54,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Account suspended' }, { status: 403 })
   }
 
+  const userRl = await checkRateLimit(`shop-links-post:user:${user.id}`, 'general')
+  if (!userRl.allowed) {
+    const r = rateLimitResponse(userRl.resetAt)
+    return NextResponse.json(r.body, { status: r.status, headers: r.headers })
+  }
+
   // 청소년보호법: 쇼핑 링크 등록은 성인 인증 필수
   const { data: hostProfile } = await supabaseService
     .from('profiles').select('is_adult').eq('id', user.id).single()
