@@ -23,6 +23,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
   }
 
+  const rlUser = await checkRateLimit(`analytics-track:user:${user.id}`, 'general')
+  if (!rlUser.allowed) {
+    const r = rateLimitResponse(rlUser.resetAt)
+    return NextResponse.json(r.body, { status: r.status, headers: r.headers })
+  }
+
   try {
     const { activityType, targetUserId, metadata } = await req.json()
 

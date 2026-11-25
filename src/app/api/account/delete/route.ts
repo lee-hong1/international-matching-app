@@ -25,6 +25,12 @@ export async function DELETE(req: NextRequest) {
     return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
   }
 
+  const rlUser = await checkRateLimit(`account-delete:user:${user.id}`, 'payment')
+  if (!rlUser.allowed) {
+    const r = rateLimitResponse(rlUser.resetAt)
+    return NextResponse.json(r.body, { status: r.status, headers: r.headers })
+  }
+
   // ── 0. 활성 예약 차단 ─────────────────────────────────────────────────────
   // pending/confirmed 예약이 있으면 삭제 불가.
   // cascade 삭제 시 환불 없이 예약 기록이 소멸되는 것을 방지.
