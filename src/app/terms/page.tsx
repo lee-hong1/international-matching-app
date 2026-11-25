@@ -112,7 +112,8 @@ const CONTENT = {
 
 export default function TermsPage() {
   const { locale } = useLanguage()
-  const lang = (locale as keyof typeof CONTENT) in CONTENT ? (locale as keyof typeof CONTENT) : 'ko'
+  // 번역 미존재 시 영어로 fallback (한국어 약관을 외국 사용자에게 표시 방지)
+  const lang = (locale as keyof typeof CONTENT) in CONTENT ? (locale as keyof typeof CONTENT) : 'en'
   const content = CONTENT[lang]
 
   return (

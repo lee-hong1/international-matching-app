@@ -133,12 +133,22 @@ const MESSAGES: Messages = {
     en: 'An error occurred.',
     ja: 'エラーが発生しました。',
     zh: '发生了错误。',
+    vi: 'Đã xảy ra lỗi.',
+    th: 'เกิดข้อผิดพลาด',
+    es: 'Ocurrió un error.',
+    id: 'Terjadi kesalahan.',
+    pt: 'Ocorreu um erro.',
   },
   'error.network': {
     ko: '네트워크 오류가 발생했습니다.',
     en: 'Network error occurred.',
     ja: 'ネットワークエラーが発生しました。',
     zh: '网络错误。',
+    vi: 'Lỗi mạng.',
+    th: 'เกิดข้อผิดพลาดทางเครือข่าย',
+    es: 'Error de red.',
+    id: 'Terjadi kesalahan jaringan.',
+    pt: 'Erro de rede.',
   },
   // ── 쇼핑 / 이벤트 ─────────────────────────────────────────────────────
   'shop.buy_now': {
@@ -737,9 +747,9 @@ const MESSAGES: Messages = {
   'feed.loading_more': { ko: '불러오는 중...', en: 'Loading...', ja: '読み込み中...', zh: '加载中...' },
 
   // ── 에러 페이지 ────────────────────────────────────────────────────────────
-  'error.retry': { ko: '다시 시도', en: 'Try Again', ja: '再試行', zh: '重试' },
-  'error.not_found': { ko: '페이지를 찾을 수 없습니다', en: 'Page not found', ja: 'ページが見つかりません', zh: '找不到页面' },
-  'error.go_home': { ko: '홈으로 돌아가기', en: 'Go Home', ja: 'ホームへ戻る', zh: '返回首页' },
+  'error.retry': { ko: '다시 시도', en: 'Try Again', ja: '再試行', zh: '重试', vi: 'Thử lại', th: 'ลองใหม่', es: 'Reintentar', id: 'Coba lagi', pt: 'Tentar novamente' },
+  'error.not_found': { ko: '페이지를 찾을 수 없습니다', en: 'Page not found', ja: 'ページが見つかりません', zh: '找不到页面', vi: 'Không tìm thấy trang', th: 'ไม่พบหน้า', es: 'Página no encontrada', id: 'Halaman tidak ditemukan', pt: 'Página não encontrada' },
+  'error.go_home': { ko: '홈으로 돌아가기', en: 'Go Home', ja: 'ホームへ戻る', zh: '返回首页', vi: 'Về trang chủ', th: 'กลับหน้าหลัก', es: 'Ir al inicio', id: 'Ke beranda', pt: 'Ir para início' },
 
   // ── 서비스 상세 (추가) ──────────────────────────────────────────────────────
   'services.login_to_book': { ko: '로그인 후 예약하기', en: 'Login to Book', ja: 'ログインして予約', zh: '登录后预约' },
@@ -754,11 +764,11 @@ const MESSAGES: Messages = {
   'commission.currency_krw': { ko: '원', en: 'KRW', ja: '韓国ウォン', zh: '韩元' },
 
   // ── 하단 네비게이션 ───────────────────────────────────────────────────────
-  'nav.home': { ko: '홈', en: 'Home', ja: 'ホーム', zh: '首页' },
-  'nav.explore': { ko: '탐색', en: 'Explore', ja: '探索', zh: '探索' },
-  'nav.events': { ko: '모임', en: 'Events', ja: 'イベント', zh: '活动' },
-  'nav.matching': { ko: '매칭', en: 'Match', ja: 'マッチング', zh: '配对' },
-  'nav.profile': { ko: '프로필', en: 'Profile', ja: 'プロフィール', zh: '档案' },
+  'nav.home': { ko: '홈', en: 'Home', ja: 'ホーム', zh: '首页', vi: 'Trang chủ', th: 'หน้าหลัก', es: 'Inicio', id: 'Beranda', pt: 'Início' },
+  'nav.explore': { ko: '탐색', en: 'Explore', ja: '探索', zh: '探索', vi: 'Khám phá', th: 'สำรวจ', es: 'Explorar', id: 'Jelajahi', pt: 'Explorar' },
+  'nav.events': { ko: '모임', en: 'Events', ja: 'イベント', zh: '活动', vi: 'Sự kiện', th: 'กิจกรรม', es: 'Eventos', id: 'Acara', pt: 'Eventos' },
+  'nav.matching': { ko: '매칭', en: 'Match', ja: 'マッチング', zh: '配对', vi: 'Kết đôi', th: 'จับคู่', es: 'Coincidir', id: 'Pasangan', pt: 'Combinar' },
+  'nav.profile': { ko: '프로필', en: 'Profile', ja: 'プロフィール', zh: '档案', vi: 'Hồ sơ', th: 'โปรไฟล์', es: 'Perfil', id: 'Profil', pt: 'Perfil' },
 
   // ── 매칭 페이지 ──────────────────────────────────────────────────────────────
   'matches.title': { ko: '나의 매칭', en: 'My Matches', ja: 'マッチング一覧', zh: '我的配对' },
@@ -837,9 +847,9 @@ const MESSAGES: Messages = {
   'creator.post_detail': { ko: '게시물', en: 'Post', ja: '投稿', zh: '帖子' },
 
   // ── 계정 정지 알림 ────────────────────────────────────────────────────────
-  'suspension.title': { ko: '계정 임시 정지', en: 'Account Suspended', ja: 'アカウント一時停止', zh: '账号已暂停' },
-  'suspension.reason_external': { ko: '외부 플랫폼 유도로 인한 임시 정지입니다.', en: 'Your account has been suspended for directing to external platforms.', ja: '外部プラットフォームへの誘導により一時停止されました。', zh: '由于引导至外部平台，您的账号已被暂停。' },
-  'suspension.warning': { ko: '외부 플랫폼 유도 경고 ({n}회 / 3회)', en: 'External platform warning ({n} of 3)', ja: '外部プラットフォーム誘導警告 ({n}/3)', zh: '外部平台引导警告（{n}/3次）' },
+  'suspension.title': { ko: '계정 임시 정지', en: 'Account Suspended', ja: 'アカウント一時停止', zh: '账号已暂停', vi: 'Tài khoản bị tạm khóa', th: 'บัญชีถูกระงับชั่วคราว', es: 'Cuenta suspendida', id: 'Akun Ditangguhkan', pt: 'Conta suspensa' },
+  'suspension.reason_external': { ko: '외부 플랫폼 유도로 인한 임시 정지입니다.', en: 'Your account has been suspended for directing to external platforms.', ja: '外部プラットフォームへの誘導により一時停止されました。', zh: '由于引导至外部平台，您的账号已被暂停。', vi: 'Tài khoản bị tạm khóa do dẫn hướng đến nền tảng bên ngoài.', th: 'บัญชีถูกระงับเนื่องจากแนะนำให้ใช้แพลตฟอร์มภายนอก', es: 'Cuenta suspendida por dirigir a plataformas externas.', id: 'Akun ditangguhkan karena mengarahkan ke platform eksternal.', pt: 'Conta suspensa por direcionar para plataformas externas.' },
+  'suspension.warning': { ko: '외부 플랫폼 유도 경고 ({n}회 / 3회)', en: 'External platform warning ({n} of 3)', ja: '外部プラットフォーム誘導警告 ({n}/3)', zh: '外部平台引导警告（{n}/3次）', vi: 'Cảnh báo nền tảng ngoài ({n}/3)', th: 'คำเตือนแพลตฟอร์มภายนอก ({n}/3)', es: 'Advertencia de plataforma externa ({n} de 3)', id: 'Peringatan platform eksternal ({n}/3)', pt: 'Aviso de plataforma externa ({n} de 3)' },
 
   // ── 메시지(채팅방 목록) 페이지 ────────────────────────────────────────────
   'messages.title': { ko: '메시지', en: 'Messages', ja: 'メッセージ', zh: '消息' },
@@ -951,15 +961,15 @@ const MESSAGES: Messages = {
   'creator.back_to_feed': { ko: '피드로 돌아가기', en: 'Back to Feed', ja: 'フィードに戻る', zh: '返回动态' },
 
   // ── 결제 실패 ───────────────────────────────────────────────────────────────
-  'payment.cancelled': { ko: '결제가 취소되었습니다', en: 'Payment Cancelled', ja: '決済がキャンセルされました', zh: '支付已取消' },
-  'payment.not_proceeded': { ko: '결제가 진행되지 않았습니다.', en: 'Payment was not completed.', ja: '決済が完了しませんでした。', zh: '支付未完成。' },
-  'payment.back_to_event': { ko: '모임으로 돌아가기', en: 'Back to Event', ja: 'イベントに戻る', zh: '返回活动' },
-  'payment.confirming': { ko: '결제 확인 중...', en: 'Confirming payment...', ja: '決済を確認中...', zh: '正在确认付款...' },
-  'payment.success_title': { ko: '결제 완료', en: 'Payment complete', ja: '決済完了', zh: '付款完成' },
-  'payment.success_desc': { ko: '신청이 승인되었습니다.', en: 'Your application has been approved.', ja: '申請が承認されました。', zh: '您的申请已获批准。' },
-  'payment.failed_title': { ko: '결제 실패', en: 'Payment failed', ja: '決済失敗', zh: '付款失败' },
-  'payment.invalid_info': { ko: '결제 정보가 올바르지 않습니다', en: 'Invalid payment information', ja: '決済情報が正しくありません', zh: '支付信息不正确' },
-  'payment.already_processing': { ko: '결제가 처리 중입니다. 잠시 후 다시 시도해 주세요.', en: 'Payment is being processed. Please try again shortly.', ja: '決済処理中です。しばらく後でもう一度お試しください。', zh: '付款正在处理中，请稍后重试。' },
+  'payment.cancelled': { ko: '결제가 취소되었습니다', en: 'Payment Cancelled', ja: '決済がキャンセルされました', zh: '支付已取消', vi: 'Thanh toán đã bị hủy', th: 'การชำระเงินถูกยกเลิก', es: 'Pago cancelado', id: 'Pembayaran dibatalkan', pt: 'Pagamento cancelado' },
+  'payment.not_proceeded': { ko: '결제가 진행되지 않았습니다.', en: 'Payment was not completed.', ja: '決済が完了しませんでした。', zh: '支付未完成。', vi: 'Thanh toán chưa hoàn tất.', th: 'การชำระเงินไม่สำเร็จ', es: 'El pago no se completó.', id: 'Pembayaran tidak selesai.', pt: 'Pagamento não concluído.' },
+  'payment.back_to_event': { ko: '모임으로 돌아가기', en: 'Back to Event', ja: 'イベントに戻る', zh: '返回活动', vi: 'Quay lại sự kiện', th: 'กลับไปยังกิจกรรม', es: 'Volver al evento', id: 'Kembali ke acara', pt: 'Voltar ao evento' },
+  'payment.confirming': { ko: '결제 확인 중...', en: 'Confirming payment...', ja: '決済を確認中...', zh: '正在确认付款...', vi: 'Đang xác nhận thanh toán...', th: 'กำลังยืนยันการชำระเงิน...', es: 'Confirmando pago...', id: 'Mengkonfirmasi pembayaran...', pt: 'Confirmando pagamento...' },
+  'payment.success_title': { ko: '결제 완료', en: 'Payment complete', ja: '決済完了', zh: '付款完成', vi: 'Thanh toán thành công', th: 'ชำระเงินสำเร็จ', es: 'Pago completado', id: 'Pembayaran berhasil', pt: 'Pagamento concluído' },
+  'payment.success_desc': { ko: '신청이 승인되었습니다.', en: 'Your application has been approved.', ja: '申請が承認されました。', zh: '您的申请已获批准。', vi: 'Đơn của bạn đã được chấp thuận.', th: 'คำขอของคุณได้รับการอนุมัติแล้ว', es: 'Tu solicitud ha sido aprobada.', id: 'Permohonan Anda telah disetujui.', pt: 'Seu pedido foi aprovado.' },
+  'payment.failed_title': { ko: '결제 실패', en: 'Payment failed', ja: '決済失敗', zh: '付款失败', vi: 'Thanh toán thất bại', th: 'การชำระเงินล้มเหลว', es: 'Pago fallido', id: 'Pembayaran gagal', pt: 'Pagamento falhou' },
+  'payment.invalid_info': { ko: '결제 정보가 올바르지 않습니다', en: 'Invalid payment information', ja: '決済情報が正しくありません', zh: '支付信息不正确', vi: 'Thông tin thanh toán không hợp lệ', th: 'ข้อมูลการชำระเงินไม่ถูกต้อง', es: 'Información de pago inválida', id: 'Informasi pembayaran tidak valid', pt: 'Informações de pagamento inválidas' },
+  'payment.already_processing': { ko: '결제가 처리 중입니다. 잠시 후 다시 시도해 주세요.', en: 'Payment is being processed. Please try again shortly.', ja: '決済処理中です。しばらく後でもう一度お試しください。', zh: '付款正在处理中，请稍后重试。', vi: 'Thanh toán đang được xử lý. Vui lòng thử lại sau.', th: 'กำลังประมวลผลการชำระเงิน โปรดลองใหม่อีกครั้ง', es: 'El pago está siendo procesado. Por favor, inténtalo de nuevo pronto.', id: 'Pembayaran sedang diproses. Silakan coba lagi sebentar.', pt: 'O pagamento está sendo processado. Tente novamente em breve.' },
   'event.create.error_title_required': { ko: '제목을 입력해 주세요.', en: 'Title is required.', ja: 'タイトルを入力してください。', zh: '请输入标题。' },
   'event.create.error_datetime_required': { ko: '날짜와 시간을 선택해 주세요.', en: 'Please select a date and time.', ja: '日時を選択してください。', zh: '请选择日期和时间。' },
   'event.create.error_partner_venue_required': { ko: '제휴 매장을 선택해 주세요.', en: 'Please select a partner venue.', ja: '提携店舗を選択してください。', zh: '请选择合作场所。' },

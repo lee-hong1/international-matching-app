@@ -108,6 +108,12 @@ export async function PATCH(
     return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
   }
 
+  const rlUser = await checkRateLimit(`booking-status:user:${user.id}`, 'general')
+  if (!rlUser.allowed) {
+    const r = rateLimitResponse(rlUser.resetAt)
+    return NextResponse.json(r.body, { status: r.status, headers: r.headers })
+  }
+
   // ── UUID 검증 ──────────────────────────────────────────────────────────────
   const { id } = await params
   if (!isValidUuid(id)) {

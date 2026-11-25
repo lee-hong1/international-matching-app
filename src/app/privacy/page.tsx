@@ -81,7 +81,7 @@ const CONTENT = {
 
 export default function PrivacyPage() {
   const { locale } = useLanguage()
-  const lang = (locale as keyof typeof CONTENT) in CONTENT ? (locale as keyof typeof CONTENT) : 'ko'
+  const lang = (locale as keyof typeof CONTENT) in CONTENT ? (locale as keyof typeof CONTENT) : 'en'
   const content = CONTENT[lang]
 
   return (
