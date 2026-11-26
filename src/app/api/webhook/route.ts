@@ -180,7 +180,58 @@ async function handlePaymentFailed(paymentIntent: Stripe.PaymentIntent) {
 }
 
 async function handleSubscriptionCreated(subscription: Stripe.Subscription) {
-  console.log('Subscription created:', subscription.id)
+  // customer.subscription.created fires when a Stripe subscription object is created.
+  // For one-time checkout flows (mode: 'payment'), checkout.session.completed is the
+  // authoritative event and already handles subscription + payment record creation.
+  // This handler guards against recurring-plan Stripe subscriptions (mode: 'subscription')
+  // that are not yet used but ensures the user gets premium status if somehow missed.
+  if (!stripe) return
+
+  const customerId = subscription.customer as string
+  let customer: Stripe.Customer | Stripe.DeletedCustomer
+  try {
+    customer = await stripe.customers.retrieve(customerId)
+  } catch (e) {
+    console.error('[webhook] handleSubscriptionCreated: customer retrieve failed', (e as Error).message)
+    return
+  }
+
+  if (customer.deleted || !customer.metadata?.userId) return
+
+  const userId = customer.metadata.userId
+  if (!isValidUuid(userId)) {
+    console.error('[webhook] handleSubscriptionCreated: invalid userId in metadata')
+    return
+  }
+
+  // Upsert subscription record — idempotent via stripe_subscription_id UNIQUE
+  const startDate = new Date(subscription.start_date * 1000)
+  const endDate = subscription.current_period_end
+    ? new Date(subscription.current_period_end * 1000)
+    : new Date(startDate.getTime() + 30 * 24 * 60 * 60 * 1000) // fallback: +30 days
+
+  const { error } = await supabaseService
+    .from('user_subscriptions')
+    .insert({
+      user_id: userId,
+      stripe_subscription_id: subscription.id,
+      start_date: startDate.toISOString(),
+      end_date: endDate.toISOString(),
+      status: subscription.status === 'active' ? 'active' : 'pending',
+    })
+
+  if (error && error.code !== '23505') {
+    console.error('[webhook] handleSubscriptionCreated insert error:', error.code)
+    return
+  }
+
+  if (!error) {
+    // Only update premium if newly inserted (not a duplicate)
+    await supabaseService
+      .from('profiles')
+      .update({ is_premium: true })
+      .eq('id', userId)
+  }
 }
 
 async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {

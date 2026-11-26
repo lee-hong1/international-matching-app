@@ -178,7 +178,7 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (error || !event) {
-      console.error('[events/POST] insert error:', error?.code)
+      console.error('[events/POST] insert error:', error?.code, error?.message)
       return NextResponse.json({ error: 'Failed to create event' }, { status: 500 })
     }
 

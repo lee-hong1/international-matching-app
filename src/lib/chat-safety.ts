@@ -7,10 +7,14 @@ const EXTERNAL_PLATFORM_PATTERNS: readonly string[] = [
   'meet.google',
   'kakaotalk',
   '카카오톡',
+  '카톡',           // Korean shorthand for KakaoTalk
   'open.kakao.com',
   'line.me',
   'line.naver',
   '라인으로',
+  '라인에서',
+  '라인 아이디',
+  '라인id',
   'wechat',
   '위챗',
   'weixin',
@@ -19,9 +23,25 @@ const EXTERNAL_PLATFORM_PATTERNS: readonly string[] = [
   'telegram',
   't.me/',
   '텔레그램',
+  '텔레 아이디',
+  '텔레id',
+  '텔레에서',
   'skype',
   'discord.gg',
   'discord.com/invite',
+  // Signal
+  'signal.me',
+  'signal.org',
+  // Instagram / Facebook DM 유도
+  'm.me/',
+  'instagram.com/direct',
+  'ig.me/',
+  // Facebook Messenger
+  'messenger.com',
+  'fb.me/',
+  // Viber
+  'viber.com',
+  'chats.viber',
   // 직접 결제 우회 채널 (에스크로 외부 거래 방지)
   'paypal.me',
   'paypal.com/send',
