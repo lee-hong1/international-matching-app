@@ -36,12 +36,12 @@ export async function GET(req: NextRequest) {
 
   // ── rate limit: IP + user ─────────────────────────────────────────────────
   const ip = req.headers.get('x-forwarded-for')?.split(',')[0].trim() ?? 'unknown'
-  const rl = await checkRateLimit(`webrtc-turn:${ip}`, 'payment')
+  const rl = await checkRateLimit(`webrtc-turn:${ip}`, 'general')
   if (!rl.allowed) {
     const r = rateLimitResponse(rl.resetAt)
     return NextResponse.json(r.body, { status: r.status, headers: r.headers })
   }
-  const userRl = await checkRateLimit(`webrtc-turn:user:${user.id}`, 'payment')
+  const userRl = await checkRateLimit(`webrtc-turn:user:${user.id}`, 'general')
   if (!userRl.allowed) {
     const r = rateLimitResponse(userRl.resetAt)
     return NextResponse.json(r.body, { status: r.status, headers: r.headers })

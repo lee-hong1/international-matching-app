@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
   const userId = searchParams.get('userId')
 
   const rawLimit = parseInt(new URL(request.url).searchParams.get('limit') ?? '50', 10)
-  const limit = Math.min(Number.isFinite(rawLimit) && rawLimit > 0 ? rawLimit : 50, 200)
+  const limit = Math.min(Number.isFinite(rawLimit) && rawLimit > 0 ? rawLimit : 50, 50)
 
   let query = supabaseService
     .from('stories')

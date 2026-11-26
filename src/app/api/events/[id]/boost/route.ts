@@ -21,6 +21,12 @@ export async function POST(
   const user = await getAuthUser(request)
   if (!user) return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
 
+  const rlPostUser = await checkRateLimit(`event-boost:user:${user.id}`, 'payment')
+  if (!rlPostUser.allowed) {
+    const r = rateLimitResponse(rlPostUser.resetAt)
+    return NextResponse.json(r.body, { status: r.status, headers: r.headers })
+  }
+
   if (await isSuspended(user.id)) {
     return NextResponse.json({ error: 'Account suspended' }, { status: 403 })
   }
@@ -99,6 +105,12 @@ export async function PATCH(
 
   const user = await getAuthUser(request)
   if (!user) return NextResponse.json({ error: 'Authentication required' }, { status: 401 })
+
+  const rlPatchUser = await checkRateLimit(`event-boost:user:${user.id}`, 'payment')
+  if (!rlPatchUser.allowed) {
+    const r = rateLimitResponse(rlPatchUser.resetAt)
+    return NextResponse.json(r.body, { status: r.status, headers: r.headers })
+  }
 
   if (await isSuspended(user.id)) {
     return NextResponse.json({ error: 'Account suspended' }, { status: 403 })

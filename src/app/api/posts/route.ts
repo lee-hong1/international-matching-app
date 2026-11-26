@@ -42,16 +42,17 @@ export async function GET(request: NextRequest) {
       post_media (id, media_url, media_type, order_index)
     `)
     .eq('is_public', true)
-    .order('created_at', { ascending: false })
     .range(offset, offset + limit - 1)
 
   if (type === 'user' && userId) {
     if (!isValidUuid(userId)) {
       return NextResponse.json({ error: 'Invalid userId' }, { status: 400 })
     }
-    query = query.eq('user_id', userId)
+    query = query.eq('user_id', userId).order('created_at', { ascending: false })
   } else if (type === 'explore') {
     query = query.order('likes_count', { ascending: false })
+  } else {
+    query = query.order('created_at', { ascending: false })
   }
 
   const { data, error } = await query

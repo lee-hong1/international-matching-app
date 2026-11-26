@@ -33,6 +33,12 @@ export async function POST(
     )
   }
 
+  const rlUser = await checkRateLimit(`sales-event-boost:user:${user.id}`, 'payment')
+  if (!rlUser.allowed) {
+    const ru = rateLimitResponse(rlUser.resetAt)
+    return NextResponse.json(ru.body, { status: ru.status, headers: ru.headers })
+  }
+
   // ── Suspension check ───────────────────────────────────────────────────
   if (await isSuspended(user.id)) {
     return NextResponse.json({ error: 'Account suspended' }, { status: 403 })
