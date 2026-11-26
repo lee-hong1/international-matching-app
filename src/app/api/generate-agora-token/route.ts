@@ -9,13 +9,14 @@ import { RtcTokenBuilder, RtcRole } from 'agora-token'
  * https://docs.agora.io/en/video-calling/get-started/authentication-workflow
  *
  * 필요 환경 변수 (서버 전용):
- *   AGORA_APP_ID        — Agora 프로젝트 App ID
+ *   AGORA_APP_ID          — Agora 프로젝트 App ID
  *   AGORA_APP_CERTIFICATE — Agora 프로젝트 App Certificate (비밀)
  *
- * 토큰 TTL: 1시간. 클라이언트는 만료 10분 전 재발급해야 함.
+ * 토큰 TTL: min(잔여 초, 3600). 프리미엄 구독 없거나 잔여 시간 0 → 403.
+ * 토큰 발급 시 video_sessions 레코드 생성 (사용 시간 추적).
  */
 
-const TOKEN_EXPIRY_SEC = 3600 // 1시간 — 정지 계정이 만료된 토큰으로 계속 통화하는 것을 방지
+const MAX_TOKEN_EXPIRY_SEC = 3600 // 최대 1시간
 
 export async function POST(req: NextRequest) {
   const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
@@ -40,12 +41,40 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Account suspended' }, { status: 403 })
   }
 
-  // 청소년보호법: 영상통화는 성인 인증 필수
+  // 청소년보호법: 영상통화는 성인 인증 필수 + 프리미엄 여부 동시 조회
   const { data: callerProfile } = await supabaseService
-    .from('profiles').select('is_adult').eq('id', user.id).single()
+    .from('profiles').select('is_adult, is_premium').eq('id', user.id).single()
   if (!callerProfile?.is_adult) {
     return NextResponse.json(
       { error: 'Age verification required', redirect: '/onboarding/verify-age' },
+      { status: 403 }
+    )
+  }
+
+  // 프리미엄 구독 없으면 영상 통화 불가
+  if (!callerProfile?.is_premium) {
+    return NextResponse.json(
+      { error: 'Premium subscription required', redirect: '/premium' },
+      { status: 403 }
+    )
+  }
+
+  // 만료된 세션 자동 종료 (백그라운드, 실패해도 토큰 발급 계속)
+  supabaseService.rpc('close_stale_video_sessions').then(() => {}).catch(() => {})
+
+  // 이번 달 잔여 초 확인
+  const { data: remainingSeconds, error: rpcErr } = await supabaseService
+    .rpc('get_video_remaining_seconds', { p_user_id: user.id })
+
+  if (rpcErr) {
+    console.error('[agora-token] remaining rpc error:', rpcErr.code, rpcErr.message)
+    return NextResponse.json({ error: 'Failed to check video quota' }, { status: 500 })
+  }
+
+  const remaining = remainingSeconds ?? 0
+  if (remaining <= 0) {
+    return NextResponse.json(
+      { error: 'Monthly video minutes exhausted', redirect: '/premium' },
       { status: 403 }
     )
   }
@@ -101,7 +130,9 @@ export async function POST(req: NextRequest) {
   }
 
 
-  const expiresAt = Math.floor(Date.now() / 1000) + TOKEN_EXPIRY_SEC
+  // TTL = min(잔여 초, 1시간) — 잔여 시간만큼만 Agora가 연결 허용
+  const tokenExpirySec = Math.min(remaining, MAX_TOKEN_EXPIRY_SEC)
+  const expiresAt = Math.floor(Date.now() / 1000) + tokenExpirySec
 
   // uid를 Agora 숫자 UID(0 = string uid mode)로 처리 — Agora SDK는 string uid를 account로 사용
   const token = RtcTokenBuilder.buildTokenWithUserAccount(
@@ -114,5 +145,19 @@ export async function POST(req: NextRequest) {
     expiresAt
   )
 
-  return NextResponse.json({ token, expiresAt, appId })
+  // 세션 추적 레코드 생성 — 실패해도 토큰은 반환 (비결제 경로이므로 non-blocking)
+  const billingMonth = new Date().toISOString().slice(0, 10).slice(0, 7) + '-01'
+  let sessionId: string | null = null
+  const { data: sessionRow } = await supabaseService
+    .from('video_sessions')
+    .insert({
+      user_id: user.id,
+      room_id: roomId,
+      billing_month: billingMonth,
+    })
+    .select('id')
+    .single()
+  if (sessionRow) sessionId = sessionRow.id
+
+  return NextResponse.json({ token, expiresAt, appId, sessionId, remainingSeconds: remaining })
 }

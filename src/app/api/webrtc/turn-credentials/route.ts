@@ -24,12 +24,18 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Account suspended' }, { status: 403 })
   }
 
-  // 청소년보호법: 영상통화 TURN 크리덴셜은 성인 인증 필수
+  // 청소년보호법: 영상통화 TURN 크리덴셜은 성인 인증 필수 + 프리미엄 필수
   const { data: turnUserProfile } = await supabaseService
-    .from('profiles').select('is_adult').eq('id', user.id).single()
+    .from('profiles').select('is_adult, is_premium').eq('id', user.id).single()
   if (!turnUserProfile?.is_adult) {
     return NextResponse.json(
       { error: 'Age verification required', redirect: '/onboarding/verify-age' },
+      { status: 403 }
+    )
+  }
+  if (!turnUserProfile?.is_premium) {
+    return NextResponse.json(
+      { error: 'Premium subscription required', redirect: '/premium' },
       { status: 403 }
     )
   }
