@@ -206,8 +206,10 @@ async function handleSubscriptionCreated(subscription: Stripe.Subscription) {
 
   // Upsert subscription record — idempotent via stripe_subscription_id UNIQUE
   const startDate = new Date(subscription.start_date * 1000)
-  const endDate = subscription.current_period_end
-    ? new Date(subscription.current_period_end * 1000)
+  // current_period_end was removed in Stripe API 2025-07-30.basil; use billing_cycle_anchor as next period boundary
+  const periodEnd = (subscription as unknown as Record<string, unknown>).current_period_end as number | undefined
+  const endDate = periodEnd
+    ? new Date(periodEnd * 1000)
     : new Date(startDate.getTime() + 30 * 24 * 60 * 60 * 1000) // fallback: +30 days
 
   const { error } = await supabaseService
