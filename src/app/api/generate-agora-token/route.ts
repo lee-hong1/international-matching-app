@@ -59,26 +59,6 @@ export async function POST(req: NextRequest) {
     )
   }
 
-  // 만료된 세션 자동 종료 (백그라운드, 실패해도 토큰 발급 계속)
-  supabaseService.rpc('close_stale_video_sessions').then(() => {}).catch(() => {})
-
-  // 이번 달 잔여 초 확인
-  const { data: remainingSeconds, error: rpcErr } = await supabaseService
-    .rpc('get_video_remaining_seconds', { p_user_id: user.id })
-
-  if (rpcErr) {
-    console.error('[agora-token] remaining rpc error:', rpcErr.code, rpcErr.message)
-    return NextResponse.json({ error: 'Failed to check video quota' }, { status: 500 })
-  }
-
-  const remaining = remainingSeconds ?? 0
-  if (remaining <= 0) {
-    return NextResponse.json(
-      { error: 'Monthly video minutes exhausted', redirect: '/premium' },
-      { status: 403 }
-    )
-  }
-
   const appId = process.env.AGORA_APP_ID
   const appCertificate = process.env.AGORA_APP_CERTIFICATE
   if (!appId || !appCertificate) {
@@ -98,7 +78,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'roomId must be a valid UUID' }, { status: 400 })
   }
 
-  // 사용자가 해당 채팅방의 참여자인지 검증 (IDOR 방지)
+  // 사용자가 해당 채팅방의 참여자인지 검증 + partner_id 추출 (IDOR 방지)
+  let partnerId: string | null = null
   {
     const { data: room } = await supabaseService
       .from('chat_rooms')
@@ -114,7 +95,10 @@ export async function POST(req: NextRequest) {
       room.user_id === user.id ||
       room.host_id === user.id
 
-    if (!isParticipant && room.match_id) {
+    if (isParticipant) {
+      // partner는 채팅방의 상대방
+      partnerId = room.user_id === user.id ? room.host_id : room.user_id
+    } else if (room.match_id) {
       const { data: match } = await supabaseService
         .from('matches')
         .select('user1_id, user2_id')
@@ -124,11 +108,36 @@ export async function POST(req: NextRequest) {
       if (!isMatchParticipant) {
         return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
       }
-    } else if (!isParticipant) {
+      partnerId = match?.user1_id === user.id ? (match?.user2_id ?? null) : (match?.user1_id ?? null)
+    } else {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
   }
 
+  // 원자적 quota claim + 세션 생성 (advisory lock으로 race condition 방지)
+  // claim_video_session: quota check + INSERT를 단일 트랜잭션 내에서 직렬 실행
+  const { data: claimRows, error: claimErr } = await supabaseService
+    .rpc('claim_video_session', {
+      p_user_id:   user.id,
+      p_room_id:   roomId,
+      p_partner_id: partnerId,
+    })
+
+  if (claimErr) {
+    console.error('[agora-token] claim rpc error:', claimErr.code, claimErr.message)
+    return NextResponse.json({ error: 'Failed to reserve video quota' }, { status: 500 })
+  }
+
+  const claim = Array.isArray(claimRows) ? claimRows[0] : claimRows
+  const remaining: number = claim?.remaining_seconds ?? 0
+  const sessionId: string | null = claim?.session_id ?? null
+
+  if (remaining <= 0) {
+    return NextResponse.json(
+      { error: 'Monthly video minutes exhausted', redirect: '/premium' },
+      { status: 403 }
+    )
+  }
 
   // TTL = min(잔여 초, 1시간) — 잔여 시간만큼만 Agora가 연결 허용
   const tokenExpirySec = Math.min(remaining, MAX_TOKEN_EXPIRY_SEC)
@@ -144,20 +153,6 @@ export async function POST(req: NextRequest) {
     expiresAt,
     expiresAt
   )
-
-  // 세션 추적 레코드 생성 — 실패해도 토큰은 반환 (비결제 경로이므로 non-blocking)
-  const billingMonth = new Date().toISOString().slice(0, 10).slice(0, 7) + '-01'
-  let sessionId: string | null = null
-  const { data: sessionRow } = await supabaseService
-    .from('video_sessions')
-    .insert({
-      user_id: user.id,
-      room_id: roomId,
-      billing_month: billingMonth,
-    })
-    .select('id')
-    .single()
-  if (sessionRow) sessionId = sessionRow.id
 
   return NextResponse.json({ token, expiresAt, appId, sessionId, remainingSeconds: remaining })
 }
