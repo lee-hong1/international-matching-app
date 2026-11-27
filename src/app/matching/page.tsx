@@ -49,6 +49,20 @@ const HOW_TITLE: Record<string, string> = {
   en: 'How Matching Works',
   ja: 'マッチングの仕組み',
   zh: '配对方式',
+  vi: 'Cách Ghép Đôi',
+  th: 'วิธีการจับคู่',
+  es: 'Cómo Funciona el Match',
+  id: 'Cara Kerja Pencocokan',
+  pt: 'Como Funciona o Match',
+}
+
+function renderWithBold(text: string) {
+  const parts = text.split(/(<strong>.*?<\/strong>)/g)
+  return parts.map((part, i) => {
+    const inner = part.match(/^<strong>(.*)<\/strong>$/)
+    if (inner) return <strong key={i}>{inner[1]}</strong>
+    return <span key={i}>{part}</span>
+  })
 }
 
 export default function MatchingPage() {
@@ -83,7 +97,7 @@ export default function MatchingPage() {
             {howSteps.map((step, i) => (
               <li key={i} className="flex gap-3">
                 <span className="text-purple-600 font-bold">{i + 1}.</span>
-                <span dangerouslySetInnerHTML={{ __html: step[lang] ?? step['en'] }} />
+                {renderWithBold(step[lang] ?? step['en'] ?? '')}
               </li>
             ))}
           </ol>

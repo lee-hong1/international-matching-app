@@ -10,6 +10,23 @@ function getStripe(): Stripe {
   return new Stripe(key, { apiVersion: '2025-07-30.basil' })
 }
 
+type Plan = { id: string; name: string; price: number; duration_months: number; price_jpy: number | null; price_cny: string | null }
+
+function getCurrencyConfig(country: string | null, plan: Plan) {
+  const c = (country ?? '').toUpperCase()
+  if (c === 'JP' && plan.price_jpy) {
+    return { currency: 'jpy', amount: plan.price_jpy, paymentMethods: ['card'] as string[] }
+  }
+  if (c === 'CN' && plan.price_cny) {
+    return {
+      currency: 'cny',
+      amount: Math.round(Number(plan.price_cny) * 100),
+      paymentMethods: ['card', 'alipay', 'wechat_pay'] as string[],
+    }
+  }
+  return { currency: 'krw', amount: Math.round(Number(plan.price)), paymentMethods: ['card'] as string[] }
+}
+
 export async function POST(req: NextRequest) {
   // Rate limit — 결제 세션 생성 (payment 티어: 5/min)
   const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
@@ -65,10 +82,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid planId' }, { status: 400 })
     }
 
-    // 사용자 정보 확인 (service role — 본인 email 조회)
+    // 사용자 정보 확인 (service role — 본인 email 조회, country로 통화 결정)
     const { data: profile, error: profileErr } = await supabaseService
       .from('profiles')
-      .select('email, display_name')
+      .select('email, display_name, country')
       .eq('id', user.id)
       .single()
 
@@ -76,10 +93,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'User profile not found' }, { status: 404 })
     }
 
-    // 구독 플랜 정보 가져오기
+    // 구독 플랜 정보 가져오기 (다국어 가격 포함)
     const { data: plan, error: planError } = await supabaseService
       .from('subscription_plans')
-      .select('id, name, price, duration_months')
+      .select('id, name, price, duration_months, price_jpy, price_cny')
       .eq('id', planId)
       .single()
 
@@ -109,18 +126,24 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Site URL not configured' }, { status: 503 })
     }
 
+    // 국가 기반 통화·결제 수단 선택 (JP→JPY, CN→CNY+Alipay/WeChat, 기본→KRW)
+    const { currency, amount, paymentMethods } = getCurrencyConfig(
+      (profile as any).country ?? null,
+      plan as Plan
+    )
+
     // 결제 세션 생성 — userId는 JWT 기반 user.id 사용
     const session = await stripe.checkout.sessions.create({
       customer: customer.id,
-      payment_method_types: ['card'],
+      payment_method_types: paymentMethods as Stripe.Checkout.SessionCreateParams.PaymentMethodType[],
       line_items: [{
         price_data: {
-          currency: 'krw',
+          currency,
           product_data: {
             name: plan.name,
             description: `${plan.duration_months}개월 구독`,
           },
-          unit_amount: Math.round(Number(plan.price)),
+          unit_amount: amount,
         },
         quantity: 1,
       }],
