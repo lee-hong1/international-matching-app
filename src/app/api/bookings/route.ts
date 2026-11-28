@@ -390,7 +390,16 @@ export async function POST(req: NextRequest) {
       .single()
     if (svc) {
       serviceAmount = Number(svc.price)
-      serviceCurrency = svc.currency ?? 'KRW'
+      if (svc.currency) {
+        serviceCurrency = svc.currency
+      } else {
+        // Service has no currency set — derive from host's country to avoid silently
+        // billing non-Korean users in KRW
+        const { data: hostProfile } = await supabaseService
+          .from('profiles').select('country').eq('id', host_id).single()
+        const hc = (hostProfile?.country ?? '').toUpperCase()
+        serviceCurrency = hc === 'JP' ? 'JPY' : hc === 'CN' ? 'CNY' : 'KRW'
+      }
     }
   }
 

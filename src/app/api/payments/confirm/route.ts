@@ -182,7 +182,7 @@ export async function POST(request: NextRequest) {
     // 수수료 정산 원장 기록
     const ledgerEntries: any[] = [
       { payment_id: paymentRecord.id, recipient_type: 'platform', recipient_id: null, amount: breakdown.platformFeeAmount },
-      { payment_id: paymentRecord.id, recipient_type: 'host', recipient_id: event.host_id, amount: breakdown.hostPayoutAmount },
+      { payment_id: paymentRecord.id, recipient_type: 'host', recipient_id: event?.host_id ?? null, amount: breakdown.hostPayoutAmount },
     ]
     if (event?.venue_type === 'partner' && event.venue_id) {
       ledgerEntries.push({
