@@ -1,4 +1,5 @@
 import { supabase } from './supabase'
+import { supabaseService } from '@src/lib/commerce'
 
 export interface PhotoAnalysis {
   isValid: boolean
@@ -178,7 +179,8 @@ class PhotoVerificationService {
     try {
       // 실제 구현에서는 이미지 해싱 및 유사도 검사
       // 현재는 목업으로 구현
-      const { data: existingPhotos } = await supabase
+      // service_role로 중복 검사 (다른 사용자 사진 해시 비교 — 개인 식별 불가)
+      const { data: existingPhotos } = await supabaseService
         .from('user_photos')
         .select('photo_url')
         .neq('user_id', userId)
@@ -289,30 +291,33 @@ class PhotoVerificationService {
     return reasons.length > 0 ? reasons : ['검증 기준을 충족하지 않습니다']
   }
 
-  // 사진 검증 결과 저장
+  // 사진 검증 결과 저장 — /api/photo-verifications POST 경유 (N+51 RLS)
   async saveVerificationResult(
     userId: string,
     photoUrl: string,
     result: VerificationResult
   ) {
     try {
-      const { error } = await supabase
-        .from('photo_verifications')
-        .insert({
+      const serviceKey = typeof process !== 'undefined' ? process.env.SUPABASE_SERVICE_ROLE_KEY : undefined
+      if (!serviceKey) return
+
+      const res = await fetch('/api/photo-verifications', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-service-key': serviceKey },
+        body: JSON.stringify({
           user_id: userId,
           photo_url: photoUrl,
           is_approved: result.approved,
           verification_score: result.score,
           rejection_reasons: result.reasons,
           analysis_data: result.analysis,
-          verified_at: new Date().toISOString()
-        })
-
-      if (error) {
-        console.error('Error saving verification result:', error)
+        }),
+      })
+      if (!res.ok) {
+        console.error('Error saving verification result:', res.status)
       }
-    } catch (error) {
-      console.error('Error saving verification result:', error)
+    } catch {
+      // fail silently — verification result save failure does not block user
     }
   }
 

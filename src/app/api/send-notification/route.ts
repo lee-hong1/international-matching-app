@@ -1,36 +1,72 @@
+import { timingSafeEqual } from 'crypto'
 import { NextRequest, NextResponse } from 'next/server'
-import { supabase } from '@/lib/supabase'
+import { supabaseService, isValidUuid } from '@src/lib/commerce'
+import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
 
-// Firebase Admin SDK (서버 사이드)
-import { initializeApp, getApps, cert } from 'firebase-admin/app'
-import { getMessaging } from 'firebase-admin/messaging'
+type NotificationData = Record<string, string>
 
-// Firebase Admin 초기화
-if (getApps().length === 0) {
+function sanitizeData(raw: Record<string, unknown>): NotificationData {
+  return Object.fromEntries(
+    Object.entries(raw).map(([k, v]) => [k, String(v)])
+  )
+}
+
+let firebaseInitialized = false
+
+async function getFirebaseMessaging() {
+  if (!process.env.FIREBASE_PROJECT_ID) return null
   try {
-    initializeApp({
-      credential: cert({
+    const { initializeApp, getApps, cert } = await import('firebase-admin/app')
+    const { getMessaging } = await import('firebase-admin/messaging')
+    if (!firebaseInitialized && getApps().length === 0) {
+      initializeApp({
+        credential: cert({
+          projectId: process.env.FIREBASE_PROJECT_ID,
+          clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+          privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+        }),
         projectId: process.env.FIREBASE_PROJECT_ID,
-        clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-        privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n')
-      }),
-      projectId: process.env.FIREBASE_PROJECT_ID
-    })
+      })
+      firebaseInitialized = true
+    }
+    return getMessaging()
   } catch (error) {
     console.error('Firebase Admin initialization error:', error)
+    return null
   }
 }
 
 export async function POST(req: NextRequest) {
-  try {
-    const { userId, payload } = await req.json()
+  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
+  const rl = await checkRateLimit(`send-notification:${ip}`, 'general')
+  if (!rl.allowed) {
+    const r = rateLimitResponse(rl.resetAt)
+    return NextResponse.json(r.body, { status: r.status, headers: r.headers })
+  }
 
-    if (!userId || !payload) {
-      return NextResponse.json({ error: 'Missing required parameters' }, { status: 400 })
+  // 내부 서버→서버 전용: x-service-key 필수
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY ?? ''
+  const provided = req.headers.get('x-service-key')
+  const bufA = Buffer.from(provided ?? '')
+  const bufB = Buffer.from(serviceKey)
+  if (!provided || bufA.length !== bufB.length || !timingSafeEqual(bufA, bufB)) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  try {
+    const body = await req.json()
+    // 호출 측이 userId 또는 user_id 모두 허용
+    const userId: string = body.userId ?? body.user_id ?? ''
+    const payload = body.payload ?? { title: body.title, body: body.body, data: body.data }
+
+    if (!userId || !isValidUuid(userId)) {
+      return NextResponse.json({ error: 'Valid userId required' }, { status: 400 })
+    }
+    if (!payload?.title) {
+      return NextResponse.json({ error: 'payload.title required' }, { status: 400 })
     }
 
-    // 사용자의 디바이스 토큰들 가져오기
-    const { data: tokens, error } = await supabase
+    const { data: tokens, error } = await supabaseService
       .from('device_tokens')
       .select('token, device_type')
       .eq('user_id', userId)
@@ -44,70 +80,77 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: 'No device tokens found' })
     }
 
-    // Firebase Admin SDK를 통해 푸시 알림 전송
-    const messaging = getMessaging()
-    const results = []
+    const messaging = await getFirebaseMessaging()
+    if (!messaging) {
+      return NextResponse.json({ message: 'Push notifications not configured' })
+    }
 
-    for (const tokenData of tokens) {
-      try {
-        const message = {
-          token: tokenData.token,
-          notification: {
-            title: payload.title,
-            body: payload.body
-          },
-          data: payload.data ? JSON.stringify(payload.data) : undefined,
-          webpush: tokenData.device_type === 'web' ? {
-            notification: {
-              title: payload.title,
-              body: payload.body,
-              icon: '/icon-192x192.png',
-              badge: '/icon-192x192.png',
-              tag: 'globalmatch',
-              requireInteraction: false,
-              actions: [
-                {
-                  action: 'open',
-                  title: '열기'
-                }
-              ]
+    const webTokens = tokens.filter((t) => t.device_type === 'web').map((t) => t.token)
+    const nativeTokens = tokens.filter((t) => t.device_type !== 'web').map((t) => t.token)
+    const staleTokens: string[] = []
+    let successCount = 0
+    let errorCount = 0
+
+    const BATCH_SIZE = 500
+
+    async function sendBatch(batchTokens: string[], isWeb: boolean) {
+      for (let i = 0; i < batchTokens.length; i += BATCH_SIZE) {
+        const batch = batchTokens.slice(i, i + BATCH_SIZE)
+        const multicastMessage = {
+          tokens: batch,
+          notification: { title: payload.title, body: payload.body },
+          data: payload.data ? sanitizeData(payload.data as Record<string, unknown>) : undefined,
+          ...(isWeb ? {
+            webpush: {
+              notification: {
+                title: payload.title,
+                body: payload.body,
+                icon: '/icon-192x192.png',
+                badge: '/icon-192x192.png',
+                tag: 'globalmatch',
+                requireInteraction: false,
+                actions: [{ action: 'open', title: 'Open' }],
+              },
+              fcmOptions: { link: process.env.NEXT_PUBLIC_APP_URL ?? 'https://globalmatch.app' },
             },
-            fcmOptions: {
-              link: process.env.NEXT_PUBLIC_APP_URL || 'https://globalmatch.app'
+          } : {}),
+        }
+
+        const result = await messaging!.sendEachForMulticast(multicastMessage)
+        successCount += result.successCount
+        errorCount += result.failureCount
+
+        result.responses.forEach((resp: { success: boolean; error?: { code: string } }, idx: number) => {
+          if (!resp.success && resp.error) {
+            const code = resp.error.code
+            if (
+              code === 'messaging/registration-token-not-registered' ||
+              code === 'messaging/invalid-registration-token'
+            ) {
+              staleTokens.push(batch[idx])
             }
-          } : undefined
-        }
-
-        const result = await messaging.send(message)
-        results.push({ token: tokenData.token, success: true, messageId: result })
-      } catch (error: any) {
-        console.error('Error sending notification to token:', tokenData.token, error)
-        
-        // 토큰이 유효하지 않은 경우 삭제
-        if (error.code === 'messaging/registration-token-not-registered' || 
-            error.code === 'messaging/invalid-registration-token') {
-          await supabase
-            .from('device_tokens')
-            .delete()
-            .eq('token', tokenData.token)
-        }
-
-        results.push({ token: tokenData.token, success: false, error: error.message })
+          }
+        })
       }
     }
 
-    return NextResponse.json({ 
-      message: 'Notification send completed',
-      results,
-      successCount: results.filter(r => r.success).length,
-      errorCount: results.filter(r => !r.success).length
-    })
+    await Promise.all([
+      webTokens.length > 0 ? sendBatch(webTokens, true) : Promise.resolve(),
+      nativeTokens.length > 0 ? sendBatch(nativeTokens, false) : Promise.resolve(),
+    ])
 
-  } catch (error: any) {
-    console.error('Send notification error:', error)
-    return NextResponse.json(
-      { error: error.message || 'Internal server error' },
-      { status: 500 }
-    )
+    if (staleTokens.length > 0) {
+      await supabaseService.from('device_tokens').delete().in('token', staleTokens)
+    }
+
+    return NextResponse.json({
+      message: 'Notification send completed',
+      successCount,
+      errorCount,
+      staleRemoved: staleTokens.length,
+    })
+  } catch (error: unknown) {
+    console.error('Send notification error:', (error as Error).message)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

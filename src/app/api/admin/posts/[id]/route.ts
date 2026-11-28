@@ -1,0 +1,111 @@
+import { createHash } from 'crypto'
+import { NextRequest, NextResponse } from 'next/server'
+import { supabaseService, getAuthUser, isValidUuid } from '@src/lib/commerce'
+import { checkRateLimit, rateLimitResponse } from '@src/lib/ratelimit'
+
+function isAdmin(email: string): boolean {
+  const adminEmails = (process.env.ADMIN_EMAILS ?? '')
+    .split(',').map((e) => e.trim().toLowerCase()).filter(Boolean)
+  return adminEmails.length > 0 && adminEmails.includes(email.toLowerCase())
+}
+
+async function getAdminUser(req: NextRequest) {
+  const user = await getAuthUser(req)
+  if (!user?.email || !isAdmin(user.email)) return null
+  return user
+}
+
+export async function PATCH(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
+  const rl = await checkRateLimit(`admin-patch-post:${ip}`, 'general')
+  if (!rl.allowed) {
+    const r = rateLimitResponse(rl.resetAt)
+    return NextResponse.json(r.body, { status: r.status, headers: r.headers })
+  }
+
+  const adminUser = await getAdminUser(req)
+  if (!adminUser) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+  const { id } = await params
+  if (!id || !isValidUuid(id)) {
+    return NextResponse.json({ error: 'Invalid post id' }, { status: 400 })
+  }
+
+  let body: { is_public?: boolean }
+  try { body = await req.json() } catch {
+    return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 })
+  }
+
+  if (typeof body.is_public !== 'boolean') {
+    return NextResponse.json({ error: 'is_public must be boolean' }, { status: 400 })
+  }
+
+  try {
+    const { error } = await supabaseService.from('posts').update({ is_public: body.is_public }).eq('id', id)
+    if (error) return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+
+    void (async () => {
+      try {
+        const adminKeyHash = 'email:' + createHash('sha256').update(adminUser.id).digest('hex').substring(0, 16)
+        await supabaseService.from('admin_actions').insert({
+          admin_key_hash: adminKeyHash,
+          target_user_id: id,
+          action: `post-visibility:${body.is_public}`,
+          reason: `Admin set post is_public=${body.is_public}`,
+        })
+      } catch (e) {
+        console.error('[admin/posts/[id] PATCH] audit log error:', (e as Error).message)
+      }
+    })()
+
+    return NextResponse.json({ success: true })
+  } catch {
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  }
+}
+
+export async function DELETE(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
+  const rl = await checkRateLimit(`admin-delete-post:${ip}`, 'general')
+  if (!rl.allowed) {
+    const r = rateLimitResponse(rl.resetAt)
+    return NextResponse.json(r.body, { status: r.status, headers: r.headers })
+  }
+
+  const adminUser = await getAdminUser(req)
+  if (!adminUser) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+  const { id } = await params
+  if (!id || !isValidUuid(id)) {
+    return NextResponse.json({ error: 'Invalid post id' }, { status: 400 })
+  }
+
+  try {
+    const { error } = await supabaseService.from('posts').delete().eq('id', id)
+    if (error) return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+
+    void (async () => {
+      try {
+        const adminKeyHash = 'email:' + createHash('sha256').update(adminUser.id).digest('hex').substring(0, 16)
+        await supabaseService.from('admin_actions').insert({
+          admin_key_hash: adminKeyHash,
+          target_user_id: id,
+          action: 'post-delete',
+          reason: 'Admin deleted post',
+        })
+      } catch (e) {
+        console.error('[admin/posts/[id] DELETE] audit log error:', (e as Error).message)
+      }
+    })()
+
+    return NextResponse.json({ success: true })
+  } catch {
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  }
+}
